@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@500;900&family=Cormorant+SC:wght@500;700&family=Bricolage+Grotesque:wght@400;700;800&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E4DA;font-family:'Bricolage Grotesque',sans-serif;color:#1E1A17}a{color:#C8261E}a:hover{color:#8E1B16}</style>
+</helmet>
+
+<section style="padding:64px 72px 24px;max-width:1500px">
+  <div style="font-family:'Noto Serif SC',serif;font-weight:900;font-size:44px;letter-spacing:2px">《谁杀了客人？》 Asset Set · Comic</div>
+  <div style="margin-top:12px;font-size:18px;max-width:880px;line-height:1.5;text-wrap:pretty">All game assets in the comic flat style: 20 cards, card back, 6 tokens, board and the online deduction sheet.</div>
+  <div style="display:flex;gap:16px;margin-top:28px;flex-wrap:wrap">
+    <div style="display:flex;gap:12px;align-items:center;background:#FFF7EC;padding:14px 18px;border-radius:4px;border:2px solid #1B1B1B"><div style="display:flex;gap:4px"><div style="width:22px;height:22px;background:#E8483B"></div><div style="width:22px;height:22px;background:#FF9A3C"></div><div style="width:22px;height:22px;background:#2FA37C"></div><div style="width:22px;height:22px;background:#FFD54A"></div></div><div><div style="font-weight:800">C · Comic flat 漫画</div><div style="font-size:13px">Thick ink outlines, bright flat fills, offset shadows</div></div></div>
+  </div>
+</section>
+
+<!-- 1 LOGO -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px">01 · Logo / Title</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap">
+    
+    
+    <div id="1c" style="position:relative;width:420px;height:260px;background:#FFD54A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:3px solid #1B1B1B">
+      <div style="position:absolute;top:10px;left:10px;font-size:12px;font-weight:800;background:#1B1B1B;color:#fff;padding:3px 8px">1c</div>
+      <div style="font-family:'ZCOOL KuaiLe',sans-serif;font-size:70px;color:#E8483B;line-height:1;-webkit-text-stroke:2px #1B1B1B;text-shadow:5px 5px 0 #1B1B1B">谁杀了客人？</div>
+      <div style="background:#fff;border:3px solid #1B1B1B;box-shadow:4px 4px 0 #1B1B1B;border-radius:30px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:22px;padding:4px 18px">Who Killed the Guest?!</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 SUSPECTS -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">02 · Suspect cards</div>
+  <div style="font-size:15px;margin-bottom:18px;max-width:820px">6 playable suspects. The guest (客人) is the victim and is shown separately; he is not shuffled into the deck.</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap"><sc-for list="{{ suspects }}" as="c" hint-placeholder-count="6">
+      <div style="position:relative;flex-shrink:0;width:252px;height:352px;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;box-shadow:6px 6px 0 #1B1B1B;display:flex;flex-direction:column;overflow:hidden;font-family:'Fredoka',sans-serif;color:#1B1B1B;box-sizing:border-box">
+        <div style="position:relative;height:208px;flex-shrink:0;border-bottom:3px solid #1B1B1B;overflow:hidden">{{ c.art }}
+          <div style="position:absolute;top:8px;left:8px;font-weight:700;font-size:11px;background:#1B1B1B;color:#fff;border-radius:10px;padding:2px 8px">{{ c.kind }}</div>
+          <div style="position:absolute;top:8px;right:8px;font-weight:700;font-size:12px;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:1px 8px">{{ c.id }}</div>
+        </div>
+        <div style="padding:10px 14px 12px;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0">
+          <div style="display:flex;align-items:baseline;gap:0 8px;flex-wrap:wrap"><div style="font-family:'ZCOOL KuaiLe';font-size:34px;line-height:1">{{ c.cn }}</div><div style="font-weight:700;font-size:16px">{{ c.en }}</div></div>
+          <div style="font-size:12.5px;font-weight:500;line-height:1.3;text-wrap:pretty">{{ c.line }}</div>
+          <sc-if value="{{ c.hasQuote }}" hint-placeholder-val="{{ true }}"><div style="margin-top:auto;align-self:flex-start;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:3px 8px;font-size:13px;font-weight:700">{{ c.quote }}</div></sc-if>
+        </div>
+      </div>
+    </sc-for></div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap;margin-top:32px;align-items:center"><sc-for list="{{ victim }}" as="c" hint-placeholder-count="6">
+      <div style="position:relative;flex-shrink:0;width:252px;height:352px;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;box-shadow:6px 6px 0 #1B1B1B;display:flex;flex-direction:column;overflow:hidden;font-family:'Fredoka',sans-serif;color:#1B1B1B;box-sizing:border-box">
+        <div style="position:relative;height:208px;flex-shrink:0;border-bottom:3px solid #1B1B1B;overflow:hidden">{{ c.art }}
+          <div style="position:absolute;top:8px;left:8px;font-weight:700;font-size:11px;background:#1B1B1B;color:#fff;border-radius:10px;padding:2px 8px">{{ c.kind }}</div>
+          <div style="position:absolute;top:8px;right:8px;font-weight:700;font-size:12px;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:1px 8px">{{ c.id }}</div>
+        </div>
+        <div style="padding:10px 14px 12px;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0">
+          <div style="display:flex;align-items:baseline;gap:0 8px;flex-wrap:wrap"><div style="font-family:'ZCOOL KuaiLe';font-size:34px;line-height:1">{{ c.cn }}</div><div style="font-weight:700;font-size:16px">{{ c.en }}</div></div>
+          <div style="font-size:12.5px;font-weight:500;line-height:1.3;text-wrap:pretty">{{ c.line }}</div>
+          <sc-if value="{{ c.hasQuote }}" hint-placeholder-val="{{ true }}"><div style="margin-top:auto;align-self:flex-start;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:3px 8px;font-size:13px;font-weight:700">{{ c.quote }}</div></sc-if>
+        </div>
+      </div>
+    </sc-for><div style="font-family:'Fredoka';font-size:15px;max-width:280px;line-height:1.45">Victim card: used in the intro / case file, not in the deck.</div></div>
+</section>
+<!-- 3 ROOMS -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">03 · Location cards</div>
+  <div style="font-size:15px;margin-bottom:18px;max-width:820px">8 rooms, matching the board.</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap"><sc-for list="{{ rooms }}" as="c" hint-placeholder-count="6">
+      <div style="position:relative;flex-shrink:0;width:252px;height:352px;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;box-shadow:6px 6px 0 #1B1B1B;display:flex;flex-direction:column;overflow:hidden;font-family:'Fredoka',sans-serif;color:#1B1B1B;box-sizing:border-box">
+        <div style="position:relative;height:208px;flex-shrink:0;border-bottom:3px solid #1B1B1B;overflow:hidden">{{ c.art }}
+          <div style="position:absolute;top:8px;left:8px;font-weight:700;font-size:11px;background:#1B1B1B;color:#fff;border-radius:10px;padding:2px 8px">{{ c.kind }}</div>
+          <div style="position:absolute;top:8px;right:8px;font-weight:700;font-size:12px;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:1px 8px">{{ c.id }}</div>
+        </div>
+        <div style="padding:10px 14px 12px;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0">
+          <div style="display:flex;align-items:baseline;gap:0 8px;flex-wrap:wrap"><div style="font-family:'ZCOOL KuaiLe';font-size:34px;line-height:1">{{ c.cn }}</div><div style="font-weight:700;font-size:16px">{{ c.en }}</div></div>
+          <div style="font-size:12.5px;font-weight:500;line-height:1.3;text-wrap:pretty">{{ c.line }}</div>
+          <sc-if value="{{ c.hasQuote }}" hint-placeholder-val="{{ true }}"><div style="margin-top:auto;align-self:flex-start;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:3px 8px;font-size:13px;font-weight:700">{{ c.quote }}</div></sc-if>
+        </div>
+      </div>
+    </sc-for></div>
+</section>
+<!-- 4 OBJECTS -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">04 · Object cards</div>
+  <div style="font-size:15px;margin-bottom:18px;max-width:820px">6 suspicious objects.</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap"><sc-for list="{{ objects }}" as="c" hint-placeholder-count="6">
+      <div style="position:relative;flex-shrink:0;width:252px;height:352px;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;box-shadow:6px 6px 0 #1B1B1B;display:flex;flex-direction:column;overflow:hidden;font-family:'Fredoka',sans-serif;color:#1B1B1B;box-sizing:border-box">
+        <div style="position:relative;height:208px;flex-shrink:0;border-bottom:3px solid #1B1B1B;overflow:hidden">{{ c.art }}
+          <div style="position:absolute;top:8px;left:8px;font-weight:700;font-size:11px;background:#1B1B1B;color:#fff;border-radius:10px;padding:2px 8px">{{ c.kind }}</div>
+          <div style="position:absolute;top:8px;right:8px;font-weight:700;font-size:12px;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:1px 8px">{{ c.id }}</div>
+        </div>
+        <div style="padding:10px 14px 12px;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0">
+          <div style="display:flex;align-items:baseline;gap:0 8px;flex-wrap:wrap"><div style="font-family:'ZCOOL KuaiLe';font-size:34px;line-height:1">{{ c.cn }}</div><div style="font-weight:700;font-size:16px">{{ c.en }}</div></div>
+          <div style="font-size:12.5px;font-weight:500;line-height:1.3;text-wrap:pretty">{{ c.line }}</div>
+          <sc-if value="{{ c.hasQuote }}" hint-placeholder-val="{{ true }}"><div style="margin-top:auto;align-self:flex-start;background:#fff;border:2px solid #1B1B1B;border-radius:10px;padding:3px 8px;font-size:13px;font-weight:700">{{ c.quote }}</div></sc-if>
+        </div>
+      </div>
+    </sc-for></div>
+</section>
+<!-- 5 BACK -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">05 · Card back</div>
+  <div style="font-size:15px;margin-bottom:18px;max-width:820px">Shared by all 20 cards.</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap"><div style="width:252px;height:352px;flex-shrink:0;border:3px solid #1B1B1B;border-radius:16px;box-shadow:6px 6px 0 #1B1B1B;overflow:hidden;box-sizing:border-box">{{ cardBack }}</div></div>
+</section>
+<!-- 6 TOKENS -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">06 · Player tokens</div>
+  <div style="font-size:15px;margin-bottom:18px;max-width:820px">One standee per suspect. Colours match the start squares on the board.</div>
+  <div style="display:flex;gap:28px;flex-wrap:wrap">
+    <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="6">
+      <div style="display:flex;flex-direction:column;align-items:center;width:150px;flex-shrink:0">
+        <div style="width:124px;height:124px;border-radius:50%;border:4px solid #1B1B1B;overflow:hidden;box-shadow:4px 4px 0 #1B1B1B;box-sizing:border-box">{{ t.art }}</div>
+        <div style="margin-top:-14px;position:relative;background:#fff;border:3px solid #1B1B1B;border-radius:14px;padding:2px 12px;display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;border:2px solid #1B1B1B;background:{{ t.color }}"></div><div style="font-family:'ZCOOL KuaiLe';font-size:22px;line-height:1.1">{{ t.cn }}</div></div>
+        <div style="width:140px;height:24px;background:{{ t.color }};border:3px solid #1B1B1B;border-radius:50%;margin-top:6px;box-sizing:border-box"></div>
+        <div style="font-family:'Fredoka';font-weight:700;font-size:13px;margin-top:6px">{{ t.en }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<!-- 11 COMIC FEWER STEPS -->
+<section style="padding:32px 72px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">07 · Board</div>
+  <div style="font-size:15px;margin-bottom:16px;max-width:860px">Single-lane corridors with big squares, about 70 steps in total. Crossing the house takes 2–3 dice rolls.</div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap">
+    <div id="11a" style="position:relative;flex-shrink:0;width:960px;height:1140px;box-shadow:8px 8px 0 #1B1B1B;border-radius:16px;overflow:hidden"><div style="position:absolute;top:8px;left:8px;font-size:14px;font-weight:800;background:#1B1B1B;color:#fff;padding:4px 10px;z-index:2">Board</div>{{ fullC2 }}</div>
+  </div>
+</section>
+
+<!-- 8 DEDUCTION SHEET -->
+<section style="padding:32px 72px 96px">
+  <div style="font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">08 · Deduction sheet (online, mobile)</div>
+  <div style="font-size:15px;margin-bottom:20px;max-width:760px">Interactive: pick a pen, tap a cell. Switch tabs for suspects, rooms and objects.</div>
+  <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+    <div id="8c" style="position:relative;flex-shrink:0;width:390px;height:844px;border:10px solid #1B1B1B;border-radius:54px;box-shadow:8px 8px 0 #1B1B1B;background:#FFF7EC;overflow:hidden;display:flex;flex-direction:column;font-family:'Fredoka',sans-serif;color:#1B1B1B">
+      <div style="height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-weight:700;font-size:15px"><div>9:41</div><div style="width:110px;height:30px;background:#1B1B1B;border-radius:16px"></div><div style="display:flex;gap:4px;align-items:center"><div style="width:18px;height:10px;border:2px solid #1B1B1B;border-radius:3px"></div></div></div>
+      <div style="padding:6px 16px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div style="width:44px;height:44px;border:2.5px solid #1B1B1B;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">‹</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'ZCOOL KuaiLe';font-size:26px;line-height:1;color:#E8483B;-webkit-text-stroke:1px #1B1B1B">侦探笔记</div>
+          <div style="font-size:12px;font-weight:500;margin-top:3px">Round 7 · 二叔 is rolling</div>
+        </div>
+        <div style="width:44px;height:44px;border:2.5px solid #1B1B1B;border-radius:50%;background:#5B8DEF;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC';font-weight:900;font-size:18px;box-shadow:3px 3px 0 #1B1B1B;flex-shrink:0">哥</div>
+      </div>
+      <div style="margin:0 16px 10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex-shrink:0">
+        <sc-for list="{{ caseSlots }}" as="slot" hint-placeholder-count="3">
+          <div style="background:{{ slot.bg }};border:2.5px solid #1B1B1B;border-radius:12px;padding:6px 8px;min-height:44px;box-sizing:border-box">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.5px">{{ slot.q }}</div>
+            <div style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1.1">{{ slot.v }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin:0 16px;display:flex;gap:6px;flex-shrink:0;background:#1B1B1B;border-radius:14px;padding:4px">
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+          <button onClick="{{ tab.go }}" style="flex:1;min-width:0;height:44px;border:none;border-radius:10px;background:{{ tab.bg }};color:{{ tab.fg }};font-family:'ZCOOL KuaiLe';font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;padding:0"><span>{{ tab.label }}</span><span style="font-family:'Fredoka';font-weight:700;font-size:11px;opacity:.8">{{ tab.count }}</span></button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:12px 12px 16px">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,40px);gap:4px;align-items:end;padding:0 0 8px;position:sticky;top:-12px;background:#FFF7EC;z-index:1;padding-top:4px">
+            <div style="font-size:11px;font-weight:700">Player →</div>
+            <sc-for list="{{ players }}" as="pl" hint-placeholder-count="6">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <div style="width:30px;height:30px;border-radius:50%;border:2.5px solid #1B1B1B;background:{{ pl.color }};color:#fff;font-family:'Noto Serif SC';font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center">{{ pl.ch }}</div>
+                <div style="font-size:10px;font-weight:700">{{ pl.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,40px);gap:4px;align-items:center;background:{{ row.bg }};border-radius:12px;padding:3px 0 3px 6px;margin-left:-6px">
+                <div style="min-width:0;opacity:{{ row.op }}">
+                  <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;border:2px solid #1B1B1B;background:{{ row.color }};flex-shrink:0"></div><div style="font-family:'ZCOOL KuaiLe';font-size:18px;line-height:1;text-decoration:{{ row.deco }}">{{ row.cn }}</div></div>
+                  <div style="font-size:10px;font-weight:500;margin-top:2px;line-height:1.1">{{ row.en }}</div>
+                  <sc-if value="{{ row.flag }}" hint-placeholder-val="{{ false }}"><div style="display:inline-block;margin-top:3px;font-size:10px;font-weight:700;background:#E8483B;color:#fff;border:2px solid #1B1B1B;border-radius:8px;padding:0 5px">No one has it</div></sc-if>
+                </div>
+                <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="6"><button onClick="{{ cell.tap }}" style="width:40px;height:44px;border:2.5px solid #1B1B1B;border-radius:9px;background:{{ cell.bg }};color:{{ cell.fg }};font-family:'Fredoka';font-weight:700;font-size:20px;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center">{{ cell.glyph }}</button></sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isNotes }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:12px;font-weight:700">Only you can see these notes.</div>
+          <textarea value="{{ notes }}" onChange="{{ setNotes }}" placeholder="e.g. 大嫂 hesitated before showing a card…" style="flex:1;border:2.5px solid #1B1B1B;border-radius:14px;padding:12px;font-family:'Fredoka';font-size:15px;background:#fff;resize:none;outline:none"></textarea>
+        </div>
+      </sc-if>
+      <div style="flex-shrink:0;border-top:3px solid #1B1B1B;background:#FFD54A;padding:10px 12px 26px;display:flex;gap:6px;align-items:center">
+        <sc-if value="{{ penMode }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ pens }}" as="pen" hint-placeholder-count="4">
+              <button onClick="{{ pen.pick }}" style="width:48px;height:52px;border:2.5px solid #1B1B1B;border-radius:12px;background:{{ pen.bg }};color:{{ pen.fg }};box-shadow:{{ pen.shadow }};cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:'Fredoka'"><span style="font-weight:700;font-size:18px;line-height:1">{{ pen.glyph }}</span><span style="font-size:10px;font-weight:700">{{ pen.label }}</span></button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ cycleMode }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;font-size:12px;font-weight:700;line-height:1.3">Tap a cell to cycle<br>✕ → ✓ → ? → blank</div>
+        </sc-if>
+        <button onClick="{{ openAccuse }}" style="flex:1;height:52px;border:2.5px solid #1B1B1B;border-radius:14px;background:#E8483B;color:#fff;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:20px;cursor:pointer">指控!</button>
+      </div>
+      <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:5">
+          <div style="width:100%;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:20px 18px 34px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px">
+            <div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#E8483B;-webkit-text-stroke:1px #1B1B1B">我要指控</div>
+            <div style="font-size:13px;font-weight:500">A wrong accusation knocks you out of the game. You'll still have to show cards.</div>
+            <sc-for list="{{ caseSlots }}" as="slot" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;align-items:center;border:2.5px solid #1B1B1B;border-radius:12px;background:{{ slot.bg }};padding:10px 12px;min-height:44px;box-sizing:border-box"><div style="font-size:13px;font-weight:700">{{ slot.q }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:20px">{{ slot.v }}</div></div>
+            </sc-for>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button onClick="{{ closeAccuse }}" style="flex:1;height:52px;border:2.5px solid #1B1B1B;border-radius:14px;background:#fff;font-family:'Fredoka';font-weight:700;font-size:16px;cursor:pointer">Not yet</button>
+              <button onClick="{{ closeAccuse }}" style="flex:1.4;height:52px;border:2.5px solid #1B1B1B;border-radius:14px;background:{{ confirmBg }};color:#fff;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:20px;cursor:pointer">{{ confirmLabel }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="max-width:340px;display:flex;flex-direction:column;gap:14px;font-family:'Fredoka';font-size:15px;line-height:1.45">
+      <div style="font-family:'ZCOOL KuaiLe';font-size:24px">How it works</div>
+      <div><b>Columns are players.</b> Each row is a card; each column is one of the 6 players at the table.</div>
+      <div><b>Marks.</b> ✕ = player doesn't have it, ✓ = player has it, ? = you suspect they do.</div>
+      <div><b>Auto-deduction.</b> A ✓ anywhere in a row crosses the card off. If every player is ✕, the row is flagged red as a likely answer.</div>
+      <div><b>Case strip.</b> The 3 slots at the top fill in once only one card is left in that category. 指控 opens a confirm sheet.</div>
+      <div><b>Tap targets</b> are 40×44px or larger for one-handed play.</div>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"inputMode":{"editor":"enum","options":["Pen toolbar","Tap to cycle"],"default":"Pen toolbar","tsType":"string"},"autoDeduce":{"editor":"boolean","default":true,"tsType":"boolean"}}'>
+const PAT = {
+  check:(id,a,b,s)=>`<pattern id="${id}" width="${s*2}" height="${s*2}" patternUnits="userSpaceOnUse"><rect width="${s*2}" height="${s*2}" fill="${a}"/><rect width="${s}" height="${s}" fill="${b}"/><rect x="${s}" y="${s}" width="${s}" height="${s}" fill="${b}"/></pattern>`,
+  dots:(id,a,b,s)=>`<pattern id="${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><rect width="${s}" height="${s}" fill="${a}"/><circle cx="${s/2}" cy="${s/2}" r="1.3" fill="${b}"/></pattern>`,
+  plank:(id,a,b,s)=>`<pattern id="${id}" width="${s*3}" height="${s}" patternUnits="userSpaceOnUse"><rect width="${s*3}" height="${s}" fill="${a}"/><path d="M0 ${s-.5}H${s*3}M${s*1.4} 0V${s}" stroke="${b}" stroke-width="1.5"/></pattern>`,
+  lattice:(id,a,b,s)=>`<pattern id="${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><rect width="${s}" height="${s}" fill="${a}"/><path d="M0 0L${s} ${s}M${s} 0L0 ${s}" stroke="${b}" stroke-width="1"/></pattern>`
+};
+const STYLES = {
+  a:{bg:'#C8261E',band:'#8E1B16',wall:'#2A1A14',wallW:8,stroke:'none',sw:0,shadow:null,rx:3,
+     f1:['lattice','#F4EAD5','#E6D3AA',22],f2:['plank','#F4EAD5','#E8D8B6',24],
+     felt:'#C8261E',feltIn:'#A61F18',wood:'#8E1B16',woodLt:'#C8261E',sofa:'#C8261E',cush:'#8E1B16',rug:'#E9D3A0',rugB:'#C9A04A',
+     tile:'#F4EAD5',tileS:'#8E1B16',paper:'#F4EAD5',orange:'#C9A04A',green:'#8E1B16',red:'#C8261E',gold:'#C9A04A',ink:'#2A1A14',
+     sq:'#F4EAD5',sqAlt:'#F4EAD5',sqS:'#C9A04A',sqRx:0,cn:"'Ma Shan Zheng',cursive",lat:"'Cormorant SC',serif",label:'#C8261E',labelSub:'#8E1B16',plate:null},
+  b:{bg:'#1E2A2A',band:'#1E2A2A',wall:'#1E2A2A',wallW:8,stroke:'#1E2A2A',sw:2,shadow:'#D9472B',rx:2,
+     f1:['check','#EFE3C8','#CFE0D6',16],f2:['dots','#EFE3C8','#E0A526',8],
+     felt:'#2E8A5E',feltIn:'#37A06D',wood:'#7A3B1E',woodLt:'#A5562E',sofa:'#1F5E5B',cush:'#E0A526',rug:'#D9472B',rugB:'#E0A526',
+     tile:'#EFE3C8',tileS:'#1E2A2A',paper:'#FFF8E6',orange:'#E0A526',green:'#2E8A5E',red:'#D9472B',gold:'#E0A526',ink:'#1E2A2A',
+     sq:'#E0A526',sqAlt:'#EFE3C8',sqS:'#1E2A2A',sqRx:0,cn:"'ZCOOL QingKe HuangYou',sans-serif",lat:"'Bricolage Grotesque',sans-serif",label:'#EFE3C8',labelSub:'#E0A526',plate:'#1F5E5B'},
+  c:{bg:'#FFD54A',band:'#FFD54A',wall:'#1B1B1B',wallW:6,stroke:'#1B1B1B',sw:3,shadow:null,rx:8,
+     f1:['plank','#C9F0DC','#9ED9BE',22],f2:['plank','#FFE3CF','#F5C9A8',22],
+     felt:'#2FA37C',feltIn:'#7FD3A8',wood:'#B86B3A',woodLt:'#E59A5F',sofa:'#9DB8F2',cush:'#FFD54A',rug:'#FFB4A8',rugB:'#E8483B',
+     tile:'#FFFFFF',tileS:'#1B1B1B',paper:'#FFFFFF',orange:'#FF9A3C',green:'#2FA37C',red:'#E8483B',gold:'#FFD54A',ink:'#1B1B1B',
+     sq:'#FFFFFF',sqAlt:'#FFFFFF',sqS:'#1B1B1B',sqRx:6,cn:"'ZCOOL KuaiLe',sans-serif",lat:"'Fredoka',sans-serif",label:'#1B1B1B',labelSub:'#E8483B',plate:'#FFFFFF'}
+};
+function boardSvg(k){
+  const p=STYLES[k], o=[];
+  const st=`stroke="${p.stroke}" stroke-width="${p.sw}"`;
+  const r=(x,y,w,h,f,rx=p.rx,sh=true)=>{if(p.shadow&&sh)o.push(`<rect x="${x+4}" y="${y+4}" width="${w}" height="${h}" rx="${rx}" fill="${p.shadow}"/>`);o.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${st}/>`);};
+  const c=(x,y,rr,f,sh=true)=>{if(p.shadow&&sh)o.push(`<circle cx="${x+3}" cy="${y+3}" r="${rr}" fill="${p.shadow}"/>`);o.push(`<circle cx="${x}" cy="${y}" r="${rr}" fill="${f}" ${st}/>`);};
+  const t=(x,y,s,f,txt,fam,extra='')=>o.push(`<text x="${x}" y="${y}" font-size="${s}" fill="${f}" font-family="${fam}" ${extra}>${txt}</text>`);
+  const tl=(x,y,w,h,f=p.tile)=>o.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${f}" stroke="${p.tileS}" stroke-width="1"/>`);
+  o.push(`<defs>${PAT[p.f1[0]](k+'f1',...p.f1.slice(1))}${PAT[p.f2[0]](k+'f2',...p.f2.slice(1))}</defs>`);
+  o.push(`<rect width="520" height="640" fill="${p.band}"/>`);
+  if(k==='c')o.push(`<rect width="520" height="640" fill="url(#cdot)"/><defs>${PAT.dots('cdot','#FFD54A','#1B1B1B',14)}</defs>`);
+  if(k==='b')o.push(`<rect width="520" height="640" fill="url(#bdot)" opacity=".5"/><defs>${PAT.dots('bdot','#1E2A2A','#E0A526',9)}</defs>`);
+  // corridor squares
+  const sqs=[];
+  for(let x=20;x<500;x+=30)for(const y of [290,320])sqs.push([x,y]);
+  for(const x of [230,260])for(const y of [260,350])sqs.push([x,y]);
+  sqs.forEach(([x,y],i)=>o.push(`<rect x="${x+1.5}" y="${y+1.5}" width="27" height="27" rx="${p.sqRx}" fill="${(Math.round((x-20)/30)+Math.round((y-260)/30))%2?p.sqAlt:p.sq}" stroke="${p.sqS}" stroke-width="${k==='c'?2.5:1.2}"/>`));
+  // floors
+  o.push(`<rect x="20" y="20" width="480" height="240" fill="url(#${k}f1)"/><rect x="20" y="380" width="480" height="240" fill="url(#${k}f2)"/>`);
+  // ===== MAHJONG ROOM =====
+  r(34,40,40,130,p.wood); o.push(`<rect x="44" y="90" width="20" height="20" fill="${p.gold}" transform="rotate(45 54 100)"/>`); t(54,106,14,p.red,'福',"'Noto Serif SC',serif",'text-anchor="middle" font-weight="900"');
+  r(232,50,56,26,p.woodLt); r(232,186,56,26,p.woodLt); r(176,102,26,56,p.woodLt); r(318,102,26,56,p.woodLt);
+  r(205,75,110,110,p.felt,8); o.push(`<rect x="214" y="84" width="92" height="92" rx="4" fill="${p.feltIn}"/>`);
+  for(let i=0;i<7;i++){tl(224+i*10,90,8,11);tl(224+i*10,159,8,11);}
+  for(let i=0;i<6;i++){tl(220,104+i*9,11,8);tl(289,104+i*9,11,8);}
+  tl(248,118,9,12,p.gold);tl(260,124,9,12);tl(254,136,9,12);
+  o.push(`<rect x="246" y="140" width="7" height="7" rx="1.5" fill="${p.paper}" stroke="${p.ink}"/><rect x="268" y="112" width="7" height="7" rx="1.5" fill="${p.paper}" stroke="${p.ink}"/>`);
+  c(440,72,26,p.wood); c(430,64,6,p.red,false); c(446,62,6,p.green,false); c(448,80,6,p.paper,false); c(432,82,6,p.gold,false);
+  r(372,160,58,44,p.paper,2); for(let i=0;i<4;i++)o.push(`<path d="M380 ${170+i*9}H422" stroke="${p.ink}" stroke-width="1" opacity=".5"/>`);
+  t(380,168,8,p.red,'番数',"'Noto Serif SC',serif");
+  c(462,218,20,p.paper); for(let a=0;a<4;a++)o.push(`<ellipse cx="462" cy="208" rx="5" ry="10" fill="${p.ink}" opacity=".7" transform="rotate(${a*90} 462 218)"/>`); c(462,218,4,p.red,false);
+  // label
+  if(p.plate)r(34,196,128,52,p.plate,p.rx,true);
+  t(42,230,30,p.plate?p.label:p.label,'麻将房',p.cn); t(42,244,10,p.labelSub,'MAHJONG ROOM',p.lat,'font-weight="700" letter-spacing="2"');
+  // ===== LIVING ROOM =====
+  r(140,440,230,140,p.rug,8,false); o.push(`<rect x="150" y="450" width="210" height="120" rx="4" fill="none" stroke="${p.rugB}" stroke-width="3" stroke-dasharray="${k==='a'?'2 5':'0'}"/>`);
+  r(40,440,48,164,p.sofa); r(88,556,200,48,p.sofa);
+  for(let i=0;i<3;i++)r(50,452+i*44,28,38,p.cush,p.rx,false); for(let i=0;i<4;i++)r(96+i*46,566,40,28,p.cush,p.rx,false);
+  r(200,472,110,64,p.wood,6); c(236,504,16,p.paper,false); c(230,500,5,p.orange,false); c(242,500,5,p.orange,false); c(236,510,5,p.orange,false);
+  c(284,496,9,p.paper,false); o.push(`<path d="M293 496h6" stroke="${p.ink}" stroke-width="2"/>`); c(278,516,4,p.paper,false); c(292,518,4,p.paper,false);
+  r(388,474,46,46,p.sofa); r(394,480,34,34,p.cush,p.rx,false);
+  r(456,436,30,150,p.wood); o.push(`<rect x="460" y="470" width="8" height="82" fill="${p.ink}"/>`);
+  c(62,408,16,p.wood); c(62,408,11,p.green,false); c(57,404,3,p.orange,false); c(67,410,3,p.orange,false); c(61,413,3,p.orange,false);
+  c(470,606,0.1,p.band,false);
+  for(const lx of [170,350]){c(lx,410,13,p.red); o.push(`<rect x="${lx-13}" y="407" width="26" height="6" fill="${p.gold}"/>`);}
+  r(236,386,48,22,p.red,p.rx,false); t(260,403,15,p.gold,'福',"'Noto Serif SC',serif",'text-anchor="middle" font-weight="900"');
+  if(p.plate)r(318,588,172,26,p.plate,p.rx,true);
+  t(326,610,22,p.label,'客厅',p.cn); t(376,608,10,p.labelSub,'LIVING ROOM',p.lat,'font-weight="700" letter-spacing="1.5"');
+  // walls with doors
+  const w=`fill="none" stroke="${p.wall}" stroke-width="${p.wallW}" stroke-linejoin="round"`;
+  o.push(`<path d="M230 260H20V20H500V260H290" ${w}/><path d="M230 380H20V620H500V380H290" ${w}/>`);
+  o.push(`<path d="M230 260A30 30 0 0 1 260 230" fill="none" stroke="${p.wall}" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M290 260A30 30 0 0 0 260 230" fill="none" stroke="${p.wall}" stroke-width="1.5" stroke-dasharray="3 3"/>`);
+  o.push(`<path d="M230 380A30 30 0 0 0 260 410M290 380A30 30 0 0 1 260 410" fill="none" stroke="${p.wall}" stroke-width="1.5" stroke-dasharray="3 3"/>`);
+  o.push(`<path d="M253 278l7-8 7 8z" fill="${p.red}"/><path d="M253 362l7 8 7-8z" fill="${p.red}"/>`);
+  return o.join('');
+}
+const FX={
+  a:{f3:['dots','#F4EAD5','#C9A04A',10],f4:['plank','#EFE2C6','#E2D0AA',40],tBg:'#C8261E',tFg:'#F4EAD5',tSub:'#C9A04A',car:'#C8261E',blue:'#8E1B16'},
+  b:{f3:['dots','#A9CFA4','#2E8A5E',9],f4:['dots','#D8D0BE','#1E2A2A',7],tBg:'#1F5E5B',tFg:'#E0A526',tSub:'#EFE3C8',car:'#D9472B',blue:'#1F5E5B'},
+  c:{f3:['dots','#A8E6BE','#2FA37C',12],f4:['check','#ECE6DC','#E0D9CC',15],tBg:'#FFFFFF',tFg:'#E8483B',tSub:'#1B1B1B',car:'#E8483B',blue:'#5B8DEF'}
+};
+function fullBoardSvg(k,big){
+  const p=STYLES[k],x=FX[k],o=[],raw=s=>o.push(s);
+  const st=`stroke="${p.stroke}" stroke-width="${p.sw}"`;
+  const r=(X,Y,w,h,f,rx=p.rx,sh=true)=>{if(p.shadow&&sh)raw(`<rect x="${X+3}" y="${Y+3}" width="${w}" height="${h}" rx="${rx}" fill="${p.shadow}"/>`);raw(`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${st}/>`);};
+  const c=(X,Y,rr,f,sh=true)=>{if(p.shadow&&sh)raw(`<circle cx="${X+3}" cy="${Y+3}" r="${rr}" fill="${p.shadow}"/>`);raw(`<circle cx="${X}" cy="${Y}" r="${rr}" fill="${f}" ${st}/>`);};
+  const d=(X,Y,rr,f)=>raw(`<circle cx="${X}" cy="${Y}" r="${rr}" fill="${f}"/>`);
+  const t=(X,Y,s,f,txt,fam,extra='')=>raw(`<text x="${X}" y="${Y}" font-size="${s}" fill="${f}" font-family="${fam}" ${extra}>${txt}</text>`);
+  const tl=(X,Y,w,h,f=p.tile)=>raw(`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="1.5" fill="${f}" stroke="${p.tileS}" stroke-width="1"/>`);
+  const serif="'Noto Serif SC',serif";
+  const oranges=(X,Y)=>{c(X,Y,11,p.paper,false);d(X-4,Y-3,4,p.orange);d(X+4,Y-3,4,p.orange);d(X,Y+4,4,p.orange);};
+  const pass=(X,Y,to)=>{r(X,Y,36,36,p.ink,p.rx,false);for(let i=0;i<4;i++)raw(`<rect x="${X+6+i*6}" y="${Y+8+i*6}" width="${24-i*6}" height="4" fill="${p.gold}"/>`);t(X,Y+48,10,p.ink,'密道 → '+to,serif,'font-weight="900"');};
+  raw(`<defs>${PAT[p.f1[0]](k+'F1',...p.f1.slice(1))}${PAT[p.f2[0]](k+'F2',...p.f2.slice(1))}${PAT[x.f3[0]](k+'F3',...x.f3.slice(1))}${PAT[x.f4[0]](k+'F4',...x.f4.slice(1))}${PAT.dots(k+'BD',p.band,k==='c'?'#1B1B1B':'#E0A526',k==='c'?14:9)}</defs>`);
+  raw(`<rect width="960" height="1140" fill="${p.band}"/>`);
+  if(k!=='a')raw(`<rect width="960" height="1140" fill="url(#${k}BD)" opacity="${k==='b'?.5:1}"/>`);
+  if(k==='a')raw(`<rect x="10" y="10" width="940" height="1120" fill="none" stroke="#C9A04A" stroke-width="2"/>`);
+  // corridor
+  if(big){
+    const sq=(X,Y,w,h,i)=>raw(`<rect x="${X+2}" y="${Y+2}" width="${w-4}" height="${h-4}" rx="10" fill="${i%2?'#FFFFFF':'#FFF1C9'}" stroke="#1B1B1B" stroke-width="3"/>`);
+    const H=[[270,330],[600,660],[870,930]],V=[[300,360],[600,660]];
+    const seg=(a,b,fn)=>{const n=Math.max(1,Math.round((b-a)/62)),s=(b-a)/n;for(let i=0;i<n;i++)fn(a+i*s,s,i);};
+    H.forEach(([y0,y1])=>{const xs=[30,...V.flat(),930];for(let j=0;j<xs.length-1;j++){const a=xs[j],b=xs[j+1];if(j%2)sq(a,y0,b-a,y1-y0,1);else seg(a,b,(X,s,i)=>sq(X,y0,s,y1-y0,i));}});
+    V.forEach(([x0,x1])=>{const ys=[30,...H.flat()];for(let j=0;j<ys.length-1;j+=2)seg(ys[j],ys[j+1],(Y,s,i)=>sq(x0,Y,x1-x0,s,i));});
+  }
+  for(let rr=1;rr<=30&&!big;rr++)for(let cc=1;cc<=30;cc++){
+    const band=[9,10,20,21,29,30].includes(rr)||[10,11,20,21].includes(cc);
+    if(!band)continue;
+    raw(`<rect x="${cc*30+1.5}" y="${rr*30+1.5}" width="27" height="27" rx="${p.sqRx}" fill="${(cc+rr)%2?p.sqAlt:p.sq}" stroke="${p.sqS}" stroke-width="${k==='c'?2.5:1.2}"/>`);
+  }
+  const ROOMS=[
+    {cn:'麻将房',en:'MAHJONG ROOM',c:1,r:1,w:9,h:8,f:'F1',doors:[['b',5],['r',5]],lab:[8,186],draw:(W,H)=>{
+      r(110,22,56,24,p.woodLt);r(110,166,56,24,p.woodLt);r(52,78,24,56,p.woodLt);r(200,78,24,56,p.woodLt);
+      r(83,51,110,110,p.felt,8);raw(`<rect x="92" y="60" width="92" height="92" rx="4" fill="${p.feltIn}"/>`);
+      for(let i=0;i<7;i++){tl(103+i*10,66,8,11);tl(103+i*10,135,8,11);}for(let i=0;i<6;i++){tl(98,80+i*9,11,8);tl(167,80+i*9,11,8);}
+      tl(126,98,9,12,p.gold);tl(138,104,9,12);tl(131,116,9,12);
+      c(238,40,22,p.wood);d(230,34,5,p.red);d(245,32,5,p.green);d(246,48,5,p.paper);d(231,48,5,p.gold);
+      c(240,206,18,p.paper);for(let a=0;a<4;a++)raw(`<ellipse cx="240" cy="197" rx="4" ry="9" fill="${p.ink}" opacity=".7" transform="rotate(${a*90} 240 206)"/>`);
+      pass(10,10,'书房');}},
+    {cn:'神台',en:'ANCESTRAL ALTAR',c:22,r:1,w:9,h:8,f:'F2',doors:[['b',26],['l',5]],lab:[8,186],draw:(W,H)=>{
+      r(95,64,80,110,p.rug,2,false);
+      r(46,12,170,48,p.wood);r(114,16,40,20,p.red,2,false);t(134,31,13,p.gold,'祖',serif,'text-anchor="middle" font-weight="900"');
+      c(134,46,9,p.gold);for(const ix of [130,134,138])raw(`<path d="M${ix} 44V30" stroke="${p.ink}" stroke-width="1.5"/>`);
+      for(const cx of [62,200]){r(cx,20,8,26,p.red,1,false);d(cx+4,17,3.5,p.gold);}
+      oranges(90,42);oranges(176,42);
+      c(110,120,16,p.red);c(160,120,16,p.red);
+      c(234,200,18,p.wood);c(234,200,12,p.green,false);d(230,196,3,p.orange);d(238,203,3,p.orange);
+      pass(W-46,72,'车房');}},
+    {cn:'书房',en:'STUDY',c:1,r:11,w:9,h:9,f:'F2',doors:[['t',5],['r',15],['b',5]],lab:[8,212],draw:(W,H)=>{
+      r(80,120,110,70,p.rug,6,false);
+      r(18,20,96,54,p.wood);r(38,26,50,8,p.ink,1,false);r(46,42,34,10,p.paper,1,false);c(100,34,7,p.gold,false);
+      c(64,96,14,p.woodLt);
+      r(162,10,100,28,p.wood);for(let i=0;i<12;i++)raw(`<rect x="${166+i*8}" y="14" width="6" height="20" fill="${[p.red,p.gold,p.green,p.paper][i%4]}"/>`);
+      r(110,140,34,26,p.paper,1);t(114,157,10,p.red,'地契',serif,'font-weight="900"');r(150,150,28,22,p.paper,1);
+      r(212,196,46,46,p.ink);c(235,219,9,p.gold,false);
+      pass(10,128,'麻将房');}},
+    {cn:'客厅',en:'LIVING ROOM',c:12,r:11,w:8,h:9,f:'F1',doors:[['t',15],['b',16],['l',12],['r',17]],lab:[128,8],draw:(W,H)=>{
+      r(50,72,140,130,p.rug,8,false);raw(`<rect x="58" y="80" width="124" height="114" rx="4" fill="none" stroke="${p.rugB}" stroke-width="3"/>`);
+      r(12,140,36,120,p.sofa);r(48,226,64,36,p.sofa);for(let i=0;i<3;i++)r(18,148+i*36,24,30,p.cush,p.rx,false);
+      r(78,106,84,56,p.wood,6);oranges(104,134);c(140,128,8,p.paper,false);d(130,148,3.5,p.paper);d(146,148,3.5,p.paper);
+      r(208,72,24,100,p.wood);raw(`<rect x="212" y="88" width="7" height="68" fill="${p.ink}"/>`);
+      c(222,246,14,p.wood);c(222,246,9,p.green,false);}},
+    {cn:'饭厅',en:'DINING ROOM',c:22,r:11,w:9,h:9,f:'F1',doors:[['l',15],['t',26],['b',26]],lab:[8,212],draw:(W,H)=>{
+      for(let i=0;i<10;i++){const a=i/10*Math.PI*2+.31;c(135+Math.cos(a)*88,128+Math.sin(a)*88,12,p.woodLt);}
+      c(135,128,72,p.wood);c(135,128,40,p.woodLt);
+      for(let i=0;i<6;i++){const a=i/6*Math.PI*2;c(135+Math.cos(a)*56,128+Math.sin(a)*56,10,p.paper,false);d(135+Math.cos(a)*56,128+Math.sin(a)*56,5,[p.red,p.orange,p.green,p.gold,p.red,p.orange][i]);}
+      c(135,128,18,p.red);c(135,128,11,p.gold,false);d(135,128,5,p.ink);
+      r(238,24,22,110,p.wood);for(let i=0;i<4;i++)d(249,40+i*24,6,[p.green,p.red,p.gold,p.green][i]);}},
+    {cn:'车房',en:'GARAGE',c:1,r:22,w:9,h:7,f:'F4',doors:[['t',3],['r',25]],lab:[8,34],draw:(W,H)=>{
+      r(8,6,46,14,p.wood);for(let i=0;i<4;i++)raw(`<rect x="${13+i*10}" y="9" width="4" height="18" fill="${p.ink}"/>`);
+      r(110,16,88,170,x.car,22);r(118,44,72,26,p.ink,6,false);r(120,74,68,62,x.car,10,false);r(118,144,72,18,p.ink,4,false);
+      r(140,176,28,8,p.paper,1,false);
+      r(222,20,16,70,p.ink,8,false);d(230,22,7,p.ink);d(230,88,7,p.ink);raw(`<path d="M214 34H246" stroke="${p.ink}" stroke-width="3"/>`);
+      r(214,140,44,40,p.woodLt);r(226,124,32,26,p.woodLt);t(222,166,10,p.ink,'CNY',p.lat,'font-weight="700"');
+      pass(10,128,'神台');}},
+    {cn:'厨房',en:'KITCHEN',c:22,r:22,w:9,h:7,f:'F2',doors:[['t',26],['l',25]],lab:[8,150],draw:(W,H)=>{
+      r(8,8,54,50,p.paper);raw(`<path d="M12 30H58" stroke="${p.ink}" stroke-width="1.5"/>`);
+      r(62,8,52,36,p.woodLt);d(76,26,6,p.red);d(92,22,5,p.green);d(100,32,5,p.orange);
+      r(156,8,106,36,p.woodLt);c(182,26,11,p.ink,false);raw(`<path d="M193 26H206" stroke="${p.ink}" stroke-width="3"/>`);c(214,26,7,p.ink,false);r(232,13,24,26,p.paper,3,false);
+      r(226,44,36,150,p.woodLt);c(244,70,11,p.paper,false);r(232,96,24,34,p.wood,2,false);raw(`<path d="M236 140L252 176" stroke="${p.ink}" stroke-width="3"/>`);oranges(244,182);
+      r(92,108,100,50,p.wood);c(118,133,10,p.paper,false);c(146,133,10,p.paper,false);d(168,128,6,p.green);d(176,140,6,p.red);}},
+    {cn:'后院',en:'BACKYARD',c:4,r:31,w:24,h:6,f:'F3',doors:[['t',10],['t',21]],lab:[20,110],draw:(W,H)=>{
+      for(const tx of [44,676]){c(tx,48,26,p.wood);c(tx,48,20,p.green,false);d(tx-8,42,4,p.orange);d(tx+6,40,4,p.orange);d(tx,54,4,p.orange);d(tx+10,54,4,p.orange);}
+      raw(`<path d="M260 30Q360 44 460 30" stroke="${p.ink}" stroke-width="1.5" fill="none"/>`);d(260,30,4,p.ink);d(460,30,4,p.ink);
+      [[276,p.red],[306,x.blue],[336,p.gold],[366,p.paper],[396,p.red],[426,x.blue]].forEach(([cx,f])=>r(cx,34,22,28,f,2,false));
+      r(250,110,30,30,p.red,4);r(334,110,30,30,x.blue,4);c(307,125,20,p.paper);
+      r(400,116,40,28,p.gold,3);for(let i=0;i<3;i++)d(410+i*10,130,4,p.green);
+      c(600,120,24,p.ink);for(let i=0;i<4;i++)raw(`<path d="M${584+i*10} 104V136" stroke="${p.gold}" stroke-width="1.5"/>`);d(592,116,3,p.red);d(606,126,3,p.red);
+      c(150,150,12,p.green);c(176,156,9,p.green);}}
+  ];
+  const wallsOut=[];
+  ROOMS.forEach(R=>{
+    const X=R.c*30,Y=R.r*30,W=R.w*30,H=R.h*30;
+    raw(`<rect x="${X}" y="${Y}" width="${W}" height="${H}" fill="url(#${k+R.f})"/>`);
+    raw(`<g transform="translate(${X} ${Y})">`);R.draw(W,H);raw('</g>');
+    raw(`<rect x="${X}" y="${Y}" width="${W}" height="${H}" fill="none" stroke="${p.wall}" stroke-width="${p.wallW}" rx="${k==='c'?6:0}"/>`);
+    const ww=p.wallW+2;
+    R.doors.forEach(([s,n])=>{
+      let gx,gy,gw,gh,mx,my,rot;
+      if(s==='b'){gx=n*30+3;gy=Y+H-ww/2;gw=24;gh=ww;mx=n*30+15;my=Y+H+15;rot=0;}
+      if(s==='t'){gx=n*30+3;gy=Y-ww/2;gw=24;gh=ww;mx=n*30+15;my=Y-15;rot=180;}
+      if(s==='l'){gx=X-ww/2;gy=n*30+3;gw=ww;gh=24;mx=X-15;my=n*30+15;rot=90;}
+      if(s==='r'){gx=X+W-ww/2;gy=n*30+3;gw=ww;gh=24;mx=X+W+15;my=n*30+15;rot=-90;}
+      raw(`<rect x="${gx}" y="${gy}" width="${gw}" height="${gh}" fill="url(#${k+R.f})"/>`);
+      raw(`<path d="M${mx-7} ${my+4}L${mx} ${my-5}L${mx+7} ${my+4}Z" fill="${p.red}" transform="rotate(${rot} ${mx} ${my})"/>`);
+    });
+    const [lx,ly]=R.lab,pw=Math.max(R.cn.length*28,R.en.length*7.4)+18;
+    if(p.plate)r(X+lx,Y+ly,pw,50,p.plate,p.rx,true);
+    t(X+lx+9,Y+ly+31,28,p.label,R.cn,p.cn);t(X+lx+9,Y+ly+44,10,p.labelSub,R.en,p.lat,'font-weight="700" letter-spacing="1.5"');
+  });
+  // title
+  r(378,48,204,204,x.tBg,k==='c'?14:2);
+  if(k==='a')raw(`<rect x="388" y="58" width="184" height="184" fill="none" stroke="#C9A04A" stroke-width="1.5"/>`);
+  t(480,138,52,x.tFg,'谁杀了',p.cn,`text-anchor="middle" ${k==='c'?'stroke="#1B1B1B" stroke-width="1.5"':''}`);
+  t(480,196,52,x.tFg,'客人？',p.cn,`text-anchor="middle" ${k==='c'?'stroke="#1B1B1B" stroke-width="1.5"':''}`);
+  t(480,226,12,x.tSub,'WHO KILLED THE GUEST?',p.lat,'text-anchor="middle" font-weight="700" letter-spacing="2"');
+  // envelope
+  r(400,690,160,110,p.red,4);raw(`<path d="M400 690L480 750L560 690" fill="none" stroke="${p.gold}" stroke-width="3"/>`);
+  c(480,750,18,p.gold);t(480,757,18,p.red,'密',serif,'text-anchor="middle" font-weight="900"');
+  t(480,836,22,k==='c'?'#1B1B1B':(k==='a'?'#F4EAD5':'#EFE3C8'),'机密 · 案件',p.cn,'text-anchor="middle"');
+  t(480,856,10,k==='c'?'#1B1B1B':p.gold,'CONFIDENTIAL CASE FILE',p.lat,'text-anchor="middle" font-weight="700" letter-spacing="2"');
+  // starts
+  const starts=big?[[330,64,'母','#C9A04A'],[630,64,'叔','#2E8A5E'],[64,630,'姑','#8A4FB0'],[896,630,'哥','#3D6FD1'],[64,900,'嫂','#E07AA0'],[896,900,'丈','#7C8085']]
+    :[[10,1,'母','#C9A04A'],[21,1,'叔','#2E8A5E'],[1,20,'姑','#8A4FB0'],[30,20,'哥','#3D6FD1'],[1,30,'嫂','#E07AA0'],[30,30,'丈','#7C8085']].map(([cc,rr,ch,f])=>[cc*30+15,rr*30+15,ch,f]);
+  starts.forEach(([X,Y,ch,f])=>{const rr=big?20:13;c(X,Y,rr,f);t(X,Y+(big?7:5),big?20:13,'#FFFFFF',ch,serif,'text-anchor="middle" font-weight="900"');});
+  return o.join('');
+}
+const SHEET={
+  sus:{label:'嫌疑人',q:'WHO',items:[['伯母','Big Aunty','#C9A04A'],['二叔','2nd Uncle','#2E8A5E'],['大姑','Big Aunt','#8A4FB0'],['表哥','Cousin','#5B8DEF'],['大嫂','Sister-in-law','#E07AA0'],['姑丈','Uncle-in-law','#7C8085']]},
+  room:{label:'地点',q:'WHERE',items:[['麻将房','Mahjong Room','#2FA37C'],['神台','Altar','#E8483B'],['书房','Study','#9DB8F2'],['客厅','Living Room','#FFFFFF'],['饭厅','Dining Room','#FF9A3C'],['车房','Garage','#C9C2B8'],['厨房','Kitchen','#FFB4A8'],['后院','Backyard','#7FD3A8']]},
+  obj:{label:'物品',q:'WITH',items:[['六万','Mahjong Tile','#FFFFFF'],['红包','Red Packet','#E8483B'],['鞭炮','Firecracker','#FF9A3C'],['年糕','Nian Gao','#C9A04A'],['橘子','Mandarin','#FFD54A'],['筷子','Chopsticks','#B86B3A']]}
+};
+const PLAYERS=[['我','哥','#5B8DEF'],['伯母','母','#C9A04A'],['二叔','叔','#2E8A5E'],['大姑','姑','#8A4FB0'],['大嫂','嫂','#E07AA0'],['姑丈','丈','#7C8085']];
+const MARK={'':['#FFFFFF','#1B1B1B',''],x:['#E6E1D8','#1B1B1B','✕'],v:['#2FA37C','#FFFFFF','✓'],q:['#FFD54A','#1B1B1B','?']};
+const SEED={'sus-2-0':'v','sus-1-3':'v','sus-0-0':'x','sus-0-1':'x','sus-0-2':'x','sus-0-3':'x','sus-0-4':'x','sus-0-5':'x','sus-4-4':'q','sus-5-2':'q','room-6-0':'v','room-0-1':'v','room-3-0':'x','room-3-1':'x','room-3-2':'x','room-3-3':'x','room-3-4':'x','room-3-5':'x','obj-5-0':'v','obj-1-0':'x','obj-1-2':'q'};
+
+const INK='#1B1B1B',NS='stroke="none"',SKIN='#F5C49A',HAIR='#3A2A2A';
+let UID=0;
+const R=(x,y,w,h,f,rx=0,ex='')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${ex}/>`;
+const C=(x,y,r,f,ex='')=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${ex}/>`;
+const E=(x,y,rx,ry,f,ex='')=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${f}" ${ex}/>`;
+const P=(d,f='none',ex='')=>`<path d="${d}" fill="${f}" ${ex}/>`;
+const T=(x,y,s,f,t,ex='')=>`<text x="${x}" y="${y}" font-size="${s}" fill="${f}" font-family="ZCOOL KuaiLe" text-anchor="middle" stroke="none" ${ex}>${t}</text>`;
+const G=s=>`<g stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">${s}</g>`;
+const N=(n,f)=>[...Array(n)].map((_,i)=>f(i)).join('');
+const rays=(a,b,cx=123,cy=96,n=20)=>R(-10,-10,280,380,a,0,NS)+N(n,i=>{const t1=i/n*6.2832,t2=(i+.5)/n*6.2832;return P(`M${cx} ${cy}L${(cx+Math.cos(t1)*500).toFixed(1)} ${(cy+Math.sin(t1)*500).toFixed(1)}L${(cx+Math.cos(t2)*500).toFixed(1)} ${(cy+Math.sin(t2)*500).toFixed(1)}Z`,b,NS);});
+const dotPat=(c,sp=12,r=1.8,op=1,w=300,h=400)=>{const id='dp'+(UID++);return `<defs><pattern id="${id}" width="${sp}" height="${sp}" patternUnits="userSpaceOnUse"><circle cx="${sp/2}" cy="${sp/2}" r="${r}" fill="${c}"/></pattern></defs><rect width="${w}" height="${h}" fill="url(#${id})" opacity="${op}"/>`;};
+const star=(cx,cy,r1,r2,n,f,ex='')=>P(N(n*2,i=>{const a=i/(n*2)*6.2832-1.5708,r=i%2?r2:r1;return (i?'L':'M')+(cx+Math.cos(a)*r).toFixed(1)+' '+(cy+Math.sin(a)*r).toFixed(1);})+'Z',f,ex);
+const body=(o,skin=SKIN)=>P('M28 216C28 166 74 148 123 148C172 148 218 166 218 216Z',o)+R(109,122,28,32,skin)+C(81,98,9,skin)+C(165,98,9,skin)+E(123,92,42,46,skin);
+const blush=()=>E(98,114,8,4.5,'#FF8A7A',NS+' opacity=".55"')+E(148,114,8,4.5,'#FF8A7A',NS+' opacity=".55"');
+const dotEyes=(dx=0,dy=0)=>C(107+dx,99+dy,4.5,INK,NS)+C(139+dx,99+dy,4.5,INK,NS)+C(108.5+dx,97.5+dy,1.5,'#fff',NS)+C(140.5+dx,97.5+dy,1.5,'#fff',NS);
+const hand=(x,y)=>E(x,y,11,10,SKIN)+P(`M${x-5} ${y-4}h9M${x-6} ${y+2}h9`,'none','stroke-width="2"');
+const nose=()=>P('M121 104Q117 112 124 112','none','stroke-width="2.5"');
+const PORTRAIT={
+'二叔':()=>rays('#7FD3A8','#64C896')+G(body('#2FA37C')+R(102,144,42,14,'#2FA37C',6)+P('M123 158V216','none','stroke-width="2.5"')+
+  [172,188,204].map(y=>P(`M112 ${y}h22`,'none','stroke="#FFD54A" stroke-width="4"')+C(123,y,3.5,'#FFD54A','stroke-width="2"')).join('')+
+  P('M82 98Q76 66 92 58L98 86Z','#555')+P('M164 98Q170 66 154 58L148 86Z','#555')+
+  P('M92 62Q124 40 156 60M96 56Q124 36 152 52M102 50Q126 34 146 46','none','stroke-width="2.5"')+
+  P('M94 80L117 86M129 86L152 80','none','stroke-width="5.5"')+
+  C(107,99,12,'#E6F7FF')+C(139,99,12,'#E6F7FF')+P('M119 99h8M95 97L83 93M151 97L163 93')+dotEyes(2,1)+nose()+
+  P('M108 121Q124 130 140 117')+P('M139 119L163 110','none','stroke="#E59A5F" stroke-width="3"')+
+  [104,112,120,128,136,144].map(x=>C(x,133,1.3,INK,NS)).join('')+
+  R(166,146,34,54,'#E8483B',7)+R(166,146,34,10,'#C9C2B8',4)+T(187,176,15,'#fff','啤')+R(148,174,12,10,'#FFD54A',3,'stroke-width="2"')+hand(166,190)),
+'大姑':()=>rays('#E4CCF5','#D2B0EE')+G([[82,70],[76,94],[82,120],[164,70],[170,94],[164,120],[100,52],[146,52],[123,46]].map(([x,y])=>C(x,y,16,HAIR)).join('')+
+  body('#8A4FB0')+R(103,140,40,18,'#8A4FB0',7)+P('M123 158Q146 168 170 160','none','stroke-width="2.5"')+
+  [[66,190],[94,204],[156,194],[186,180],[134,212],[200,206]].map(([x,y])=>C(x,y,6,'#FFB4A8','stroke-width="2"')+C(x,y,2,'#FFD54A',NS)).join('')+
+  [-16,-8,0,8,16].map(d=>C(123+d,166-d*d/40,3.5,'#fff','stroke-width="1.5"')).join('')+
+  C(81,112,5,'#FFD54A','stroke-width="2"')+C(165,112,5,'#FFD54A','stroke-width="2"')+
+  [[94,62,12],[110,54,13],[128,52,13],[146,58,12],[158,72,10],[88,76,10]].map(([x,y,r])=>C(x,y,r,HAIR)).join('')+
+  P('M96 86Q106 80 116 86M130 80Q142 70 153 78','none','stroke-width="4"')+dotEyes()+P('M100 95L96 91M146 95L150 91','none','stroke-width="2.5"')+nose()+
+  E(123,121,9,5,'#E8483B')+P('M115 121h16','none','stroke-width="2"')+blush()+
+  P('M150 200L176 150Q210 154 214 190Z','#E8483B')+P('M150 200L186 152M150 200L200 160M150 200L210 176','none','stroke="#FFD54A" stroke-width="2.5"')+hand(152,196)),
+'表哥':()=>rays('#B8CCF7','#9DB8F2')+G(P('M66 216C62 160 88 138 123 138C158 138 184 160 180 216Z','#3E6FD8')+body('#5B8DEF')+
+  P('M92 216L98 194H148L154 216','#3E6FD8')+P('M112 156L110 184M134 156L136 184','none','stroke-width="2.5"')+C(110,187,3,'#fff','stroke-width="2"')+C(136,187,3,'#fff','stroke-width="2"')+
+  P('M92 148Q123 174 154 148','none','stroke-width="7"')+R(80,136,18,26,'#E8483B',7)+R(148,136,18,26,'#E8483B',7)+
+  P('M80 92L76 62L92 70L92 42L108 58L118 32L130 56L144 38L148 62L164 52L160 74L168 90Q152 66 123 66Q96 66 80 92Z',INK)+
+  P('M97 88L115 90M131 90L149 88','none','stroke-width="4"')+P('M98 98h18M130 98h18')+C(108,102,3.5,INK,NS)+C(140,102,3.5,INK,NS)+nose()+
+  P('M114 123h18')+R(142,108,18,9,'#FFE3CF',3,'stroke-width="2" transform="rotate(-20 151 112)"')+
+  R(170,142,32,54,INK,7)+R(174,148,24,40,'#7FD3A8',3,NS)+P('M180 168l6 6 8-12','none','stroke="#fff" stroke-width="2.5"')+hand(172,184)),
+'大嫂':()=>rays('#FFDCD4','#FFC4B8')+G(P('M98 22L150 54','none','stroke="#E8483B" stroke-width="5"')+P('M104 16L154 46','none','stroke="#FFD54A" stroke-width="5"')+C(123,40,20,HAIR)+
+  body('#E07AA0')+P('M90 216L96 168H150L156 216Z','#FFFFFF')+P('M100 168L110 150M146 168L136 150','none','stroke-width="3"')+R(111,184,24,18,'#FFD54A',4,'stroke-width="2.5"')+
+  P('M81 94Q78 50 123 48Q168 50 165 94Q154 66 130 64Q112 74 81 94Z',HAIR)+C(81,112,5,'#2FA37C','stroke-width="2"')+C(165,112,5,'#2FA37C','stroke-width="2"')+
+  P('M98 100Q107 91 116 100M130 100Q139 91 148 100','none','stroke-width="4"')+nose()+P('M108 117Q123 134 138 117Z','#E8483B')+blush()+
+  P('M190 198V134','none','stroke-width="9"')+P('M190 198V134','none','stroke="#B86B3A" stroke-width="5"')+E(190,126,16,11,'#C9C2B8')+E(190,124,9,4,'#fff',NS)+hand(190,180)),
+'姑丈':()=>rays('#E8E2D6','#D6CDBE')+G(body('#7C8085')+P('M104 150L123 196L142 150Z','#fff')+P('M117 160H129L132 198L123 208L114 198Z','#E8483B')+
+  P('M104 150L92 172L110 176L123 200Z','#5E6268')+P('M142 150L154 172L136 176L123 200Z','#5E6268')+
+  P('M81 92Q76 48 122 48Q168 48 165 90Q160 66 140 62L106 64Q88 68 81 92Z','#2A2A2A')+P('M106 52Q104 58 106 64','none','stroke="#fff" stroke-width="2"')+
+  P('M96 88L115 82M131 82L150 88','none','stroke-width="4"')+C(107,100,3.5,INK,NS)+C(139,100,3.5,INK,NS)+nose()+
+  P('M102 118Q112 108 123 115Q134 108 144 118Q134 124 123 119Q112 124 102 118Z','#2A2A2A')+P('M117 128Q123 125 129 128','none','stroke-width="2.5"')+
+  P('M162 62Q170 76 162 82Q154 76 162 62Z','#9DB8F2','stroke-width="2.5"')+P('M70 70q-4 6 0 10M176 48q4 6 0 10','none','stroke-width="2"')+
+  '<g transform="rotate(-10 180 180)">'+R(148,146,66,64,'#fff',2)+T(166,176,20,INK,'报')+P('M182 160h24M182 170h24M156 186h50M156 194h50M156 202h40','none','stroke-width="2"')+'</g>'+hand(150,188)),
+'伯母':()=>rays('#FFF1C9','#F0DCA0')+G(P('M78 94Q74 42 123 40Q172 42 168 94L178 178H148L146 112H100L98 178H68Z',HAIR)+body('#C9A04A')+P('M106 150Q123 176 140 150Z','#FFF7EC')+
+  P('M104 150L92 178L108 182L118 170Z','#A9842F')+P('M142 150L154 178L138 182L128 170Z','#A9842F')+P('M112 160Q123 170 134 160','none','stroke="#FFD54A" stroke-width="2.5"')+C(123,169,3.5,'#FFD54A','stroke-width="1.5"')+
+  P('M81 98Q80 50 123 48Q166 50 165 98Q152 62 125 58Q100 62 81 98Z',HAIR)+R(92,50,28,15,INK,7)+R(126,50,28,15,INK,7)+P('M120 56h6')+P('M97 55h6M131 55h6','none','stroke="#fff" stroke-width="2"')+
+  C(81,116,7,'none','stroke="#FFD54A" stroke-width="3"')+C(165,116,7,'none','stroke="#FFD54A" stroke-width="3"')+
+  P('M97 86Q106 82 116 86M131 84Q140 80 149 84','none','stroke-width="3.5"')+C(107,99,4.5,INK,NS)+C(108.5,97.5,1.5,'#fff',NS)+P('M100 94L97 90M104 92L103 88','none','stroke-width="2"')+
+  P('M131 100Q139 93 147 100')+nose()+P('M112 118Q123 128 134 118Q123 122 112 118Z','#E8483B')+blush()+
+  P('M172 170Q186 142 200 170','none','stroke-width="4"')+R(160,166,52,40,'#E8483B',8)+R(179,180,14,10,'#FFD54A',2,'stroke-width="2"')+hand(160,192)),
+'大伯':()=>rays('#FFC9BE','#FFB4A8')+G(P('M22 216C22 160 70 146 123 146C176 146 224 160 224 216Z','#E8483B')+R(108,120,30,32,SKIN)+C(78,98,11,SKIN)+C(168,98,11,SKIN)+E(123,94,46,48,SKIN)+
+  P('M100 150L123 172L146 150','none','stroke-width="3"')+C(162,186,16,'#FFD54A')+T(162,193,18,'#E8483B','福')+
+  P('M80 86Q78 66 88 62M166 86Q168 66 158 62','none','stroke="#C9C2B8" stroke-width="6"')+
+  P('M96 84Q106 78 116 84M130 84Q140 78 150 84','none','stroke-width="4"')+P('M98 100Q107 92 116 100M130 100Q139 92 148 100','none','stroke-width="4"')+nose()+
+  P('M104 116Q123 136 142 116Z','#fff')+P('M108 136Q123 144 138 136','none','stroke-width="2.5"')+blush()+P('M96 154Q123 170 150 154','none','stroke="#FFD54A" stroke-width="4"'))+
+  '<g transform="rotate(-14 123 104)">'+R(-30,90,310,30,'#FFD54A',0,`stroke="${INK}" stroke-width="3"`)+T(123,112,18,INK,'受害者 · VICTIM · 受害者')+'</g>'
+};
+const fw=(x,y,c)=>N(12,i=>{const a=i/12*6.283;return P(`M${(x+Math.cos(a)*8).toFixed(1)} ${(y+Math.sin(a)*8).toFixed(1)}L${(x+Math.cos(a)*22).toFixed(1)} ${(y+Math.sin(a)*22).toFixed(1)}`,'none',`stroke="${c}" stroke-width="3"`);})+C(x,y,3,c,NS);
+const ROOM={
+'麻将房':()=>G(R(-5,-5,260,160,'#BDE8D2',0,NS)+N(13,i=>R(i*20,0,8,150,'#A8DDC2',0,NS))+R(-5,150,260,70,'#B86B3A')+P('M0 172H246M0 192H246','none','stroke-width="2" opacity=".4"')+
+  P('M24 18H64M24 92H64','none','stroke-width="5"')+R(28,20,32,70,'#fff',2)+T(44,66,28,'#E8483B','发')+
+  P('M123 0V18')+E(123,38,24,19,'#E8483B')+P('M123 20V56','none','stroke-width="2"')+R(112,16,22,6,'#FFD54A',2)+R(112,54,22,6,'#FFD54A',2)+P('M123 60V74','none','stroke="#FFD54A" stroke-width="4"')+
+  C(206,44,18,'#fff')+P('M206 44V32M206 44L214 48','none','stroke-width="3"')+
+  E(24,182,18,7,'#E59A5F')+R(18,186,12,22,'#E59A5F')+E(222,182,18,7,'#E59A5F')+R(216,186,12,22,'#E59A5F')+
+  R(42,176,10,32,'#8B4A2B')+R(194,176,10,32,'#8B4A2B')+P('M58 122H188L216 170H30Z','#2FA37C')+P('M70 128H176L196 162H50Z','#7FD3A8','stroke-width="2"')+R(30,170,186,10,'#8B4A2B',2)+
+  N(10,i=>R(68+i*11,106,10,18,'#fff',2,'stroke-width="2"')+R(68+i*11,119,10,5,'#2FA37C',0,NS))+N(11,i=>R(46+i*14,160,13,8,'#fff',2,'stroke-width="2"'))+
+  R(96,138,12,9,'#FFD54A',2,'stroke-width="2"')+R(112,142,12,9,'#fff',2,'stroke-width="2"')+R(128,134,12,9,'#fff',2,'stroke-width="2"')+
+  R(152,134,11,11,'#fff',2,'stroke-width="2" transform="rotate(20 157 139)"')+C(155,137,1.5,'#E8483B',NS)+C(160,142,1.5,'#E8483B',NS)),
+'神台':()=>R(0,0,246,160,'#E8483B')+dotPat('#FFD54A',14,1.6,.45,246,150)+G(R(-5,150,260,70,'#8B4A2B')+
+  R(6,14,20,128,'#C62E22')+R(220,14,20,128,'#C62E22')+['福','寿','安','康'].map((c,i)=>T(16,42+i*28,15,'#FFD54A',c)).join('')+['吉','祥','如','意'].map((c,i)=>T(230,42+i*28,15,'#FFD54A',c)).join('')+
+  P('M62 22H184L174 12H72Z','#8B4A2B')+R(68,22,110,74,'#5A2E1A',3)+R(106,28,34,42,'#FFD54A',3)+T(123,46,13,'#E8483B','祖')+T(123,64,13,'#E8483B','先')+
+  P('M114 82V66M123 82V62M132 82V66','none','stroke="#8B4A2B" stroke-width="2.5"')+P('M134 64Q146 54 148 42Q150 30 160 22','none','stroke="#fff" stroke-width="2"')+P('M106 80H140L136 96H110Z','#FFD54A')+
+  R(48,70,8,26,'#E8483B',2)+E(52,64,4,7,'#FFD54A','stroke-width="2"')+R(190,70,8,26,'#E8483B',2)+E(194,64,4,7,'#FFD54A','stroke-width="2"')+
+  R(30,96,186,12,'#5A2E1A',2)+R(40,108,166,100,'#8B4A2B',3)+P('M40 140H206M123 108V140','none','stroke-width="2.5"')+C(110,124,3,'#FFD54A','stroke-width="1.5"')+C(136,124,3,'#FFD54A','stroke-width="1.5"')+
+  R(70,152,106,40,'#C62E22',3)+T(123,181,22,'#FFD54A','福')+
+  [[76,88],[90,88],[83,76],[156,88],[170,88],[163,76]].map(([x,y])=>C(x,y,8,'#FF9A3C','stroke-width="2.5"')).join('')),
+'书房':()=>G(R(-5,-5,260,160,'#9DB8F2',0,NS)+R(-5,150,260,70,'#6B4A3A')+
+  R(150,18,76,62,'#1E2A5A',4)+C(204,38,10,'#FFD54A',NS)+C(209,35,9,'#1E2A5A',NS)+C(166,30,1.5,'#fff',NS)+C(176,60,1.5,'#fff',NS)+P('M188 18V80M150 49H226','none','stroke-width="3"')+
+  R(8,24,74,160,'#B86B3A',3)+[0,1,2,3].map(s=>{let x=12,o='';const cs=['#E8483B','#FFD54A','#2FA37C','#FFF7EC','#5B8DEF','#FF9A3C'];[7,10,6,9,8,11,7].forEach((w,i)=>{if(x+w>78)return;const h=26+((i*7+s*3)%8);o+=R(x,28+s*40+34-h,w,h,cs[(i+s)%6],1,'stroke-width="1.5"');x+=w+1;});return o;}).join('')+
+  P('M8 64H82M8 104H82M8 144H82','none','stroke-width="3"')+
+  R(100,140,58,58,'#555',5)+R(106,146,46,46,'#6E6E6E',3,'stroke-width="2"')+C(129,169,11,'#C9C2B8')+P('M129 160V164','none','stroke-width="2"')+R(144,160,4,18,'#C9C2B8',2,'stroke-width="1.5"')+
+  R(196,130,38,74,'#8B4A2B',2)+P('M196 154H234M196 178H234','none','stroke-width="2.5"')+C(215,142,2.5,'#FFD54A',NS)+C(215,166,2.5,'#FFD54A',NS)+R(92,118,148,12,'#8B4A2B',2)+
+  P('M106 96L92 118H144L130 96Z','#FFF7C9',NS+' opacity=".6"')+P('M118 118V96','none','stroke-width="3"')+P('M106 96H130L124 80H112Z','#2FA37C')+
+  R(144,102,40,16,'#FFF7EC',2,'stroke-width="2" transform="rotate(-6 164 110)"')+T(164,115,10,'#E8483B','地契','transform="rotate(-6 164 110)"')+
+  R(206,100,14,18,'#E8483B',2,'stroke-width="2"')+P('M210 100L206 88M216 100L220 90','none','stroke-width="2"')),
+'客厅':()=>G(R(-5,-5,260,160,'#FFF1C9',0,NS)+R(-5,150,260,70,'#E8B07A')+P('M0 172H246M0 194H246','none','stroke-width="2" opacity=".4"')+
+  R(8,10,18,100,'#E8483B')+['新','年','快','乐'].map((c,i)=>T(17,32+i*24,14,'#FFD54A',c)).join('')+
+  R(108,12,30,30,'#E8483B',2,'transform="rotate(45 123 27)"')+T(123,22,18,'#FFD54A','福','transform="rotate(180 123 28)"')+
+  P('M76 0V14')+E(76,26,12,11,'#E8483B')+R(70,13,12,4,'#FFD54A',1,'stroke-width="2"')+R(70,35,12,4,'#FFD54A',1,'stroke-width="2"')+
+  R(12,96,112,52,'#9DB8F2',12)+R(6,128,124,32,'#9DB8F2',8)+R(2,112,18,52,'#7FA3EE',8)+R(116,112,18,52,'#7FA3EE',8)+R(24,104,40,30,'#FFD54A',8)+R(70,104,40,30,'#FF9A3C',8)+R(16,164,8,12,INK)+R(112,164,8,12,INK)+
+  R(142,124,96,40,'#B86B3A',3)+P('M190 124V164','none','stroke-width="2.5"')+C(184,144,2.5,INK,NS)+C(196,144,2.5,INK,NS)+
+  P('M180 116L176 124M200 116L204 124')+R(146,54,88,62,INK,5)+R(152,60,76,50,'#5B8DEF',2,NS)+T(190,92,18,'#FFD54A','春晚')+
+  R(70,186,8,20,'#8B4A2B')+R(170,186,8,20,'#8B4A2B')+E(124,186,62,12,'#B86B3A')+C(108,182,13,'#E8483B')+C(108,182,7,'#FFD54A','stroke-width="2"')+C(142,182,7,'#FF9A3C','stroke-width="2.5"')+C(155,184,7,'#FF9A3C','stroke-width="2.5"')),
+'饭厅':()=>G(R(-5,-5,260,160,'#FFD8A8',0,NS)+R(-5,150,260,70,'#B86B3A')+
+  R(170,20,62,44,'#fff',3)+P('M184 40Q196 28 210 40Q196 52 184 40Z','#FF9A3C','stroke-width="2"')+P('M210 40L220 32V48Z','#FF9A3C','stroke-width="2"')+T(201,59,9,'#E8483B','年年有余')+
+  R(12,30,40,56,'#E8483B',2)+T(32,66,24,'#FFD54A','春')+
+  P('M86 48L56 116H190L160 48Z','#FFF7C9',NS+' opacity=".6"')+P('M123 0V26')+P('M100 26H146L160 48H86Z','#2FA37C')+
+  [44,92,154,202].map(x=>R(x-12,92,24,44,'#8B4A2B',6)).join('')+
+  P('M24 136Q30 198 123 198Q216 198 222 136Z','#E8483B')+E(123,134,100,26,'#E8483B')+P('M24 138Q123 186 222 138','none','stroke="#FFD54A" stroke-width="3"')+
+  E(123,130,48,13,'#fff')+E(123,128,26,8,'#C9F0DC','stroke-width="2"')+P('M106 128Q118 120 132 128Q118 136 106 128Z','#FF9A3C','stroke-width="2"')+P('M132 128L140 122V134Z','#FF9A3C','stroke-width="2"')+
+  [[48,140],[80,150],[166,150],[198,140]].map(([x,y])=>E(x,y,11,5,'#fff','stroke-width="2"')+C(x,y-3,5,'#fff','stroke-width="1.5"')+P(`M${x+12} ${y+2}L${x+24} ${y-6}M${x+14} ${y+4}L${x+26} ${y-3}`,'none','stroke="#8B4A2B" stroke-width="2"')).join('')),
+'车房':()=>G(R(-5,-5,260,160,'#C9C2B8',0,NS)+R(-5,150,260,70,'#8A8F95')+E(70,192,28,6,'#5A5F66',NS)+
+  R(8,16,74,130,'#E0D9CC',2)+N(9,i=>P(`M8 ${30+i*13}H82`,'none','stroke-width="2"'))+R(36,136,18,6,'#555',2,'stroke-width="2"')+
+  R(176,16,62,58,'#E59A5F',3)+R(186,26,4,30,'#555',1,'stroke-width="2"')+R(180,22,16,8,'#555',1,'stroke-width="2"')+P('M206 30V60','none','stroke-width="4"')+C(206,26,5,'none','stroke-width="3"')+R(222,30,6,24,'#E8483B',2,'stroke-width="2"')+
+  P('M100 100L114 66H170L184 100Z','#E8483B')+P('M110 96L120 72H164L174 96Z','#BDE8F5')+P('M126 76L134 92','none','stroke="#fff" stroke-width="3"')+
+  R(84,96,116,52,'#E8483B',14)+C(102,116,10,'#FFD54A')+C(182,116,10,'#FFD54A')+R(124,108,36,18,'#555',3)+P('M131 108V126M138 108V126M145 108V126M152 108V126','none','stroke-width="1.5"')+
+  R(88,148,22,24,INK,4)+R(174,148,22,24,INK,4)+R(80,138,124,14,'#C9C2B8',6)+R(120,141,44,10,'#fff',2,'stroke-width="2"')+T(142,149.5,8,INK,'CNY 888')+
+  R(16,128,34,26,'#E59A5F',2)+T(33,146,10,INK,'CNY')+R(10,154,46,40,'#E59A5F',2)+P('M10 168H56M33 154V194','none','stroke-width="2"')),
+'厨房':()=>G(R(-5,-5,260,140,'#FFE3CF',0,NS)+N(12,i=>P(`M${i*22} 0V124`,'none','stroke="#F5C9A8" stroke-width="1.5"'))+N(6,i=>P(`M0 ${i*22}H246`,'none','stroke="#F5C9A8" stroke-width="1.5"'))+
+  R(-5,124,260,12,'#fff')+R(-5,136,260,80,'#9DB8F2')+P('M62 136V208M124 136V208M186 136V208','none','stroke-width="2.5"')+[52,72,114,134,176,196].map(x=>C(x,160,3,'#FFD54A','stroke-width="1.5"')).join('')+
+  R(14,30,64,8,'#B86B3A',2)+R(22,36,8,6,'#8B4A2B')+R(16,42,20,24,'#C9C2B8',2)+P('M48 38L48 72L54 66L54 38Z','#C9C2B8')+P('M68 38V62','none','stroke-width="3"')+E(68,66,6,4,'#C9C2B8')+
+  R(14,88,40,16,'#E59A5F',4)+R(14,104,40,16,'#E59A5F',4)+E(34,86,20,5,'#E59A5F')+P('M14 96H54M14 112H54','none','stroke-width="1.5"')+
+  P('M150 10Q180 20 210 10','none','stroke-width="2"')+[156,168,180,192,204].map(x=>P(`M${x} 15Q${x+3} 34 ${x} 46`,'none','stroke-width="10"')+P(`M${x} 15Q${x+3} 34 ${x} 46`,'none','stroke="#A33A2A" stroke-width="6"')).join('')+
+  P('M112 92Q106 80 114 70Q120 62 114 52M140 92Q134 80 142 70','none','stroke="#fff" stroke-width="3"')+
+  R(84,112,86,14,'#555',3)+P('M108 112Q112 102 118 110Q123 98 128 110Q134 102 140 112Z','#FF9A3C','stroke-width="2"')+
+  P('M82 96Q127 134 172 96Z',INK)+P('M172 98L198 90','none','stroke-width="6"')+C(112,101,5,'#FF9A3C',NS)+C(127,104,5,'#2FA37C',NS)+C(142,101,5,'#E8483B',NS)+
+  E(214,116,20,8,'#fff')+C(208,110,6,'#FF9A3C','stroke-width="2"')+C(220,111,6,'#FF9A3C','stroke-width="2"')),
+'后院':()=>G(R(-5,-5,260,140,'#1E2A5A',0,NS)+[[20,20],[90,14],[150,46],[232,70],[60,74],[120,10],[214,10]].map(([x,y])=>C(x,y,1.8,'#fff',NS)).join('')+fw(56,40,'#FFD54A')+fw(190,32,'#E8483B')+fw(130,24,'#7FD3A8')+
+  R(-5,120,260,100,'#7FD3A8')+N(13,i=>P(`M${i*20+4} 128V86L${i*20+12} 78L${i*20+20} 86V128Z`,'#FFF7EC','stroke-width="2.5"'))+R(-5,98,260,8,'#FFF7EC',0,'stroke-width="2.5"')+
+  P('M0 60Q123 104 246 60','none','stroke-width="2"')+[.12,.3,.5,.7,.88].map(t=>{const x=246*t,y=(1-t)*(1-t)*60+2*(1-t)*t*104+t*t*60;return E(x.toFixed(1),(y+8).toFixed(1),6,7,'#E8483B','stroke-width="2"');}).join('')+
+  R(26,160,6,32,'#8B4A2B')+R(78,160,6,32,'#8B4A2B')+R(18,150,74,10,'#B86B3A',2)+E(46,142,12,9,'#fff')+P('M58 140L66 134','none','stroke-width="3"')+R(68,142,10,8,'#fff',2,'stroke-width="2"')+
+  [[110,190],[128,182],[140,196],[100,178]].map(([x,y],i)=>R(x,y,8,4,'#E8483B',1,`stroke-width="1.5" transform="rotate(${i*40} ${x} ${y})"`)).join('')+
+  C(193,118,40,'#2FA37C')+R(160,158,66,10,'#8B4A2B',2)+R(166,168,54,36,'#B86B3A',3)+T(193,192,14,'#FFD54A','吉')+
+  [[176,104],[200,94],[214,122],[184,134],[206,140],[172,124],[194,116]].map(([x,y])=>C(x,y,6,'#FF9A3C','stroke-width="2"')).join('')+R(198,100,6,9,'#E8483B',1,'stroke-width="1.5"')),
+};
+const OBJ={
+'六万':()=>rays('#FFE3CF','#FFD0B0')+G('<g transform="rotate(-8 123 104)">'+E(130,186,60,10,INK,NS+' opacity=".2"')+R(90,36,80,120,'#2FA37C',14)+R(80,28,80,120,'#fff',14)+R(88,36,64,104,'none',8,'stroke-width="2" stroke-dasharray="3 5"')+T(120,82,46,INK,'六')+T(120,132,46,'#E8483B','萬')+'</g>'+
+  P('M42 52L60 62M38 86H58M44 116L62 106M204 52L186 62M208 86H188M204 116L186 106','none','stroke-width="4"')),
+'红包':()=>rays('#FFE08A','#FFD54A')+G(R(122,40,78,122,'#C62E22',8,'transform="rotate(14 160 102)"')+
+  R(62,28,88,136,'#E8483B',8)+P('M62 38Q106 84 150 38','#C62E22')+R(70,36,72,120,'none',4,'stroke="#FFD54A" stroke-width="2"')+C(106,76,18,'#FFD54A')+T(106,84,20,'#E8483B','福')+T(106,134,18,'#FFD54A','大吉')+
+  [[54,182],[86,190],[168,180],[194,192],[140,194]].map(([x,y])=>E(x,y,14,8,'#FFD54A')+R(x-3,y-2,6,4,'#E59A5F',0,'stroke-width="1.5"')).join('')+star(196,40,14,6,4,'#fff','stroke-width="2"')),
+'鞭炮':()=>rays('#FFE3CF','#FFD0B0')+G(P('M123 30V200','none','stroke-width="3"')+
+  N(8,i=>{const y=46+i*19,s=i%2?1:-1,x0=s>0?123:85;return `<g transform="rotate(${s*18} 123 ${y})">`+R(x0,y-7,38,14,'#E8483B',4)+R(s>0?x0+30:x0,y-7,8,14,'#FFD54A',2)+'</g>';})+
+  P('M123 30L111 20M123 30L135 20','none','stroke="#FFD54A" stroke-width="5"')+C(123,30,5,'#FFD54A')+P('M123 26Q132 14 140 16','none','stroke-width="3"')+star(146,14,14,6,6,'#FFD54A')+
+  star(198,172,30,16,10,'#FFD54A')+T(198,180,20,'#E8483B','啪!')),
+'年糕':()=>rays('#FFF1C9','#FFE3A0')+G(E(123,172,92,18,'#fff')+P('M46 168L34 150L62 156L68 138L92 150L110 136L123 150L136 136L154 150L176 138L182 156L210 150L198 168Z','#2FA37C')+
+  P('M64 106V148Q123 176 182 148V106Z','#8B4A2B')+E(123,106,59,20,'#B86B3A')+E(123,104,44,13,'none','stroke="#D98A55" stroke-width="2"')+C(110,102,11,'#E8483B')+T(110,108,13,'#FFD54A','福')+
+  E(144,100,8,5,'#A3201A')+P('M150 96l6-4','none','stroke-width="2"')+P('M82 140Q84 158 78 164','none','stroke="#5A2E1A" stroke-width="4"')+
+  P('M178 182L210 172L216 188L184 198Z','#8B4A2B')+P('M178 182L210 172L206 166L176 176Z','#B86B3A')),
+'橘子':()=>rays('#FFF1C9','#FFE08A')+G(E(123,188,86,10,INK,NS+' opacity=".18"')+
+  C(162,134,40,'#FF9A3C')+P('M162 94Q166 86 162 82','none','stroke="#8B4A2B" stroke-width="3"')+P('M164 92Q184 74 198 88Q182 100 164 92Z','#2FA37C')+
+  C(94,120,52,'#FF9A3C')+E(76,98,12,8,'#FFD0A0',NS+' opacity=".8"')+[[110,100],[120,124],[84,140],[104,150],[70,124]].map(([x,y])=>C(x,y,1.6,'#E07F24',NS)).join('')+
+  P('M94 68Q96 58 92 52','none','stroke="#8B4A2B" stroke-width="3"')+P('M96 66Q74 42 58 56Q76 72 96 66Z','#2FA37C')+P('M98 66Q124 46 138 62Q118 76 98 66Z','#2FA37C')+
+  R(118,142,30,30,'#E8483B',2,'transform="rotate(45 133 157)"')+T(133,163,15,'#FFD54A','吉')+
+  P('M190 192Q198 172 208 192Z','#FFB45E','stroke-width="2.5"')+P('M206 192Q214 172 224 192Z','#FFB45E','stroke-width="2.5"')),
+'筷子':()=>rays('#E0D9CC','#CFC6B7')+G(P('M112 22L117 120M138 22L131 120','none','stroke-width="10"')+P('M112 22L117 120M138 22L131 120','none','stroke="#E8483B" stroke-width="5"')+
+  P('M112 22L113 40M138 22L137 40','none','stroke="#FFD54A" stroke-width="5"')+
+  [[94,120],[108,110],[124,106],[140,110],[154,118],[122,118],[102,124],[146,124]].map(([x,y])=>C(x,y,14,'#fff','stroke-width="2.5"')).join('')+
+  P('M64 122H182Q178 178 123 184Q68 178 64 122Z','#FFF7EC')+P('M74 142Q123 158 172 142','none','stroke="#5B8DEF" stroke-width="3"')+[90,110,136,156].map(x=>C(x,164,3,'#5B8DEF',NS)).join('')+R(104,182,38,10,'#FFF7EC',3)+
+  P('M44 70q8-8 0-16M202 70q-8-8 0-16M36 110q8-8 0-16','none','stroke-width="3"'))
+};
+const BACK=()=>R(0,0,252,352,'#E8483B')+dotPat('#FFD54A',22,3,1,252,352)+G(R(14,14,224,324,'none',12,'stroke="#FFD54A" stroke-width="4" stroke-dasharray="0.1 9"')+R(24,24,204,304,'none',10,'stroke-width="3"')+
+  R(110,36,32,42,'#fff',6)+T(126,66,22,'#E8483B','中')+'<g transform="rotate(180 126 296)">'+R(110,274,32,42,'#fff',6)+T(126,304,22,'#E8483B','中')+'</g>'+
+  C(126,176,80,'#FFF7EC')+C(126,176,68,'none','stroke="#E8483B" stroke-width="3" stroke-dasharray="2 7"')+
+  P('M138 166L160 188','none','stroke-width="11"')+P('M138 166L160 188','none','stroke="#B86B3A" stroke-width="6"')+C(118,146,26,'#BDE8F5')+T(118,158,34,'#E8483B','?')+T(126,222,22,INK,'谁杀了客人？'));
+const svgEl=(inner,vb='0 0 246 208')=>React.createElement('svg',{viewBox:vb,width:'100%',height:'100%',preserveAspectRatio:'xMidYMid slice',style:{display:'block'},dangerouslySetInnerHTML:{__html:inner}});
+const CARDS={
+  sus:[['S01','二叔','2nd Uncle','#2E8A5E','Lost big at last night\u2019s mahjong. Owes the guest money.','“我只是来拜年的！”'],['S02','大姑','Big Aunt','#8A4FB0','Eldest sister. Has always wanted the family house.','“这个家我说了算。”'],['S03','表哥','Cousin','#5B8DEF','Never looks up from his phone. Or does he?','“我在打游戏啦～”'],['S04','大嫂','Sister-in-law','#E07AA0','Cooked the reunion dinner. Knows every knife in the kitchen.','“饭快好了！”'],['S05','姑丈','Uncle-in-law','#7C8085','Quiet and polite. Sweating a lot tonight.','“我什么都没看到…”'],['S06','伯母','Big Aunty','#C9A04A','Runs the house. First to find the body, or so she says.','“红包呢？”']],
+  room:[['R01','麻将房','Mahjong Room','Where the tiles never stop clacking.'],['R02','神台','Ancestral Altar','Incense burning, ancestors watching.'],['R03','书房','Study','The house deed is kept in the safe.'],['R04','客厅','Living Room','春晚 on TV, too loud to hear a scream.'],['R05','饭厅','Dining Room','Reunion dinner, one seat empty.'],['R06','车房','Garage','Someone left the engine warm.'],['R07','厨房','Kitchen','Something is still boiling.'],['R08','后院','Backyard','Firecrackers cover every sound.']],
+  obj:[['O01','六万','Mahjong Tile','Missing from the winning hand.'],['O02','红包','Red Packet','Heavier than it should be.'],['O03','鞭炮','Firecracker','One string never went off.'],['O04','年糕','Nian Gao','Sticky enough to choke on.'],['O05','橘子','Mandarin','A gift of gold, or a bribe?'],['O06','筷子','Chopsticks','Stuck upright in the rice. Bad luck.']]
+};
+PORTRAIT['客人']=()=>rays('#F3EADB','#E8DCC4')+G(body('#F3EADB')+P('M104 150L123 196L142 150Z','#fff')+
+  P('M104 150L92 172L110 176L123 200Z','#E0D3BA')+P('M142 150L154 172L136 176L123 200Z','#E0D3BA')+
+  P('M110 158L123 166L110 174Z','#E8483B')+P('M136 158L123 166L136 174Z','#E8483B')+C(123,166,4,'#C62E22')+R(150,176,16,8,'#FFD54A',2,'stroke-width="2"')+
+  P('M81 92Q78 50 123 48Q168 50 165 92Q150 62 100 66Q90 72 81 92Z',INK)+P('M118 55Q140 52 152 62','none','stroke="#fff" stroke-width="2.5"')+
+  P('M96 84L116 86M130 86L150 84','none','stroke-width="4"')+C(107,99,11,'none','stroke="#FFD54A" stroke-width="3"')+C(139,99,11,'none','stroke="#FFD54A" stroke-width="3"')+P('M118 99h10','none','stroke="#FFD54A" stroke-width="3"')+
+  dotEyes()+nose()+P('M108 120Q124 130 140 118')+
+  R(160,150,48,44,'#E8483B',4)+P('M184 150V194M160 172H208','none','stroke="#FFD54A" stroke-width="5"')+P('M176 146Q184 134 184 150Q184 134 192 146','none','stroke="#FFD54A" stroke-width="3"')+hand(162,184));
+const VICTIM=()=>PORTRAIT['客人']()+'<g transform="rotate(-14 123 104)">'+R(-30,90,310,30,'#FFD54A',0,'stroke="'+INK+'" stroke-width="3"')+T(123,112,18,INK,'受害者 · 受害者 · 受害者')+'</g>';
+
+function buildAssets(){
+  const suspects=CARDS.sus.map(([id,cn,en,color,line,quote])=>({id,cn,en,line,quote,hasQuote:true,kind:'嫌疑人 · Suspect',art:svgEl(PORTRAIT[cn]())}));
+  const victim=[{id:'V00',cn:'客人',en:'The Guest',line:'Dropped by to 拜年 and claimed to know everyone’s secrets. Found dead at midnight. Not part of the deck.',quote:'“我知道你们每个人的秘密。”',hasQuote:true,kind:'受害者 · Victim',art:svgEl(VICTIM())}];
+  const rooms=CARDS.room.map(([id,cn,en,line])=>({id,cn,en,line,hasQuote:false,kind:'地点 · Room',art:svgEl(ROOM[cn]())}));
+  const objects=CARDS.obj.map(([id,cn,en,line])=>({id,cn,en,line,hasQuote:false,kind:'物品 · Object',art:svgEl(OBJ[cn]())}));
+  const tokens=CARDS.sus.map(([id,cn,en,color])=>({cn,en,color,art:svgEl(PORTRAIT[cn](),'58 28 130 130')}));
+  return {suspects,victim,rooms,objects,tokens,cardBack:svgEl(BACK(),'0 0 252 352')};
+}
+
+class Component extends DCLogic {
+  assets(){ if(!this._a) this._a=buildAssets(); return this._a; }
+  state={tab:'sus',pen:'x',marks:SEED,notes:'',sheet:false};
+  renderVals(){
+    const auto=this.props.autoDeduce ?? true, penMode=(this.props.inputMode ?? 'Pen toolbar')==='Pen toolbar';
+    const M=this.state.marks, cyc={'':'x',x:'v',v:'q',q:''};
+    const tap=key=>this.setState(s=>{const m={...s.marks},cur=m[key]||'';const n=penMode?(s.pen==='clear'||cur===s.pen?'':s.pen):cyc[cur];if(n)m[key]=n;else delete m[key];return{marks:m};});
+    const left=cat=>SHEET[cat].items.filter((_,i)=>!PLAYERS.some((_,c)=>M[cat+'-'+i+'-'+c]==='v'));
+    const tabs=['sus','room','obj','notes'].map(id=>({label:id==='notes'?'笔记':SHEET[id].label,count:id==='notes'?'':left(id).length,bg:this.state.tab===id?'#FFD54A':'transparent',fg:this.state.tab===id?'#1B1B1B':'#FFFFFF',go:()=>this.setState({tab:id})}));
+    const cat=this.state.tab==='notes'?'sus':this.state.tab;
+    const rows=SHEET[cat].items.map(([cn,en,color],i)=>{
+      const ms=PLAYERS.map((_,c)=>M[cat+'-'+i+'-'+c]||'');
+      const has=auto&&ms.includes('v'), flag=auto&&ms.every(m=>m==='x');
+      return {cn,en,color,deco:has?'line-through':'none',op:has?.4:1,flag,bg:flag?'#FFE1DB':'transparent',
+        cells:ms.map((m,c)=>({bg:MARK[m][0],fg:MARK[m][1],glyph:MARK[m][2],tap:()=>tap(cat+'-'+i+'-'+c)}))};
+    });
+    const caseSlots=['sus','room','obj'].map(k=>{const l=left(k);return{q:SHEET[k].q,v:l.length===1?l[0][0]:l.length+' left',bg:l.length===1?'#7FD3A8':'#FFFFFF'};});
+    const ready=caseSlots.every(s=>s.bg==='#7FD3A8');
+    const pens=[['x','✕','No'],['v','✓','Has'],['q','?','Maybe'],['clear','⌫','Clear']].map(([id,glyph,label])=>{const on=this.state.pen===id;return{glyph,label,bg:on?'#1B1B1B':'#FFFFFF',fg:on?'#FFD54A':'#1B1B1B',shadow:on?'none':'3px 3px 0 #1B1B1B',pick:()=>this.setState({pen:id})};});
+    const mk=k=>React.createElement('svg',{viewBox:'0 0 520 640',width:520,height:640,style:{display:'block'},dangerouslySetInnerHTML:{__html:boardSvg(k)}});
+    const full=k=>React.createElement('svg',{viewBox:'0 0 960 1140',width:960,height:1140,style:{display:'block'},dangerouslySetInnerHTML:{__html:fullBoardSvg(k)}});
+    return {...this.assets(),tabs,rows,caseSlots,pens,penMode,cycleMode:!penMode,players:PLAYERS.map(([name,ch,color])=>({name,ch,color})),isGrid:this.state.tab!=='notes',isNotes:this.state.tab==='notes',notes:this.state.notes,setNotes:e=>this.setState({notes:e.target.value}),sheetOpen:this.state.sheet,openAccuse:()=>this.setState({sheet:true}),closeAccuse:()=>this.setState({sheet:false}),confirmBg:ready?'#E8483B':'#C9C2B8',confirmLabel:ready?'确认指控':'Not sure yet',boardA:mk('a'),boardB:mk('b'),boardC:mk('c'),fullC2:React.createElement('svg',{viewBox:'0 0 960 1140',width:960,height:1140,style:{display:'block'},dangerouslySetInnerHTML:{__html:fullBoardSvg('c',true)}}),fullA:full('a'),fullB:full('b'),fullC:full('c')};
+  }
+}
+</script>
+</body>
+</html>

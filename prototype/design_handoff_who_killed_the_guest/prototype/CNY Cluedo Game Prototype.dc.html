@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./game-art.js"></script>
+<script src="./game-core.js"></script>
+<style>
+body{margin:0;background:#2A2320}
+a{color:#FFD54A}a:hover{color:#FFFFFF}
+button,input{color:#1B1B1B}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes glow{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes burst{0%{transform:scale(.1);opacity:0}15%{opacity:1}70%{opacity:1}100%{transform:scale(1.15);opacity:0}}
+@keyframes flicker{0%{opacity:0}10%{opacity:.85}15%{opacity:.1}30%{opacity:.9}35%{opacity:.3}55%{opacity:1}100%{opacity:1}}
+@keyframes slideIn{0%{transform:translateX(-300px)}100%{transform:translateX(0)}}
+@keyframes flash{0%{opacity:0}10%{opacity:1}100%{opacity:0}}
+@keyframes pop{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.2) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(6px,4px)}}
+@keyframes fall{0%{transform:rotate(0)}100%{transform:rotate(80deg)}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes wobble{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes floatUp{0%{transform:translateY(0) scale(.6);opacity:0}15%{transform:translateY(-20px) scale(1.1);opacity:1}80%{opacity:1}100%{transform:translateY(-220px) scale(1);opacity:0}}
+@keyframes ribbon{0%{transform:translateX(-110%) rotate(-4deg)}15%{transform:translateX(0) rotate(-4deg)}85%{transform:translateX(0) rotate(-4deg)}100%{transform:translateX(110%) rotate(-4deg)}}
+@keyframes tear{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(-90px) rotate(-14deg);opacity:0}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#2A2320;padding:40px 48px 80px;box-sizing:border-box;font-family:'Fredoka',sans-serif;color:#FFF7EC;display:flex;flex-direction:column;gap:22px">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <div>
+      <div style="font-family:'ZCOOL KuaiLe';font-size:40px;color:#FFD54A;line-height:1">谁杀了客人？ 游戏流程原型</div>
+      <div style="font-size:16px;margin-top:8px;max-width:780px;line-height:1.45">Tap through the game as one player on the phone. The TV shows the spectator screen at the same moment. Use the steps below to jump anywhere.</div>
+    </div>
+    <button onClick="{{ toggleMode }}" style="height:44px;padding:0 16px;border:2.5px solid #FFF7EC;border-radius:22px;background:transparent;color:#FFF7EC;font-family:'Fredoka';font-weight:600;font-size:14px;cursor:pointer">Room mode: {{ modeLabel }}</button>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <sc-for list="{{ flow }}" as="f" hint-placeholder-count="12">
+      <button onClick="{{ f.go }}" style="height:40px;padding:0 14px;border:2.5px solid #FFF7EC;border-radius:20px;background:{{ f.bg }};color:{{ f.fg }};font-family:'Fredoka';font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px"><span style="opacity:.6">{{ f.n }}</span><span>{{ f.label }}</span></button>
+    </sc-for>
+  </div>
+  <div style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+
+    <div data-screen-label="Phone" style="position:relative;flex-shrink:0;width:390px;height:844px;border:10px solid #1B1B1B;border-radius:54px;background:#FFF7EC;overflow:hidden;box-shadow:10px 10px 0 #000;display:flex;flex-direction:column;color:#1B1B1B">
+      <div style="height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-weight:600;font-size:15px;background:{{ stBg }};color:{{ stFg }}"><div>9:41</div><div style="width:110px;height:30px;background:#1B1B1B;border-radius:16px"></div><div style="width:24px;height:12px;border:2px solid {{ stFg }};border-radius:4px"></div></div>
+      <div style="flex:1;min-height:0;position:relative;display:flex;flex-direction:column">
+
+        <sc-if value="{{ isLang }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background-color:#FFD54A;background-image:radial-gradient(#1B1B1B 1.4px,transparent 1.8px);background-size:18px 18px">
+            <div style="font-family:'ZCOOL KuaiLe';font-size:50px;line-height:1;color:#E8483B;-webkit-text-stroke:2px #1B1B1B;text-shadow:4px 4px 0 #1B1B1B">谁杀了客人？</div>
+            <div style="background:#FFFFFF;border:3px solid #1B1B1B;border-radius:20px;padding:3px 14px;font-weight:700;font-size:16px;box-shadow:3px 3px 0 #1B1B1B">Who Killed the Guest?</div>
+            <div style="margin-top:30px;font-family:'ZCOOL KuaiLe';font-size:22px">选择语言 · Choose language</div>
+            <button onClick="{{ pickZh }}" style="width:100%;height:72px;border:3px solid #1B1B1B;border-radius:18px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:30px;cursor:pointer">中文</button>
+            <button onClick="{{ pickEn }}" style="width:100%;height:72px;border:3px solid #1B1B1B;border-radius:18px;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'Fredoka';font-weight:700;font-size:26px;cursor:pointer">English</button>
+            <div style="font-size:13px;font-weight:600;text-align:center">可以随时在设置中更改 · You can change this later in Settings</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 22px 26px;background-color:#FFD54A;background-image:radial-gradient(#1B1B1B 1.4px,transparent 1.8px);background-size:18px 18px;gap:14px">
+            <div style="align-self:stretch;display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:700;font-size:13px;background:#FFFFFF;border:2.5px solid #1B1B1B;border-radius:14px;padding:6px 12px"><span style="display:{{ zhD }}">你好，陈小明</span><span style="display:{{ enD }}">Hi, 陈小明</span></div>
+              <button onClick="{{ toSettings }}" style="width:44px;height:44px;border-radius:50%;border:3px solid #1B1B1B;background:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="4" fill="none" stroke="#1B1B1B" stroke-width="2.5"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" stroke="#1B1B1B" stroke-width="2.5" stroke-linecap="round"></path></svg></button>
+            </div>
+            <div style="margin-top:4px;background:#FFFFFF;border:3px solid #1B1B1B;padding:10px 10px 34px;box-shadow:6px 6px 0 #1B1B1B;transform:rotate(-4deg);position:relative">
+              <div style="width:240px;height:200px;border:2.5px solid #1B1B1B;overflow:hidden;box-sizing:border-box">{{ victimArt }}</div>
+              <div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font-family:'ZCOOL KuaiLe';font-size:18px"><span style="display:{{ zhD }}">神秘客人 · 2026</span><span style="display:{{ enD }}">The Guest · 2026</span></div>
+            </div>
+            <div style="text-align:center;margin-top:6px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:50px;line-height:1;color:#E8483B;-webkit-text-stroke:2px #1B1B1B;text-shadow:4px 4px 0 #1B1B1B"><span style="display:{{ zhD }}">谁杀了客人？</span><span style="display:{{ enD }}">Who Killed the Guest?</span></div>
+              <div style="display:inline-block;margin-top:10px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:20px;padding:3px 14px;font-weight:700;font-size:16px;box-shadow:3px 3px 0 #1B1B1B"><span style="display:{{ zhD }}">新年推理游戏</span><span style="display:{{ enD }}">A Chinese New Year mystery</span></div>
+            </div>
+            <div style="margin-top:auto;align-self:stretch;display:flex;flex-direction:column;gap:12px">
+              <button onClick="{{ openCreate }}" style="height:60px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px"><span style="display:{{ zhD }}">创建房间</span><span style="display:{{ enD }}">Create room</span></button>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <button onClick="{{ openJoin }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:19px;line-height:1.1"><span style="display:{{ zhD }}">加入房间</span><span style="display:{{ enD }}">Join room</span></span></button>
+                <button onClick="{{ openTv }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:19px;line-height:1.1"><span style="display:{{ zhD }}">电视观看</span><span style="display:{{ enD }}">Watch on TV</span></span></button>
+              </div>
+              <button onClick="{{ openRules }}" style="height:44px;border:none;background:transparent;font-family:'Fredoka';font-weight:700;font-size:15px;text-decoration:underline;cursor:pointer;color:#1B1B1B"><span style="display:{{ zhD }}">怎么玩？</span><span style="display:{{ enD }}">How to play</span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#FFF7EC">
+            <div style="height:60px;display:flex;align-items:center;gap:12px;padding:0 16px">
+              <button onClick="{{ toHome }}" style="width:44px;height:44px;border-radius:50%;border:3px solid #1B1B1B;background:#FFFFFF;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 5L8 12L15 19" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              <div><div style="font-family:'ZCOOL KuaiLe';font-size:26px;line-height:1"><span style="display:{{ zhD }}">设置</span><span style="display:{{ enD }}">Settings</span></div></div>
+            </div>
+            <div style="padding:6px 16px;display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ toggles }}" as="tg" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:12px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:16px;padding:10px 14px;min-height:66px;box-sizing:border-box">
+                  <div style="flex:1;min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:19px;line-height:1.1">{{ tg.cn }}</div><div style="font-size:12.5px;font-weight:500;line-height:1.3">{{ tg.en }}</div></div>
+                  <button onClick="{{ tg.flip }}" style="width:58px;height:34px;border-radius:17px;border:3px solid #1B1B1B;background:{{ tg.bg }};position:relative;cursor:pointer;padding:0;flex-shrink:0"><div style="position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#FFFFFF;border:2.5px solid #1B1B1B;box-sizing:border-box;transform:{{ tg.knob }};transition:transform .2s"></div></button>
+                </div>
+              </sc-for>
+              <div style="background:#FFFFFF;border:3px solid #1B1B1B;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div><div style="font-family:'ZCOOL KuaiLe';font-size:19px;line-height:1.1"><span style="display:{{ zhD }}">语言</span><span style="display:{{ enD }}">Language</span></div></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#1B1B1B;border-radius:12px;padding:4px">
+                  <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="3"><button onClick="{{ lg.pick }}" style="height:40px;border:none;border-radius:9px;background:{{ lg.bg }};color:{{ lg.fg }};font-family:'ZCOOL KuaiLe';font-size:16px;cursor:pointer">{{ lg.label }}</button></sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isLobby }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#FFF7EC;min-height:0">
+            <div style="height:58px;display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0">
+              <button onClick="{{ toHome }}" style="width:44px;height:44px;border-radius:50%;border:3px solid #1B1B1B;background:#FFFFFF;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 5L8 12L15 19" fill="none" stroke="#1B1B1B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+              <div style="flex:1;min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:24px;line-height:1"><span style="display:{{ zhD }}">等待玩家 · {{ roomName }}</span><span style="display:{{ enD }}">Waiting room · {{ roomName }}</span></div></div>
+              <sc-if value="{{ tvMode }}" hint-placeholder-val="{{ true }}"><div style="font-size:11px;font-weight:700;background:#2FA37C;color:#FFFFFF;border:2px solid #1B1B1B;border-radius:10px;padding:3px 8px"><span style="display:{{ zhD }}">电视已连接</span><span style="display:{{ enD }}">TV on</span></div></sc-if>
+            </div>
+            <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+              <div style="background:#FFD54A;border:3px solid #1B1B1B;border-radius:16px;box-shadow:4px 4px 0 #1B1B1B;padding:10px 14px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1"><div style="font-size:12px;font-weight:700"><span style="display:{{ zhD }}">房间号</span><span style="display:{{ enD }}">Room code</span></div><div style="display:flex;gap:6px;margin-top:4px"><sc-for list="{{ codeDigits }}" as="cd" hint-placeholder-count="4"><div style="width:38px;height:46px;background:#FFFFFF;border:2.5px solid #1B1B1B;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:26px">{{ cd.v }}</div></sc-for></div></div>
+                <button style="height:46px;padding:0 14px;border:2.5px solid #1B1B1B;border-radius:12px;background:#FFFFFF;font-family:'Fredoka';font-weight:700;font-size:14px;cursor:pointer"><span style="display:{{ zhD }}">分享</span><span style="display:{{ enD }}">Share</span></button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-family:'ZCOOL KuaiLe';font-size:19px"><span style="display:{{ zhD }}">选择角色</span><span style="display:{{ enD }}">Pick your character</span></div></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                <sc-for list="{{ charPick }}" as="cp" hint-placeholder-count="6">
+                  <button onClick="{{ cp.pick }}" style="height:100px;border:3px solid #1B1B1B;border-radius:14px;background:{{ cp.bg }};opacity:{{ cp.op }};cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:{{ cp.shadow }}">
+                    <div style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:2.5px solid #1B1B1B;box-sizing:border-box">{{ cp.face }}</div>
+                    <div style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1">{{ cp.cn }}</div>
+                    <div style="font-size:10px;font-weight:700;background:{{ cp.tagBg }};color:{{ cp.tagFg }};border:1.5px solid #1B1B1B;border-radius:8px;padding:0 5px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">{{ cp.tag }}</div>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:19px"><span style="display:{{ zhD }}">玩家 {{ joinedTxt }}</span><span style="display:{{ enD }}">Players {{ joinedTxt }}</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <sc-for list="{{ seats }}" as="st" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:8px;height:42px;border:2.5px solid #1B1B1B;border-radius:12px;background:#FFFFFF;padding:0 8px;opacity:{{ st.op }};box-sizing:border-box">
+                    <div style="width:22px;height:22px;border-radius:50%;border:2px solid #1B1B1B;background:{{ st.color }};flex-shrink:0;color:#FFFFFF;font-family:'Noto Serif SC';font-weight:900;font-size:11px;display:flex;align-items:center;justify-content:center">{{ st.g }}</div>
+                    <div style="min-width:0;flex:1"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ st.name }}</div><div style="font-size:10px;font-weight:500">{{ st.status }}</div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding:12px 16px 22px;display:flex;gap:10px;flex-shrink:0">
+              <sc-if value="{{ showFill }}" hint-placeholder-val="{{ true }}"><button onClick="{{ fillBots }}" style="flex:1;height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1.1"><span style="display:{{ zhD }}">机器人补位</span><span style="display:{{ enD }}">Fill with bots</span></span></button></sc-if>
+              <button onClick="{{ startGame }}" style="flex:1.4;height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;opacity:{{ startOp }};display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:21px;line-height:1.1"><span style="display:{{ zhD }}">开始游戏</span><span style="display:{{ enD }}">Start · 3+ players</span></span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStory }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#1B1B1B;color:#FFF7EC;padding:10px 12px 22px;gap:12px;min-height:0">
+            <div style="display:flex;align-items:center;gap:8px;height:36px">
+              <div style="font-size:12px;font-weight:700;background:#FFD54A;color:#1B1B1B;border-radius:10px;padding:4px 10px">{{ storyChapter }}</div>
+              <sc-if value="{{ tvMode }}" hint-placeholder-val="{{ true }}"><div style="font-size:11px;font-weight:700;border:1.5px solid #FFF7EC;border-radius:10px;padding:3px 8px"><span style="display:{{ zhD }}">电视同步</span><span style="display:{{ enD }}">On TV too</span></div></sc-if>
+              <button onClick="{{ storySkip }}" style="margin-left:auto;height:36px;padding:0 12px;border:2px solid #FFF7EC;border-radius:18px;background:transparent;color:#FFF7EC;font-family:'Fredoka';font-weight:700;font-size:13px;cursor:pointer"><span style="display:{{ zhD }}">跳过</span><span style="display:{{ enD }}">Skip</span></button>
+            </div>
+            <div style="width:100%;aspect-ratio:1;border:3px solid #FFF7EC;border-radius:16px;overflow:hidden;box-sizing:border-box">{{ storyScene }}</div>
+            <div style="background:#FFF7EC;color:#1B1B1B;border:3px solid #1B1B1B;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:22px;line-height:1.3;text-wrap:pretty">{{ storyCn }}</div>
+              <div style="font-size:14px;font-weight:500;line-height:1.4;text-wrap:pretty">{{ storyEn }}</div>
+            </div>
+            <div style="display:flex;gap:6px;justify-content:center"><sc-for list="{{ storyDots }}" as="sd" hint-placeholder-count="3"><div style="height:8px;width:{{ sd.w }};border-radius:4px;background:{{ sd.bg }}"></div></sc-for></div>
+            <button onClick="{{ storyNext }}" style="margin-top:auto;height:56px;border:3px solid #FFF7EC;border-radius:16px;background:#E8483B;color:#FFFFFF;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer">{{ storyNextLabel }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isMurder }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#0B0B10;color:#FFF7EC;padding:10px 12px 22px;gap:14px">
+            <div style="display:flex;align-items:center;gap:8px;height:36px">
+              <div style="font-size:12px;font-weight:700;background:#E8483B;color:#FFFFFF;border-radius:10px;padding:4px 10px"><span style="display:{{ zhD }}">第二章 · 凶案</span><span style="display:{{ enD }}">The murder</span></div>
+              <button onClick="{{ murderReplay }}" style="margin-left:auto;height:36px;padding:0 12px;border:2px solid #FFF7EC;border-radius:18px;background:transparent;color:#FFF7EC;font-family:'Fredoka';font-weight:700;font-size:13px;cursor:pointer"><span style="display:{{ zhD }}">重播</span><span style="display:{{ enD }}">Replay</span></button>
+              <button onClick="{{ murderNext }}" style="height:36px;padding:0 12px;border:2px solid #FFF7EC;border-radius:18px;background:transparent;color:#FFF7EC;font-family:'Fredoka';font-weight:700;font-size:13px;cursor:pointer"><span style="display:{{ zhD }}">跳过</span><span style="display:{{ enD }}">Skip</span></button>
+            </div>
+            <div style="width:100%;aspect-ratio:1;border:3px solid #333;border-radius:16px;overflow:hidden;box-sizing:border-box">{{ murderScene }}</div>
+            <div style="display:flex;gap:4px"><sc-for list="{{ murderBars }}" as="mb" hint-placeholder-count="6"><div style="flex:1;height:5px;border-radius:3px;background:{{ mb.bg }}"></div></sc-for></div>
+            <div style="text-align:center;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:28px;line-height:1.25;text-wrap:pretty">{{ murderCn }}</div>
+              <div style="font-size:15px;font-weight:500;opacity:.85">{{ murderEn }}</div>
+            </div>
+            <sc-if value="{{ murderDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ murderNext }}" style="margin-top:auto;height:56px;border:3px solid #FFF7EC;border-radius:16px;background:#E8483B;color:#FFFFFF;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer;animation:fadeUp .4s ease-out both"><span style="display:{{ zhD }}">继续</span><span style="display:{{ enD }}">Continue</span></button></sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#2FA37C;padding:10px 16px 22px;gap:12px;min-height:0">
+            <div style="display:flex;align-items:center;height:36px"><div style="font-size:12px;font-weight:700;background:#1B1B1B;color:#FFFFFF;border-radius:10px;padding:4px 10px"><span style="display:{{ zhD }}">准备游戏</span><span style="display:{{ enD }}">Setting up</span></div></div>
+            <sc-if value="{{ setupDeal }}" hint-placeholder-val="{{ true }}">
+              <div style="width:100%;aspect-ratio:1;border:3px solid #1B1B1B;border-radius:16px;overflow:hidden;box-sizing:border-box">{{ setupScene }}</div>
+              <div style="background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:4px 4px 0 #1B1B1B">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:21px;line-height:1.3">{{ setupCn }}</div>
+                <div style="font-size:14px;font-weight:500;line-height:1.4">{{ setupEn }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ setupRole }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center"><div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#FFFFFF;-webkit-text-stroke:1px #1B1B1B"><span style="display:{{ zhD }}">你的角色</span><span style="display:{{ enD }}">Your character · only you see this</span></div></div>
+              <div onClick="{{ flipRole }}" style="align-self:center;width:220px;height:308px;perspective:900px;cursor:pointer">
+                <div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.4,.5,1);transform:{{ roleRot }}">
+                  <div style="position:absolute;inset:0;backface-visibility:hidden;border:3px solid #1B1B1B;border-radius:16px;overflow:hidden;box-shadow:6px 6px 0 #1B1B1B;animation:wobble 1.6s ease-in-out infinite">{{ backArt }}</div>
+                  <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border:3px solid #1B1B1B;border-radius:16px;overflow:hidden;background:#FFF7EC;display:flex;flex-direction:column;box-shadow:6px 6px 0 #1B1B1B">
+                    <div style="height:178px;border-bottom:3px solid #1B1B1B;overflow:hidden;flex-shrink:0">{{ myArt }}</div>
+                    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:4px">
+                      <div style="font-family:'ZCOOL KuaiLe';font-size:38px;line-height:1">{{ myChar }}</div>
+                      <div style="font-weight:700;font-size:15px">{{ myEn }}</div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700"><div style="width:14px;height:14px;border-radius:50%;border:2px solid #1B1B1B;background:{{ myColor }}"></div><span style="display:{{ zhD }}">你的棋子颜色</span><span style="display:{{ enD }}">Your token colour</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <sc-if value="{{ roleNotFlipped }}" hint-placeholder-val="{{ true }}"><div style="text-align:center;font-family:'ZCOOL KuaiLe';font-size:20px;color:#FFFFFF;animation:pulse 1.2s ease-in-out infinite"><span style="display:{{ zhD }}">点击翻牌</span><span style="display:{{ enD }}">Tap to reveal</span></div></sc-if>
+              <sc-if value="{{ roleFlipped }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#FFF7EC;border:3px solid #1B1B1B;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.4;animation:fadeUp .4s ease-out both"><span style="display:{{ zhD }}">每个人都是嫌疑人，包括你。凶手可能就是你扮演的角色，你自己也不知道。</span><span style="display:{{ enD }}">Everyone is a suspect, including you. Your character could be the killer and you wouldn’t know.</span></div>
+                <div style="display:flex;justify-content:space-between;gap:4px"><sc-for list="{{ tableSeats }}" as="ts" hint-placeholder-count="6"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;flex:1"><div style="width:38px;height:38px;border-radius:50%;overflow:hidden;border:2.5px solid #1B1B1B;box-sizing:border-box">{{ ts.face }}</div><div style="font-size:10px;font-weight:700;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ ts.name }}</div></div></sc-for></div>
+              </sc-if>
+              <button onClick="{{ roleNext }}" style="margin-top:auto;height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer;opacity:{{ roleNextOp }}"><span style="display:{{ zhD }}">看我的手牌</span><span style="display:{{ enD }}">See my cards</span></button>
+            </sc-if>
+            <sc-if value="{{ setupHand }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center"><div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#FFFFFF;-webkit-text-stroke:1px #1B1B1B"><span style="display:{{ zhD }}">你的手牌</span><span style="display:{{ enD }}">Your cards</span></div></div>
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:6px">
+                <sc-for list="{{ handFlips }}" as="hc" hint-placeholder-count="3">
+                  <div style="width:108px;height:152px;perspective:700px;flex-shrink:0">
+                    <div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,1.4,.5,1);transform:{{ hc.rot }}">
+                      <div style="position:absolute;inset:0;backface-visibility:hidden;border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden">{{ hc.back }}</div>
+                      <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFF7EC;display:flex;flex-direction:column;box-shadow:4px 4px 0 #1B1B1B">
+                        <div style="height:88px;border-bottom:2.5px solid #1B1B1B;overflow:hidden;flex-shrink:0">{{ hc.art }}</div>
+                        <div style="padding:5px 7px"><div style="font-size:9px;font-weight:700">{{ hc.kind }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:20px;line-height:1.1">{{ hc.cn }}</div><div style="font-size:10px;font-weight:600">{{ hc.en }}</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#FFF7EC;border:3px solid #1B1B1B;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">你手上的牌一定不在信封里，已在笔记中帮你打勾。</span><span style="display:{{ enD }}">Your cards can’t be in the envelope. They’re already ticked in your notes.</span></div>
+              <button onClick="{{ toBoard }}" style="margin-top:auto;height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer"><span style="display:{{ zhD }}">前往棋盘</span><span style="display:{{ enD }}">Go to the board</span></button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGame }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;background:#FFF7EC;min-height:0">
+            <div style="height:52px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px">
+              <div style="height:30px;padding:0 8px;border:2.5px solid #1B1B1B;border-radius:15px;background:#FFFFFF;display:flex;align-items:center;font-family:'ZCOOL KuaiLe';font-size:13px;white-space:nowrap"><span style="display:{{ zhD }}">第{{ round }}轮</span><span style="display:{{ enD }}">R{{ round }}</span></div>
+              <div style="flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:3px">
+                <sc-for list="{{ seatBar }}" as="sb" hint-placeholder-count="6">
+                  <div style="position:relative;width:{{ sb.sz }};height:{{ sb.sz }};flex-shrink:0;transition:width .25s,height .25s;opacity:{{ sb.op }}">
+                    <svg viewBox="0 0 36 36" width="100%" height="100%" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="18" cy="18" r="16" fill="none" stroke="{{ sb.ringBg }}" stroke-width="3.5"></circle><circle cx="18" cy="18" r="16" fill="none" stroke="{{ sb.ring }}" stroke-width="3.5" pathLength="100" stroke-dasharray="{{ sb.dash }}" stroke-linecap="round" style="transition:stroke-dasharray 1s linear"></circle></svg>
+                    <div style="position:absolute;inset:4px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;filter:{{ sb.filt }};box-sizing:border-box">{{ sb.face }}</div>
+                    <sc-if value="{{ sb.me }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);background:#E8483B;color:#FFFFFF;border:1.5px solid #1B1B1B;border-radius:6px;font-size:9px;font-weight:700;padding:0 4px;line-height:1.3;white-space:nowrap">{{ meShort }}</div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="height:30px;min-width:38px;padding:0 6px;border:2.5px solid #1B1B1B;border-radius:15px;background:{{ timerBg }};color:{{ timerFg }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-sizing:border-box">{{ timerTxt }}</div>
+              <button onClick="{{ toggleReact }}" style="width:40px;height:40px;border-radius:50%;border:2.5px solid #1B1B1B;background:#FFD54A;box-shadow:2px 2px 0 #1B1B1B;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 5h16v11H10l-5 4v-4H4z" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="2" stroke-linejoin="round"></path><circle cx="9" cy="10.5" r="1.3" fill="#1B1B1B"></circle><circle cx="15" cy="10.5" r="1.3" fill="#1B1B1B"></circle><path d="M9 13q3 2 6 0" fill="none" stroke="#1B1B1B" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+            </div>
+            <div style="padding:0 12px;flex-shrink:0">
+              <div style="position:relative;width:100%;aspect-ratio:1;background:#FFD54A;border:3px solid #1B1B1B;border-radius:14px;overflow:hidden;box-sizing:border-box">
+                <sc-for list="{{ bCells }}" as="cl" hint-placeholder-count="40">
+                  <div onClick="{{ cl.tap }}" style="position:absolute;left:{{ cl.l }};top:{{ cl.t }};width:9.09%;height:9.09%;padding:1.5px;box-sizing:border-box;cursor:{{ cl.cur }}"><div style="width:100%;height:100%;border-radius:5px;border:2px solid #1B1B1B;background:{{ cl.bg }};box-sizing:border-box;animation:{{ cl.anim }}"></div></div>
+                </sc-for>
+                <sc-for list="{{ bRooms }}" as="rm" hint-placeholder-count="8">
+                  <div onClick="{{ rm.tap }}" style="position:absolute;left:{{ rm.l }};top:{{ rm.t }};width:27.27%;height:27.27%;padding:2px;box-sizing:border-box;cursor:{{ rm.cur }}">
+                    <div style="position:relative;width:100%;height:100%;border:2.5px solid #1B1B1B;border-radius:8px;overflow:hidden;box-sizing:border-box;box-shadow:{{ rm.glow }}">{{ rm.art }}
+                      <div style="position:absolute;left:3px;top:3px;background:#FFFFFF;border:2px solid #1B1B1B;border-radius:7px;padding:0 4px;font-family:'ZCOOL KuaiLe';font-size:12px;line-height:1.3">{{ rm.cn }}</div>
+                      <sc-if value="{{ rm.secret }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:3px;bottom:3px;background:#1B1B1B;color:#FFD54A;border-radius:6px;padding:0 4px;font-size:9px;font-weight:700"><span style="display:{{ zhD }}">密道 ↗</span><span style="display:{{ enD }}">Passage ↗</span></div></sc-if>
+                      <div style="position:absolute;inset:0;background:{{ rm.over }};animation:{{ rm.anim }}"></div>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-for list="{{ bDoors }}" as="dr" hint-placeholder-count="20"><div style="position:absolute;left:{{ dr.l }};top:{{ dr.t }};width:{{ dr.w }};height:{{ dr.h }};background:#E8483B;border:1.5px solid #1B1B1B;border-radius:2px;box-sizing:border-box"></div></sc-for>
+                <div style="position:absolute;left:36.36%;top:36.36%;width:27.27%;height:27.27%;padding:3px;box-sizing:border-box"><div style="width:100%;height:100%;background:#E8483B;border:2.5px solid #1B1B1B;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box"><div style="width:36px;height:36px;border-radius:50%;background:#FFD54A;border:2.5px solid #1B1B1B;display:flex;align-items:center;justify-content:center;font-family:'ZCOOL KuaiLe';font-size:20px;color:#E8483B">密</div></div></div>
+                <sc-for list="{{ bTokens }}" as="tk" hint-placeholder-count="6"><div style="position:absolute;left:{{ tk.l }};top:{{ tk.t }};width:0;height:0;transition:left .16s linear,top .16s linear;z-index:{{ tk.z }}">
+                  <sc-if value="{{ tk.active }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-23px;top:-23px;width:46px;height:46px;border-radius:50%;background:#FFD54A;border:2.5px solid #1B1B1B;opacity:.85;animation:pulse .9s ease-in-out infinite;box-sizing:border-box"></div></sc-if>
+                  <div style="position:absolute;left:-16px;top:-16px;width:32px;height:32px;border-radius:50%;background:{{ tk.c }};border:3px solid #FFFFFF;outline:2.5px solid #1B1B1B;box-shadow:2px 4px 0 3px rgba(0,0,0,.45);opacity:{{ tk.op }};color:#FFFFFF;font-family:'Noto Serif SC';font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box">{{ tk.g }}</div>
+                  <sc-if value="{{ tk.mine }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-30px;top:{{ tk.pinTop }};width:60px;display:flex;flex-direction:{{ tk.pinDir }};align-items:center;animation:bob 1s ease-in-out infinite"><div style="background:#E8483B;color:#FFFFFF;border:2px solid #1B1B1B;border-radius:8px;padding:0 7px;font-family:'ZCOOL KuaiLe';font-size:13px;line-height:1.4;white-space:nowrap">{{ meTag }}</div><div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:{{ tk.arTop }};border-bottom:{{ tk.arBot }}"></div></div></sc-if>
+                </div></sc-for>
+              </div>
+            </div>
+            <div style="height:32px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 14px;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden"><div style="width:8px;height:8px;border-radius:50%;background:#E8483B;flex-shrink:0;animation:blink 1.2s infinite"></div><div style="overflow:hidden;text-overflow:ellipsis">{{ lastLog }}</div></div>
+            <div style="margin:0 12px;display:flex;gap:4px;background:#1B1B1B;border-radius:14px;padding:4px;flex-shrink:0">
+              <sc-for list="{{ paneTabs }}" as="pt" hint-placeholder-count="3"><button onClick="{{ pt.go }}" style="flex:1;height:38px;border:none;border-radius:10px;background:{{ pt.bg }};color:{{ pt.fg }};font-family:'ZCOOL KuaiLe';font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">{{ pt.label }}</button></sc-for>
+            </div>
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:10px 12px 14px;display:flex;flex-direction:column">
+              <sc-if value="{{ paneAct }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+                  <sc-if value="{{ actRoll }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ openDice }}" style="height:76px;border:3px solid #1B1B1B;border-radius:18px;background:#FFD54A;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:14px;animation:pulse 1.6s ease-in-out infinite">
+                      <div style="width:44px;height:44px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:10px;display:grid;grid-template-columns:repeat(3,1fr);padding:5px;box-sizing:border-box;transform:rotate(-10deg)"><div style="border-radius:50%;background:#E8483B;width:8px;height:8px;grid-column:1"></div><div></div><div></div><div></div><div style="border-radius:50%;background:#E8483B;width:8px;height:8px"></div><div></div><div></div><div></div><div style="border-radius:50%;background:#E8483B;width:8px;height:8px"></div></div>
+                      <div style="text-align:left"><div style="font-family:'ZCOOL KuaiLe';font-size:24px;line-height:1"><span style="display:{{ zhD }}">掷骰子</span><span style="display:{{ enD }}">Roll the die</span></div></div>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ actMove }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:12px;align-items:center;background:#FFD54A;border:3px solid #1B1B1B;border-radius:16px;padding:10px 14px">
+                      <div style="width:52px;height:52px;flex-shrink:0;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:30px">{{ diceValue }}</div>
+                      <div><div style="font-family:'ZCOOL KuaiLe';font-size:18px;line-height:1.2"><span style="display:{{ zhD }}">最多走 {{ diceValue }} 步</span><span style="display:{{ enD }}">Move up to {{ diceValue }}</span></div><div style="font-size:12.5px;font-weight:600;line-height:1.35"><span style="display:{{ zhD }}">点击棋盘上发光的格子或房间。</span><span style="display:{{ enD }}">Tap a glowing square or room on the board.</span></div></div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ actSuggest }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ openSuggest }}" style="height:64px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:22px;line-height:1.1"><span style="display:{{ zhD }}">提出推理</span><span style="display:{{ enD }}">Make a suggestion</span></span></button>
+                  </sc-if>
+                  <sc-if value="{{ actEnd }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ endTurn }}" style="height:64px;border:3px solid #1B1B1B;border-radius:16px;background:#2FA37C;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:22px;line-height:1.1"><span style="display:{{ zhD }}">结束回合</span><span style="display:{{ enD }}">End turn</span></span></button>
+                  </sc-if>
+                  <sc-if value="{{ actWait }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:10px;align-items:center;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:16px;padding:10px 12px">
+                      <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:2.5px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ turnFace }}</div>
+                      <div style="flex:1;min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:17px">{{ waitCn }}</div><div style="font-size:12px;font-weight:600">{{ waitEn }}</div></div>
+                      <div style="display:flex;gap:3px"><div style="width:6px;height:6px;border-radius:50%;background:#1B1B1B;animation:blink 1s infinite"></div><div style="width:6px;height:6px;border-radius:50%;background:#1B1B1B;animation:blink 1s .2s infinite"></div><div style="width:6px;height:6px;border-radius:50%;background:#1B1B1B;animation:blink 1s .4s infinite"></div></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px"><sc-for list="{{ miniLog }}" as="ml" hint-placeholder-count="3"><div style="font-size:12px;font-weight:500;padding:4px 8px;border-radius:8px;background:#F3EADB">{{ ml.t }}</div></sc-for></div>
+                    <button onClick="{{ skipBots }}" style="height:36px;border:2px dashed #1B1B1B;border-radius:12px;background:transparent;font-family:'Fredoka';font-weight:600;font-size:12px;cursor:pointer">Prototype: skip to my turn</button>
+                  </sc-if>
+                  <sc-if value="{{ actOut }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:12px;align-items:center;background:#E6E1D8;border:3px dashed #1B1B1B;border-radius:16px;padding:10px 12px"><svg viewBox="0 0 60 64" width="54" height="58" style="flex-shrink:0;animation:bob 1.6s ease-in-out infinite"><path d="M6 60V28C6 14 17 4 30 4S54 14 54 28V60L46 54L38 60L30 54L22 60L14 54Z" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"></path><ellipse cx="22" cy="28" rx="4" ry="6" fill="#1B1B1B"></ellipse><ellipse cx="38" cy="28" rx="4" ry="6" fill="#1B1B1B"></ellipse><ellipse cx="30" cy="42" rx="5" ry="4" fill="#1B1B1B"></ellipse></svg><div style="flex:1;min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:20px"><span style="display:{{ zhD }}">你是幽灵</span><span style="display:{{ enD }}">You’re a ghost</span></div><div style="font-size:12.5px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">不能移动、推理或指控。别人推理时，你还是要给牌。</span><span style="display:{{ enD }}">You can’t move, suggest or accuse. You still show cards when someone suggests.</span></div></div></div>
+                  </sc-if>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto">
+                    <button onClick="{{ takeSecret }}" style="height:52px;border:3px solid #1B1B1B;border-radius:14px;background:#1B1B1B;color:#FFD54A;cursor:pointer;opacity:{{ secretOp }};display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1.1"><span style="display:{{ zhD }}">走密道</span><span style="display:{{ enD }}">Secret passage</span></span></button>
+                    <button onClick="{{ openAccuse }}" style="height:52px;border:3px solid #E8483B;border-radius:14px;background:#FFFFFF;color:#E8483B;cursor:pointer;opacity:{{ accuseOp }};display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1.1"><span style="display:{{ zhD }}">指控！</span><span style="display:{{ enD }}">Accuse</span></span></button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ paneCards }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:17px"><span style="display:{{ zhD }}">我的牌</span><span style="display:{{ enD }}">My cards</span></div>
+                  <div style="display:flex;gap:8px">
+                    <sc-for list="{{ myHand }}" as="h" hint-placeholder-count="3">
+                      <div style="flex:1;min-width:0;border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B"><div style="height:70px;border-bottom:2.5px solid #1B1B1B;overflow:hidden">{{ h.art }}</div><div style="padding:4px 6px"><div style="font-family:'ZCOOL KuaiLe';font-size:17px;line-height:1.1">{{ h.cn }}</div><div style="font-size:10px;font-weight:600">{{ h.en }}</div></div></div>
+                    </sc-for>
+                  </div>
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:17px;margin-top:4px"><span style="display:{{ zhD }}">别人给我看的牌</span><span style="display:{{ enD }}">Shown to me</span></div>
+                  <sc-if value="{{ noShown }}" hint-placeholder-val="{{ true }}"><div style="font-size:12.5px;font-weight:500;padding:10px;border:2px dashed #1B1B1B;border-radius:12px"><span style="display:{{ zhD }}">还没有。提出推理就能看到别人的牌。</span><span style="display:{{ enD }}">Nothing yet. Make a suggestion to see other players' cards.</span></div></sc-if>
+                  <sc-for list="{{ shownList }}" as="sh" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:8px;border:2.5px solid #1B1B1B;border-radius:12px;background:#FFFFFF;padding:6px 8px">
+                      <div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ sh.face }}</div>
+                      <div style="font-size:12px;font-weight:600;flex:1"><span style="display:{{ zhD }}">{{ sh.from }} 给你看了</span><span style="display:{{ enD }}">{{ sh.from }} showed</span></div>
+                      <div style="font-family:'ZCOOL KuaiLe';font-size:17px">{{ sh.cn }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ paneNotes }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ hasResume }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resumeSheet }}" style="height:46px;margin-bottom:8px;border:3px solid #1B1B1B;border-radius:14px;background:#E8483B;color:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:18px;cursor:pointer;flex-shrink:0">{{ resumeLabel }}</button></sc-if>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,34px);gap:3px;align-items:center;position:sticky;top:-10px;background:#FFF7EC;padding:2px 0 6px;z-index:2">
+                  <div style="font-size:10px;font-weight:700"><span style="display:{{ zhD }}">点击标记 ✕ ✓ ?</span><span style="display:{{ enD }}">Tap to mark ✕ ✓ ?</span></div>
+                  <sc-for list="{{ noteHead }}" as="nh" hint-placeholder-count="6"><div style="width:28px;height:28px;margin:0 auto;border-radius:50%;border:2px solid #1B1B1B;background:{{ nh.c }};color:#FFFFFF;font-family:'Noto Serif SC';font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;box-sizing:border-box">{{ nh.g }}</div></sc-for>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <sc-for list="{{ noteRows }}" as="nr" hint-placeholder-count="10">
+                    <sc-if value="{{ nr.head }}" hint-placeholder-val="{{ false }}"><div style="font-family:'ZCOOL KuaiLe';font-size:15px;color:#E8483B;margin-top:6px">{{ nr.label }}</div></sc-if>
+                    <sc-if value="{{ nr.row }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(6,34px);gap:3px;align-items:center">
+                        <div style="font-family:'ZCOOL KuaiLe';font-size:15px;text-decoration:{{ nr.deco }};opacity:{{ nr.op }};white-space:nowrap;overflow:hidden">{{ nr.cn }}</div>
+                        <sc-for list="{{ nr.cells }}" as="nc" hint-placeholder-count="6"><button onClick="{{ nc.tap }}" style="height:30px;border:2px solid #1B1B1B;border-radius:7px;background:{{ nc.bg }};color:{{ nc.fg }};font-family:'Fredoka';font-weight:700;font-size:15px;padding:0;cursor:pointer">{{ nc.glyph }}</button></sc-for>
+                      </div>
+                    </sc-if>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ reactOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:50px;right:8px;z-index:22;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;box-shadow:4px 4px 0 #1B1B1B;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:250px;animation:fadeUp .2s ease-out">
+            <sc-for list="{{ stickers }}" as="st" hint-placeholder-count="6"><button onClick="{{ st.send }}" style="height:44px;border:2.5px solid #1B1B1B;border-radius:12px;background:{{ st.bg }};color:{{ st.fg }};font-family:'ZCOOL KuaiLe';font-size:16px;cursor:pointer;padding:0">{{ st.txt }}</button></sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isGame }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;bottom:120px;height:0;z-index:23;pointer-events:none"><sc-for list="{{ floats }}" as="fl" hint-placeholder-count="0"><div style="position:absolute;left:{{ fl.l }};bottom:0;display:flex;align-items:center;gap:4px;animation:floatUp 2.6s ease-out both"><div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;box-sizing:border-box">{{ fl.face }}</div><div style="background:{{ fl.bg }};color:{{ fl.fg }};border:2.5px solid #1B1B1B;border-radius:12px;padding:2px 10px;font-family:'ZCOOL KuaiLe';font-size:18px;white-space:nowrap;box-shadow:2px 2px 0 #1B1B1B">{{ fl.txt }}</div></div></sc-for></div></sc-if>
+        <sc-if value="{{ bannerOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:-20px;right:-20px;top:200px;z-index:24;pointer-events:none;animation:ribbon 1.8s ease-in-out both"><div style="background:#FFD54A;border-top:4px solid #1B1B1B;border-bottom:4px solid #1B1B1B;padding:12px 0;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.35)"><div style="font-family:'ZCOOL KuaiLe';font-size:44px;line-height:1;color:#E8483B;-webkit-text-stroke:1.5px #1B1B1B"><span style="display:{{ zhD }}">轮到你了！</span><span style="display:{{ enD }}">YOUR TURN!</span></div><div style="font-size:13px;font-weight:700;margin-top:4px"><span style="display:{{ zhD }}">60 秒内完成行动</span><span style="display:{{ enD }}">You have 60 seconds</span></div></div></div>
+        </sc-if>
+        <sc-if value="{{ momentOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;z-index:19;background:rgba(11,11,16,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px;color:#FFF7EC;animation:fadeUp .25s ease-out">
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:3px solid #FFD54A;box-sizing:border-box">{{ mFace }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:24px;color:#FFD54A">{{ mTitle }}</div></div>
+            <div style="display:flex;gap:8px"><sc-for list="{{ mCards }}" as="mc" hint-placeholder-count="3"><div style="width:108px;border:3px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFF7EC;color:#1B1B1B;box-shadow:4px 4px 0 #000;animation:{{ mc.anim }}"><div style="font-size:10px;font-weight:700;padding:2px 6px;background:#1B1B1B;color:#FFFFFF">{{ mc.q }}</div><div style="height:84px;overflow:hidden;border-bottom:2.5px solid #1B1B1B">{{ mc.art }}</div><div style="padding:4px 6px;font-family:'ZCOOL KuaiLe';font-size:18px;line-height:1.1">{{ mc.cn }}</div></div></sc-for></div>
+            <div style="font-size:13px;font-weight:700;opacity:.85"><span style="display:{{ zhD }}">顺时针询问：谁有这些牌？</span><span style="display:{{ enD }}">Going clockwise: who has one of these?</span></div>
+            <div style="display:flex;gap:8px;justify-content:center"><sc-for list="{{ mChain }}" as="ch" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;opacity:{{ ch.op }};transition:opacity .2s"><div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:3px solid {{ ch.ring }};box-sizing:border-box">{{ ch.face }}</div><div style="min-width:44px;text-align:center;border-radius:8px;padding:1px 4px;font-size:12px;font-weight:700;background:{{ ch.bg }};color:{{ ch.fg }};animation:{{ ch.anim }}">{{ ch.label }}</div></div></sc-for></div>
+            <div style="font-family:'ZCOOL KuaiLe';font-size:20px;min-height:28px;text-align:center">{{ mStatus }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ tutOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;z-index:40;overflow:hidden">
+            <div style="position:absolute;left:{{ tutX }};top:{{ tutY }};width:{{ tutW }};height:{{ tutH }};border:3px solid #FFD54A;border-radius:14px;box-shadow:0 0 0 9999px rgba(11,11,16,.72);transition:all .3s;box-sizing:border-box;pointer-events:none"></div>
+            <div style="position:absolute;left:14px;right:14px;top:{{ tutBy }};background:#FFF7EC;border:3px solid #1B1B1B;border-radius:18px;box-shadow:5px 5px 0 #000;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:top .3s">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:700;background:#1B1B1B;color:#FFD54A;border-radius:8px;padding:2px 8px"><span style="display:{{ zhD }}">新手教学</span><span style="display:{{ enD }}">Tutorial</span> {{ tutStep }}</div><button onClick="{{ tutSkip }}" style="height:32px;padding:0 10px;border:2px solid #1B1B1B;border-radius:10px;background:#FFFFFF;font-family:'Fredoka';font-weight:700;font-size:12px;cursor:pointer"><span style="display:{{ zhD }}">跳过教学</span><span style="display:{{ enD }}">Skip tutorial</span></button></div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:19px;line-height:1.4;text-wrap:pretty">{{ tutText }}</div>
+              <button onClick="{{ tutNext }}" style="height:48px;border:3px solid #1B1B1B;border-radius:14px;background:#E8483B;color:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:19px;cursor:pointer">{{ tutBtn }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isReveal }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;background:#0B0B10;color:#FFF7EC;padding:14px 16px 22px;gap:12px;overflow:hidden">
+            <div style="text-align:center"><div style="font-family:'ZCOOL KuaiLe';font-size:24px;color:#FFD54A"><span style="display:{{ zhD }}">{{ accuserCn }} 指控</span><span style="display:{{ enD }}">{{ accuserCn }} accuses</span></div></div>
+            <div style="display:flex;gap:6px"><sc-for list="{{ accusedChips }}" as="ac" hint-placeholder-count="3"><div style="background:#FFF7EC;color:#1B1B1B;border:2px solid #1B1B1B;border-radius:10px;padding:3px 10px;font-family:'ZCOOL KuaiLe';font-size:17px">{{ ac.cn }}</div></sc-for></div>
+            <sc-if value="{{ rvEnvelope }}" hint-placeholder-val="{{ true }}"><div style="width:100%;aspect-ratio:1;border-radius:16px;overflow:hidden">{{ envSceneEl }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:22px"><span style="display:{{ zhD }}">打开信封…</span><span style="display:{{ enD }}">Opening the envelope</span></div></sc-if>
+            <sc-if value="{{ rvCards }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;gap:8px;align-items:center">
+                <sc-for list="{{ revealCards }}" as="rc" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                    <div style="width:108px;height:152px;perspective:700px"><div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.4,.5,1);transform:{{ rc.rot }}">
+                      <div style="position:absolute;inset:0;backface-visibility:hidden;border:2.5px solid #FFF7EC;border-radius:12px;overflow:hidden">{{ rc.back }}</div>
+                      <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFF7EC;color:#1B1B1B;display:flex;flex-direction:column"><div style="height:96px;border-bottom:2.5px solid #1B1B1B;overflow:hidden">{{ rc.art }}</div><div style="padding:6px 8px"><div style="font-family:'ZCOOL KuaiLe';font-size:20px;line-height:1.1">{{ rc.cn }}</div><div style="font-size:10px;font-weight:600">{{ rc.en }}</div></div></div>
+                    </div></div>
+                    <div style="width:34px;height:34px;border-radius:50%;border:2.5px solid #FFF7EC;background:{{ rc.badgeBg }};opacity:{{ rc.badgeOp }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;transition:opacity .3s">{{ rc.badge }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rvSpot }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative;width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(ellipse at 50% 40%,#5A4A2A 0%,#0B0B10 60%)">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:22px"><span style="display:{{ zhD }}">凶手是…</span><span style="display:{{ enD }}">The killer is…</span></div>
+                <div style="width:220px;height:220px;border-radius:50%;overflow:hidden;border:4px solid #FFD54A;box-shadow:0 0 60px #FFD54A;filter:{{ spotFilter }};transition:filter 2s ease-out">{{ killerFace }}</div>
+                <div style="font-family:'ZCOOL KuaiLe';font-size:44px;color:#E8483B;-webkit-text-stroke:1.5px #FFF7EC;opacity:{{ spotTextOp }};transition:opacity .6s .8s">{{ killerCn }}！</div>
+                <div style="font-size:14px;font-weight:600;opacity:{{ spotTextOp }};transition:opacity .6s 1s"><span style="display:{{ zhD }}">在 {{ solRoom }} · 用 {{ solObj }}</span><span style="display:{{ enD }}">in the {{ solRoom }} · with the {{ solObj }}</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rvVerdict }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;background:#FFD54A;color:#1B1B1B;border:3px solid #1B1B1B;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;animation:fadeUp .4s ease-out both">
+                <div style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:2.5px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ winnerFace }}</div>
+                <div style="flex:1"><div style="font-family:'ZCOOL KuaiLe';font-size:20px"><span style="display:{{ zhD }}">{{ winnerCn }} 破案了！</span><span style="display:{{ enD }}">{{ winnerCn }} solved the case!</span></div></div>
+              </div>
+              <button onClick="{{ toEnd }}" style="width:100%;height:56px;border:3px solid #FFF7EC;border-radius:16px;background:#E8483B;color:#FFFFFF;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer"><span style="display:{{ zhD }}">查看结果</span><span style="display:{{ enD }}">See results</span></button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isEnd }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;overflow-y:auto;background-color:#FFD54A;background-image:radial-gradient(#1B1B1B 1.4px,transparent 1.8px);background-size:18px 18px;padding:12px 16px 22px;display:flex;flex-direction:column;gap:12px">
+            <div style="text-align:center"><div style="font-family:'ZCOOL KuaiLe';font-size:40px;line-height:1;color:#E8483B;-webkit-text-stroke:1.5px #1B1B1B;text-shadow:3px 3px 0 #1B1B1B"><span style="display:{{ zhD }}">结案！</span><span style="display:{{ enD }}">Case closed</span></div></div>
+            <div style="background:#FFFFFF;border:3px solid #1B1B1B;border-radius:16px;box-shadow:4px 4px 0 #1B1B1B;padding:10px 12px;display:flex;align-items:center;gap:10px">
+              <div style="width:52px;height:52px;border-radius:50%;overflow:hidden;border:2.5px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ winnerFace }}</div>
+              <div><div style="font-family:'ZCOOL KuaiLe';font-size:22px"><span style="display:{{ zhD }}">{{ winnerCn }} 赢了！</span><span style="display:{{ enD }}">{{ winnerCn }} wins!</span></div><div style="font-size:12.5px;font-weight:600">{{ resultNote }}</div></div>
+            </div>
+            <div style="display:flex;gap:8px"><sc-for list="{{ solCards }}" as="sc" hint-placeholder-count="3"><div style="flex:1;min-width:0;border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFFFFF"><div style="font-size:10px;font-weight:700;padding:3px 6px;background:#1B1B1B;color:#FFFFFF">{{ sc.q }}</div><div style="height:70px;overflow:hidden;border-bottom:2.5px solid #1B1B1B">{{ sc.art }}</div><div style="padding:4px 6px;font-family:'ZCOOL KuaiLe';font-size:17px">{{ sc.cn }}</div></div></sc-for></div>
+            <div style="background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:19px"><span style="display:{{ zhD }}">真相</span><span style="display:{{ enD }}">What really happened</span></div>
+              <div style="font-size:13.5px;font-weight:600;line-height:1.45"><span style="display:{{ zhD }}">姑丈欠了一大笔赌债，客人知道这个秘密。烟花一响，他把客人骗到车房，拉下电闸，用冻硬的年糕下手，再把尸体拖到大门口。</span><span style="display:{{ enD }}">Uncle-in-law had huge gambling debts, and the guest knew. During the fireworks he lured the guest to the garage, cut the power, struck with a frozen nian gao, then dragged the body to the front steps.</span></div>
+            </div>
+            <div style="background:#FFFFFF;border:3px solid #1B1B1B;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:19px"><span style="display:{{ zhD }}">案件时间线</span><span style="display:{{ enD }}">Case timeline</span></div>
+              <sc-for list="{{ timeline }}" as="tl" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:8px"><div style="font-size:10px;font-weight:700;background:#1B1B1B;color:#FFFFFF;border-radius:6px;padding:1px 5px;flex-shrink:0">{{ tl.r }}</div><div style="width:24px;height:24px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ tl.face }}</div><div style="font-size:12px;font-weight:600;line-height:1.3;flex:1;min-width:0">{{ tl.t }}</div><div style="width:10px;height:10px;border-radius:50%;background:{{ tl.dot }};border:1.5px solid #1B1B1B;flex-shrink:0"></div></div></sc-for>
+            </div>
+            <div style="font-family:'ZCOOL KuaiLe';font-size:19px"><span style="display:{{ zhD }}">本局奖项</span><span style="display:{{ enD }}">Awards</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><sc-for list="{{ awards }}" as="aw" hint-placeholder-count="4"><div style="background:{{ aw.bg }};border:2.5px solid #1B1B1B;border-radius:14px;padding:8px;display:flex;align-items:center;gap:8px;box-shadow:3px 3px 0 #1B1B1B"><div style="width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ aw.face }}</div><div style="min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:15px;line-height:1.1">{{ aw.title }}</div><div style="font-size:11px;font-weight:700">{{ aw.who }}</div><div style="font-size:10px;font-weight:500;line-height:1.25">{{ aw.why }}</div></div></div></sc-for></div>
+            <div style="background:#1B1B1B;color:#FFF7EC;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-family:'ZCOOL KuaiLe';font-size:18px"><span style="display:{{ zhD }}">再来一局？</span><span style="display:{{ enD }}">Rematch?</span></div><div style="font-weight:700;font-size:13px">{{ voteTxt }}</div></div>
+              <div style="display:flex;gap:6px;justify-content:space-between"><sc-for list="{{ voteRow }}" as="vr" hint-placeholder-count="6"><div style="position:relative;width:40px;height:40px"><div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:3px solid {{ vr.ring }};opacity:{{ vr.op }};box-sizing:border-box">{{ vr.face }}</div><sc-if value="{{ vr.yes }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;background:#2FA37C;border:2px solid #FFF7EC;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;animation:pop .3s ease-out both">✓</div></sc-if></div></sc-for></div>
+              <button onClick="{{ myVote }}" style="height:44px;border:2.5px solid #FFF7EC;border-radius:12px;background:{{ myVoteBg }};color:{{ myVoteFg }};font-family:'ZCOOL KuaiLe';font-size:17px;cursor:pointer">{{ myVoteLabel }}</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ stats }}" as="sx" hint-placeholder-count="3"><div style="background:#FFFFFF;border:2.5px solid #1B1B1B;border-radius:12px;padding:8px;text-align:center"><div style="font-weight:700;font-size:24px">{{ sx.v }}</div><div style="font-size:10.5px;font-weight:600">{{ sx.l }}</div></div></sc-for></div>
+            <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:10px;margin-top:auto">
+              <button onClick="{{ toHome }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:18px;cursor:pointer"><span style="display:{{ zhD }}">首页</span><span style="display:{{ enD }}">Home</span></button>
+              <button onClick="{{ playAgain }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:18px;cursor:pointer"><span style="display:{{ zhD }}">再来一局</span><span style="display:{{ enD }}">Play again</span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ diceOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ roll }}" style="position:absolute;inset:0;background:rgba(27,27,27,.75);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;cursor:pointer">
+            <div style="font-family:'ZCOOL KuaiLe';font-size:30px;color:#FFD54A">{{ diceTitle }}</div>
+            <div style="width:130px;height:130px;perspective:600px"><div style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(20deg)"><div style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1.3s cubic-bezier(.2,.7,.2,1);transform:{{ diceRotP }}">
+              <sc-for list="{{ facesP }}" as="f" hint-placeholder-count="6"><div style="position:absolute;inset:0;background:#FFF7EC;border:4px solid #1B1B1B;border-radius:20px;transform:{{ f.tf }};display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:16px;gap:6px;box-sizing:border-box"><sc-for list="{{ f.pips }}" as="p" hint-placeholder-count="9"><div style="border-radius:50%;background:{{ f.pc }};opacity:{{ p.op }}"></div></sc-for></div></sc-for>
+            </div></div></div>
+            <div style="width:120px;height:16px;border-radius:50%;background:#000;opacity:.5"></div>
+            <div style="color:#FFFFFF;font-size:15px;font-weight:600;text-align:center">{{ diceHint }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetSuggest }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:20">
+            <div style="width:100%;max-height:94%;overflow-y:auto;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:12px 16px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;animation:fadeUp .25s ease-out">
+              <div style="align-self:center;width:44px;height:5px;border-radius:3px;background:#1B1B1B;opacity:.3"></div>
+              <div><div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#E8483B;-webkit-text-stroke:1px #1B1B1B"><span style="display:{{ zhD }}">提出推理</span><span style="display:{{ enD }}">Make a suggestion</span></div><div style="font-size:13px;font-weight:600"><span style="display:{{ zhD }}">你在 {{ myRoomCn }}，房间已固定</span><span style="display:{{ enD }}">You're in the {{ myRoomCn }}, so the room is fixed</span></div></div>
+              <button onClick="{{ peekNotes }}" style="align-self:flex-start;height:40px;padding:0 14px;border:2.5px solid #1B1B1B;border-radius:12px;background:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:16px;cursor:pointer;display:flex;align-items:center;gap:6px"><span style="display:{{ zhD }}"></span><span style="display:{{ enD }}"></span><span style="display:{{ zhD }}">查看笔记</span><span style="display:{{ enD }}">Check my notes</span></button><div style="font-family:'ZCOOL KuaiLe';font-size:17px"><span style="display:{{ zhD }}">谁？</span><span style="display:{{ enD }}">Who</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px"><sc-for list="{{ sugSus }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.pick }}" style="height:82px;border:3px solid #1B1B1B;border-radius:12px;background:{{ o.bg }};box-shadow:{{ o.shadow }};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0"><div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;box-sizing:border-box">{{ o.face }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:15px">{{ o.cn }}</div></button></sc-for></div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:17px"><span style="display:{{ zhD }}">用什么？</span><span style="display:{{ enD }}">With what</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px"><sc-for list="{{ sugObj }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.pick }}" style="height:82px;border:3px solid #1B1B1B;border-radius:12px;background:{{ o.bg }};box-shadow:{{ o.shadow }};cursor:pointer;display:flex;flex-direction:column;overflow:hidden;padding:0"><div style="height:52px;width:100%;overflow:hidden;border-bottom:2px solid #1B1B1B">{{ o.art }}</div><div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;font-family:'ZCOOL KuaiLe';font-size:15px">{{ o.cn }}</div></button></sc-for></div>
+              <div style="background:#FFFFFF;border:2.5px dashed #1B1B1B;border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">我认为是 <b>{{ sugSusTxt }}</b>，在 <b>{{ myRoomCn }}</b>，用 <b>{{ sugObjTxt }}</b>。</span><span style="display:{{ enD }}">I suggest <b>{{ sugSusTxt }}</b>, in the <b>{{ myRoomCn }}</b>, with the <b>{{ sugObjTxt }}</b>.</span></div>
+              <button onClick="{{ submitSuggest }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer;opacity:{{ sugOp }}"><span style="display:{{ zhD }}">提出</span><span style="display:{{ enD }}">Suggest</span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetDisprove }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.7);display:flex;align-items:center;justify-content:center;z-index:20;padding:20px">
+            <div style="width:100%;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:22px;box-shadow:6px 6px 0 #000;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;animation:fadeUp .25s ease-out">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><sc-for list="{{ lastTrio }}" as="lt" hint-placeholder-count="3"><div style="background:#FFD54A;border:2px solid #1B1B1B;border-radius:10px;padding:2px 10px;font-family:'ZCOOL KuaiLe';font-size:16px">{{ lt.cn }}</div></sc-for></div>
+              <sc-if value="{{ dpChoosing }}" hint-placeholder-val="{{ true }}">
+                <div style="width:56px;height:56px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;box-sizing:border-box">{{ dpFace }}</div>
+                <div><div style="font-family:'ZCOOL KuaiLe';font-size:20px"><span style="display:{{ zhD }}">{{ dpCn }} 正在挑一张牌给你看…</span><span style="display:{{ enD }}">{{ dpCn }} is choosing a card to show you…</span></div></div>
+                <div style="width:100px;height:140px;border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;animation:wobble .8s ease-in-out infinite">{{ backArt }}</div>
+              </sc-if>
+              <sc-if value="{{ dpShown }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:20px"><span style="display:{{ zhD }}">{{ dpCn }} 给你看了：</span><span style="display:{{ enD }}">{{ dpCn }} showed you:</span></div>
+                <div style="width:150px;border:3px solid #1B1B1B;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:5px 5px 0 #1B1B1B;animation:pop .45s ease-out both"><div style="height:120px;overflow:hidden;border-bottom:3px solid #1B1B1B">{{ dpArt }}</div><div style="padding:6px 8px"><div style="font-family:'ZCOOL KuaiLe';font-size:26px;line-height:1.1">{{ dpCard }}</div><div style="font-size:12px;font-weight:600">{{ dpCardEn }}</div></div></div>
+                <div style="font-size:12.5px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">只有你看得到这张牌，已在笔记 {{ dpCn }} 那一栏打勾。</span><span style="display:{{ enD }}">Only you can see this card. It's ticked in your notes under {{ dpCn }}.</span></div>
+              </sc-if>
+              <sc-if value="{{ dpNone }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#E8483B"><span style="display:{{ zhD }}">没有人能反驳！</span><span style="display:{{ enD }}">No one could disprove!</span></div>
+                <div style="font-size:13px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">没有人有这 3 张牌。除非在你自己手上，否则它们都在信封里。</span><span style="display:{{ enD }}">Nobody holds any of these 3 cards. Unless one is in your own hand, they are all in the envelope.</span></div>
+              </sc-if>
+              <sc-if value="{{ dpDone }}" hint-placeholder-val="{{ false }}"><button onClick="{{ gotIt }}" style="width:100%;height:52px;border:3px solid #1B1B1B;border-radius:14px;background:#2FA37C;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:20px;cursor:pointer"><span style="display:{{ zhD }}">知道了</span><span style="display:{{ enD }}">Got it</span></button></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetShow }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:20">
+            <div style="width:100%;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:14px 16px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease-out">
+              <div style="align-self:center;width:44px;height:5px;border-radius:3px;background:#1B1B1B;opacity:.3"></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ pFace }}</div><div><div style="font-family:'ZCOOL KuaiLe';font-size:22px"><span style="display:{{ zhD }}">轮到你给牌了 · {{ pBy }} 推理：</span><span style="display:{{ enD }}">Show a card · {{ pBy }} suggests:</span></div></div></div>
+              <div style="display:flex;gap:6px"><sc-for list="{{ pTrio }}" as="pt" hint-placeholder-count="3"><div style="flex:1;text-align:center;background:{{ pt.bg }};border:2px solid #1B1B1B;border-radius:10px;padding:4px;font-family:'ZCOOL KuaiLe';font-size:17px">{{ pt.cn }}</div></sc-for></div>
+              <div style="font-size:13px;font-weight:600;line-height:1.4"><span style="display:{{ zhD }}">你有 {{ pCount }} 张相关的牌，选一张给 {{ pBy }} 看。其他人只知道你给了牌。</span><span style="display:{{ enD }}">You hold {{ pCount }} of these. Pick one to show {{ pBy }}. Everyone else only sees that you showed a card.</span></div>
+              <div style="display:flex;gap:8px;justify-content:center"><sc-for list="{{ pCards }}" as="pc" hint-placeholder-count="1"><button onClick="{{ pc.pick }}" style="width:110px;border:3px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFFFFF;box-shadow:{{ pc.shadow }};transform:{{ pc.lift }};transition:transform .15s;cursor:pointer;padding:0"><div style="height:80px;overflow:hidden;border-bottom:2.5px solid #1B1B1B">{{ pc.art }}</div><div style="padding:5px;font-family:'ZCOOL KuaiLe';font-size:18px">{{ pc.cn }}</div></button></sc-for></div>
+              <button onClick="{{ showCard }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:20px;cursor:pointer"><span style="display:{{ zhD }}">给 {{ pBy }} 看</span><span style="display:{{ enD }}">Show {{ pBy }} this card</span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetAccuse }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:20">
+            <div style="position:relative;width:100%;max-height:94%;overflow-y:auto;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:12px 16px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:9px;animation:fadeUp .25s ease-out">
+              <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:'ZCOOL KuaiLe';font-size:26px;color:#E8483B;-webkit-text-stroke:1px #1B1B1B"><span style="display:{{ zhD }}">我要指控 · 只有一次机会</span><span style="display:{{ enD }}">Accuse · one chance only</span></div></div><button onClick="{{ closeSheet }}" style="width:40px;height:40px;border-radius:50%;border:2.5px solid #1B1B1B;background:#FFFFFF;font-size:18px;font-weight:700;cursor:pointer;padding:0">✕</button></div>
+              <button onClick="{{ peekNotes }}" style="align-self:flex-start;height:40px;padding:0 14px;border:2.5px solid #1B1B1B;border-radius:12px;background:#FFFFFF;box-shadow:3px 3px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:16px;cursor:pointer;display:flex;align-items:center;gap:6px"><span style="display:{{ zhD }}"></span><span style="display:{{ enD }}"></span><span style="display:{{ zhD }}">查看笔记</span><span style="display:{{ enD }}">Check my notes</span></button><div style="font-family:'ZCOOL KuaiLe';font-size:16px"><span style="display:{{ zhD }}">谁？</span><span style="display:{{ enD }}">Who</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px"><sc-for list="{{ accSus }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.pick }}" style="height:44px;border:2.5px solid #1B1B1B;border-radius:10px;background:{{ o.bg }};cursor:pointer;display:flex;align-items:center;gap:6px;padding:0 6px"><div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ o.face }}</div><span style="font-family:'ZCOOL KuaiLe';font-size:15px">{{ o.cn }}</span></button></sc-for></div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:16px"><span style="display:{{ zhD }}">在哪里？</span><span style="display:{{ enD }}">Where</span></div>
+              <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px"><sc-for list="{{ accRoom }}" as="o" hint-placeholder-count="8"><button onClick="{{ o.pick }}" style="height:44px;border:2.5px solid #1B1B1B;border-radius:10px;background:{{ o.bg }};cursor:pointer;font-family:'ZCOOL KuaiLe';font-size:15px;padding:0">{{ o.cn }}</button></sc-for></div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:16px"><span style="display:{{ zhD }}">用什么？</span><span style="display:{{ enD }}">With what</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px"><sc-for list="{{ accObj }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.pick }}" style="height:44px;border:2.5px solid #1B1B1B;border-radius:10px;background:{{ o.bg }};cursor:pointer;font-family:'ZCOOL KuaiLe';font-size:15px;padding:0">{{ o.cn }}</button></sc-for></div>
+              <button onClick="{{ accAsk }}" style="margin-top:4px;height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:21px;cursor:pointer;opacity:{{ accOp }}"><span style="display:{{ zhD }}">指控</span><span style="display:{{ enD }}">Accuse</span></button>
+              <sc-if value="{{ accConfirm }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;inset:0;background:rgba(255,247,236,.96);display:flex;flex-direction:column;justify-content:center;gap:14px;padding:22px;text-align:center">
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:28px"><span style="display:{{ zhD }}">确定吗？</span><span style="display:{{ enD }}">Are you sure?</span></div>
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:20px;line-height:1.4">{{ accLine }}</div><div style="font-size:13.5px;font-weight:600;line-height:1.45"><span style="display:{{ zhD }}">如果错了你就出局：不能再移动或推理，但别人推理时你还要给牌。</span><span style="display:{{ enD }}">If you're wrong you're out: no more moves or suggestions, but you still show cards when asked.</span></div>
+                  <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:10px"><button onClick="{{ accBack }}" style="height:54px;border:3px solid #1B1B1B;border-radius:14px;background:#FFFFFF;font-family:'ZCOOL KuaiLe';font-size:18px;cursor:pointer"><span style="display:{{ zhD }}">再想想</span><span style="display:{{ enD }}">Not yet</span></button><button onClick="{{ accGo }}" style="height:54px;border:3px solid #1B1B1B;border-radius:14px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:18px;cursor:pointer"><span style="display:{{ zhD }}">确定指控</span><span style="display:{{ enD }}">Accuse</span></button></div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetWrong }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(11,11,16,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:25;padding:22px;color:#FFF7EC;text-align:center">
+            <div style="font-family:'ZCOOL KuaiLe';font-size:32px;color:#E8483B"><span style="display:{{ zhD }}">你猜错了…</span><span style="display:{{ enD }}">Wrong accusation…</span></div>
+            <div style="font-size:14px;font-weight:600"><span style="display:{{ zhD }}">信封里的答案 · 只有你看得到</span><span style="display:{{ enD }}">The envelope · only you can see this</span></div>
+            <div style="display:flex;gap:8px"><sc-for list="{{ wrongCards }}" as="rc" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100px;height:140px;perspective:700px"><div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s;transform:{{ rc.rot }}"><div style="position:absolute;inset:0;backface-visibility:hidden;border:2.5px solid #FFF7EC;border-radius:12px;overflow:hidden">{{ rc.back }}</div><div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border:2.5px solid #1B1B1B;border-radius:12px;overflow:hidden;background:#FFF7EC;color:#1B1B1B"><div style="height:94px;overflow:hidden;border-bottom:2.5px solid #1B1B1B">{{ rc.art }}</div><div style="padding:5px;font-family:'ZCOOL KuaiLe';font-size:18px">{{ rc.cn }}</div></div></div></div><div style="font-size:11px;font-weight:700;color:{{ rc.mc }}"><span style="display:{{ zhD }}">你猜 {{ rc.mine }}</span><span style="display:{{ enD }}">You said {{ rc.mine }}</span></div></div></sc-for></div>
+            <div style="font-size:13.5px;font-weight:600;line-height:1.45"><span style="display:{{ zhD }}">你出局了。不能再移动或推理，但别人推理时你还要给牌。</span><span style="display:{{ enD }}">You're out. You can't move or suggest any more, but you still show cards when someone suggests.</span></div>
+            <button onClick="{{ continueGhost }}" style="width:100%;height:56px;border:3px solid #FFF7EC;border-radius:16px;background:#E8483B;color:#FFFFFF;font-family:'ZCOOL KuaiLe';font-size:19px;cursor:pointer"><span style="display:{{ zhD }}">以幽灵身份继续</span><span style="display:{{ enD }}">Continue as a ghost</span></button>
+            <button onClick="{{ fastForward }}" style="width:100%;height:44px;border:2px solid #FFF7EC;border-radius:14px;background:transparent;color:#FFF7EC;font-family:'Fredoka';font-weight:600;font-size:13px;cursor:pointer"><span style="display:{{ zhD }}">原型：快进到结局</span><span style="display:{{ enD }}">Prototype: fast-forward to the end</span></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetCreate }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:20">
+            <div style="width:100%;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:12px 18px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease-out">
+              <div style="align-self:center;width:44px;height:5px;border-radius:3px;background:#1B1B1B;opacity:.3"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:'ZCOOL KuaiLe';font-size:26px"><span style="display:{{ zhD }}">创建房间</span><span style="display:{{ enD }}">Create room</span></div></div><button onClick="{{ closeSheet }}" style="width:40px;height:40px;border-radius:50%;border:2.5px solid #1B1B1B;background:#FFFFFF;font-size:18px;font-weight:700;cursor:pointer;padding:0">✕</button></div>
+              <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:12px;font-weight:700"><span style="display:{{ zhD }}">房间名称</span><span style="display:{{ enD }}">Room name</span></div><input value="{{ roomName }}" onChange="{{ setRoomName }}" style="height:48px;border:3px solid #1B1B1B;border-radius:12px;padding:0 12px;font-family:'ZCOOL KuaiLe';font-size:18px;background:#FFFFFF;outline:none"></div>
+              <div style="display:flex;align-items:center;gap:10px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:14px;padding:8px 12px"><div style="flex:1"><div style="font-family:'ZCOOL KuaiLe';font-size:17px"><span style="display:{{ zhD }}">最多人数</span><span style="display:{{ enD }}">Max players</span></div></div><button onClick="{{ maxDown }}" style="width:40px;height:40px;border-radius:10px;border:2.5px solid #1B1B1B;background:#FFF7EC;font-size:22px;font-weight:700;cursor:pointer;padding:0">−</button><div style="width:28px;text-align:center;font-weight:700;font-size:22px">{{ maxSeats }}</div><button onClick="{{ maxUp }}" style="width:40px;height:40px;border-radius:10px;border:2.5px solid #1B1B1B;background:#FFF7EC;font-size:22px;font-weight:700;cursor:pointer;padding:0">+</button></div>
+              <div style="font-size:12px;font-weight:700"><span style="display:{{ zhD }}">显示方式</span><span style="display:{{ enD }}">Display</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><sc-for list="{{ modeOpts }}" as="mo" hint-placeholder-count="2"><button onClick="{{ mo.pick }}" style="border:3px solid #1B1B1B;border-radius:14px;background:{{ mo.bg }};box-shadow:{{ mo.shadow }};padding:10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px"><div style="font-family:'ZCOOL KuaiLe';font-size:17px">{{ mo.cn }}</div><div style="font-size:11.5px;font-weight:600;line-height:1.35">{{ mo.en }}</div></button></sc-for></div>
+              <div style="display:flex;align-items:center;gap:10px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:14px;padding:8px 12px"><div style="flex:1"><div style="font-family:'ZCOOL KuaiLe';font-size:17px"><span style="display:{{ zhD }}">机器人补位</span><span style="display:{{ enD }}">Auto-fill empty seats with bots</span></div></div><button onClick="{{ flipBots }}" style="width:58px;height:34px;border-radius:17px;border:3px solid #1B1B1B;background:{{ botsBg }};position:relative;cursor:pointer;padding:0;flex-shrink:0"><div style="position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#FFFFFF;border:2.5px solid #1B1B1B;box-sizing:border-box;transform:{{ botsKnob }};transition:transform .2s"></div></button></div>
+              <button onClick="{{ createRoom }}" style="height:58px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:22px;cursor:pointer"><span style="display:{{ zhD }}">创建</span><span style="display:{{ enD }}">Create</span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetInfo }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(27,27,27,.55);display:flex;align-items:flex-end;z-index:20">
+            <div style="width:100%;background:#FFF7EC;border-top:3px solid #1B1B1B;border-radius:26px 26px 0 0;padding:12px 18px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease-out">
+              <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:'ZCOOL KuaiLe';font-size:26px">{{ infoCn }}</div><div style="font-size:13px;font-weight:600">{{ infoEn }}</div></div><button onClick="{{ closeSheet }}" style="width:40px;height:40px;border-radius:50%;border:2.5px solid #1B1B1B;background:#FFFFFF;font-size:18px;font-weight:700;cursor:pointer;padding:0">✕</button></div>
+              <sc-if value="{{ infoJoin }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;justify-content:center"><sc-for list="{{ codeDigits }}" as="cd" hint-placeholder-count="4"><div style="width:56px;height:66px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:34px">{{ cd.v }}</div></sc-for></div></sc-if>
+              <sc-for list="{{ infoSteps }}" as="is" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:#FFD54A;border:2.5px solid #1B1B1B;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">{{ is.n }}</div><div style="font-size:13.5px;font-weight:600;line-height:1.4;padding-top:3px">{{ is.t }}</div></div></sc-for>
+              <button onClick="{{ infoGo }}" style="height:56px;border:3px solid #1B1B1B;border-radius:16px;background:#E8483B;color:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B;font-family:'ZCOOL KuaiLe';font-size:20px;cursor:pointer">{{ infoBtn }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;flex-shrink:0;width:900px">
+      <div data-screen-label="TV" style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:900px;height:506px;border:14px solid #1B1B1B;border-radius:18px;background:#111111;overflow:hidden;position:relative;box-sizing:border-box;box-shadow:10px 10px 0 #000;color:#FFF7EC;pointer-events:none">
+
+          <sc-if value="{{ tvOff }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#1B1B1B"><div style="font-family:'ZCOOL KuaiLe';font-size:34px;color:#777"><span style="display:{{ zhD }}">电视未连接</span><span style="display:{{ enD }}">TV not connected</span></div><div style="font-size:16px;color:#999999"><span style="display:{{ zhD }}">这个房间只用手机，每部手机都显示完整棋盘。</span><span style="display:{{ enD }}">This room is phones-only. Every phone shows the full board.</span></div></div>
+          </sc-if>
+
+          <sc-if value="{{ tvIdle }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background-color:#E8483B;background-image:radial-gradient(#FFD54A 2.5px,transparent 3px);background-size:26px 26px">
+              <div style="font-family:'ZCOOL KuaiLe';font-size:96px;line-height:1;color:#FFD54A;-webkit-text-stroke:3px #1B1B1B;text-shadow:6px 6px 0 #1B1B1B"><span style="display:{{ zhD }}">谁杀了客人？</span><span style="display:{{ enD }}">Who Killed the Guest?</span></div>
+              <div style="background:#FFFFFF;color:#1B1B1B;border:3px solid #1B1B1B;border-radius:24px;padding:6px 20px;font-weight:700;font-size:22px;box-shadow:4px 4px 0 #1B1B1B"><span style="display:{{ zhD }}">新年推理游戏</span><span style="display:{{ enD }}">A Chinese New Year mystery</span></div>
+              <div style="font-size:18px;font-weight:600;color:#FFFFFF;margin-top:8px"><span style="display:{{ zhD }}">等待房主创建房间</span><span style="display:{{ enD }}">Waiting for the host to create a room</span></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tvLobby }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;display:grid;grid-template-columns:330px 1fr;gap:28px;padding:28px 32px;background:#FFF7EC;color:#1B1B1B;box-sizing:border-box">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:12px;background:#FFD54A;border:4px solid #1B1B1B;border-radius:20px;padding:18px;box-shadow:6px 6px 0 #1B1B1B">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:24px"><span style="display:{{ zhD }}">扫码加入</span><span style="display:{{ enD }}">Scan to join</span></div>
+                <div style="width:200px;height:200px;border:4px solid #1B1B1B;border-radius:12px;overflow:hidden">{{ qrEl }}</div>
+                <div style="font-size:14px;font-weight:700"><span style="display:{{ zhD }}">或输入房间号</span><span style="display:{{ enD }}">or enter code</span></div>
+                <div style="display:flex;gap:8px"><sc-for list="{{ codeDigits }}" as="cd" hint-placeholder-count="4"><div style="width:52px;height:62px;background:#FFFFFF;border:3px solid #1B1B1B;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:36px">{{ cd.v }}</div></sc-for></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div><div style="font-family:'ZCOOL KuaiLe';font-size:36px;line-height:1">{{ roomName }}</div><div style="font-size:16px;font-weight:600;margin-top:4px"><span style="display:{{ zhD }}">玩家 {{ joinedTxt }} · 等待房主开始</span><span style="display:{{ enD }}">Players {{ joinedTxt }} · waiting for the host to start</span></div></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                  <sc-for list="{{ tvSeats }}" as="ts" hint-placeholder-count="6">
+                    <div style="height:150px;border:3px solid #1B1B1B;border-radius:16px;background:{{ ts.bg }};opacity:{{ ts.op }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:4px 4px 0 #1B1B1B;animation:{{ ts.anim }}">
+                      <div style="width:74px;height:74px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;background:#E6E1D8;box-sizing:border-box">{{ ts.face }}</div>
+                      <div style="font-family:'ZCOOL KuaiLe';font-size:20px;line-height:1">{{ ts.cn }}</div>
+                      <div style="font-size:13px;font-weight:700">{{ ts.name }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tvScene }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:#1B1B1B;display:flex;align-items:center;gap:32px;padding:16px 40px 16px 16px;box-sizing:border-box">
+              <div style="width:446px;height:446px;flex-shrink:0;border:4px solid #FFF7EC;border-radius:12px;overflow:hidden;box-sizing:border-box">{{ tvSceneEl }}</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:16px">
+                <div style="align-self:flex-start;font-size:15px;font-weight:700;background:#FFD54A;color:#1B1B1B;border-radius:10px;padding:4px 12px">{{ tvChapter }}</div>
+                <div style="font-family:'ZCOOL KuaiLe';font-size:34px;line-height:1.35;text-wrap:pretty">{{ tvCn }}</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tvChecking }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:#2FA37C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;color:#1B1B1B">
+              <div style="text-align:center"><div style="font-family:'ZCOOL KuaiLe';font-size:40px;color:#FFFFFF;-webkit-text-stroke:1.5px #1B1B1B"><span style="display:{{ zhD }}">大家正在看自己的角色和手牌</span><span style="display:{{ enD }}">Everyone is checking their character and cards on their phone</span></div></div>
+              <div style="display:flex;gap:16px"><sc-for list="{{ tvReady }}" as="tr" hint-placeholder-count="6"><div style="width:118px;display:flex;flex-direction:column;align-items:center;gap:6px;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:16px;padding:12px 6px;box-shadow:4px 4px 0 #1B1B1B"><div style="width:70px;height:70px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;box-sizing:border-box">{{ tr.face }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:19px">{{ tr.cn }}</div><div style="font-size:12px;font-weight:700">{{ tr.name }}</div><div style="font-size:12px;font-weight:700;background:{{ tr.bg }};color:#FFFFFF;border-radius:8px;padding:1px 8px">{{ tr.status }}</div></div></sc-for></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tvGame }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:#2A2320;display:flex;gap:16px;padding:16px;box-sizing:border-box">
+              <div style="width:446px;height:446px;flex-shrink:0;position:relative">
+                <div style="position:absolute;left:0;top:0;width:346px;height:346px;transform:scale(1.289);transform-origin:0 0">
+                  <div style="position:relative;width:100%;height:100%;background:#FFD54A;border:3px solid #1B1B1B;border-radius:14px;overflow:hidden;box-sizing:border-box;color:#1B1B1B">
+                    <sc-for list="{{ bCells }}" as="cl" hint-placeholder-count="40"><div style="position:absolute;left:{{ cl.l }};top:{{ cl.t }};width:9.09%;height:9.09%;padding:1.5px;box-sizing:border-box"><div style="width:100%;height:100%;border-radius:5px;border:2px solid #1B1B1B;background:{{ cl.bg }};box-sizing:border-box;animation:{{ cl.anim }}"></div></div></sc-for>
+                    <sc-for list="{{ bRooms }}" as="rm" hint-placeholder-count="8"><div style="position:absolute;left:{{ rm.l }};top:{{ rm.t }};width:27.27%;height:27.27%;padding:2px;box-sizing:border-box"><div style="position:relative;width:100%;height:100%;border:2.5px solid #1B1B1B;border-radius:8px;overflow:hidden;box-sizing:border-box">{{ rm.art }}<div style="position:absolute;left:3px;top:3px;background:#FFFFFF;border:2px solid #1B1B1B;border-radius:7px;padding:0 4px;font-family:'ZCOOL KuaiLe';font-size:12px;line-height:1.3">{{ rm.cn }}</div><div style="position:absolute;inset:0;background:{{ rm.over }};animation:{{ rm.anim }}"></div></div></div></sc-for>
+                    <sc-for list="{{ bDoors }}" as="dr" hint-placeholder-count="20"><div style="position:absolute;left:{{ dr.l }};top:{{ dr.t }};width:{{ dr.w }};height:{{ dr.h }};background:#E8483B;border:1.5px solid #1B1B1B;border-radius:2px;box-sizing:border-box"></div></sc-for>
+                    <div style="position:absolute;left:36.36%;top:36.36%;width:27.27%;height:27.27%;padding:3px;box-sizing:border-box"><div style="width:100%;height:100%;background:#E8483B;border:2.5px solid #1B1B1B;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box"><div style="width:36px;height:36px;border-radius:50%;background:#FFD54A;border:2.5px solid #1B1B1B;display:flex;align-items:center;justify-content:center;font-family:'ZCOOL KuaiLe';font-size:20px;color:#E8483B">密</div></div></div>
+                    <sc-for list="{{ bTokens }}" as="tk" hint-placeholder-count="6"><div style="position:absolute;left:{{ tk.l }};top:{{ tk.t }};width:0;height:0;transition:left .16s linear,top .16s linear;z-index:{{ tk.z }}">
+                  <sc-if value="{{ tk.active }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-23px;top:-23px;width:46px;height:46px;border-radius:50%;background:#FFD54A;border:2.5px solid #1B1B1B;opacity:.85;animation:pulse .9s ease-in-out infinite;box-sizing:border-box"></div></sc-if>
+                  <div style="position:absolute;left:-16px;top:-16px;width:32px;height:32px;border-radius:50%;background:{{ tk.c }};border:3px solid #FFFFFF;outline:2.5px solid #1B1B1B;box-shadow:2px 4px 0 3px rgba(0,0,0,.45);opacity:{{ tk.op }};color:#FFFFFF;font-family:'Noto Serif SC';font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box">{{ tk.g }}</div>
+                </div></sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px;background:{{ turnBg }};color:#1B1B1B;border:3px solid #1B1B1B;border-radius:16px;padding:8px 12px">
+                  <div style="width:58px;height:58px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ turnFace }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tvTurnCn }}</div><div style="font-size:13px;font-weight:700">{{ tvTurnEn }} · ⏱ {{ timerTxt }}</div></div>
+                  <div style="width:70px;height:70px;perspective:400px;flex-shrink:0"><div style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(20deg)"><div style="width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1.3s cubic-bezier(.2,.7,.2,1);transform:{{ diceRotP }}"><sc-for list="{{ facesT }}" as="f" hint-placeholder-count="6"><div style="position:absolute;inset:0;background:#FFF7EC;border:3px solid #1B1B1B;border-radius:12px;transform:{{ f.tf }};display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:9px;gap:3px;box-sizing:border-box"><sc-for list="{{ f.pips }}" as="p" hint-placeholder-count="9"><div style="border-radius:50%;background:{{ f.pc }};opacity:{{ p.op }}"></div></sc-for></div></sc-for></div></div></div>
+                </div>
+                <div style="background:#FFF7EC;color:#1B1B1B;border:3px solid #1B1B1B;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12px;font-weight:700"><span style="display:{{ zhD }}">最新推理</span><span style="display:{{ enD }}">Latest suggestion</span></div>
+                  <sc-if value="{{ hasSug }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:6px;align-items:center"><div style="width:30px;height:30px;border-radius:50%;overflow:hidden;border:2px solid #1B1B1B;flex-shrink:0;box-sizing:border-box">{{ sugByFace }}</div><sc-for list="{{ lastTrio }}" as="lt" hint-placeholder-count="3"><div style="flex:1;text-align:center;background:#FFD54A;border:2px solid #1B1B1B;border-radius:10px;padding:3px 4px;font-family:'ZCOOL KuaiLe';font-size:18px">{{ lt.cn }}</div></sc-for></div>
+                    <div style="display:flex;align-items:center;gap:8px;background:#1B1B1B;color:#FFF7EC;border-radius:10px;padding:6px 10px"><div style="font-family:'ZCOOL KuaiLe';font-size:17px;flex:1">{{ tvShowCn }}</div><div style="width:26px;height:36px;border:2px solid #FFF7EC;border-radius:5px;overflow:hidden;flex-shrink:0">{{ backArt }}</div></div>
+                    <div style="font-size:12px;font-weight:600">{{ tvShowEn }}</div>
+                  </sc-if>
+                  <sc-if value="{{ noSug }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;font-weight:600"><span style="display:{{ zhD }}">还没有推理。</span><span style="display:{{ enD }}">No suggestions yet.</span></div></sc-if>
+                </div>
+                <div style="flex:1;min-height:0;background:#1B1B1B;border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+                  <div style="font-size:12px;font-weight:700;color:#FFD54A"><span style="display:{{ zhD }}">记录</span><span style="display:{{ enD }}">Game log</span></div>
+                  <sc-for list="{{ tvLog }}" as="lg" hint-placeholder-count="5"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:{{ lg.op }}">{{ lg.t }}</div></sc-for>
+                </div>
+                <div style="display:flex;gap:6px"><sc-for list="{{ tvSeatRow }}" as="sr" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:{{ sr.op }}"><div style="width:40px;height:40px;border-radius:50%;overflow:hidden;border:3px solid {{ sr.ring }};box-sizing:border-box;filter:{{ sr.filt }}">{{ sr.face }}</div><div style="font-size:10px;font-weight:700;white-space:nowrap">{{ sr.name }}</div></div></sc-for></div>
+              </div>
+            </div>
+            <sc-if value="{{ tvWrong }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:0;background:rgba(11,11,16,.88);display:flex;align-items:center;justify-content:center;gap:36px;animation:fadeUp .3s ease-out both">
+                <div style="position:relative;width:200px;height:200px">
+                  <div style="width:200px;height:200px;border-radius:50%;overflow:hidden;border:5px solid #C9C2B8;filter:grayscale(1);opacity:.6;box-sizing:border-box">{{ wrongFace }}</div>
+                  <div style="position:absolute;right:-20px;top:-24px"><svg viewBox="0 0 60 64" width="96" height="102" style="flex-shrink:0;animation:bob 1.6s ease-in-out infinite"><path d="M6 60V28C6 14 17 4 30 4S54 14 54 28V60L46 54L38 60L30 54L22 60L14 54Z" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="3" stroke-linejoin="round"></path><ellipse cx="22" cy="28" rx="4" ry="6" fill="#1B1B1B"></ellipse><ellipse cx="38" cy="28" rx="4" ry="6" fill="#1B1B1B"></ellipse><ellipse cx="30" cy="42" rx="5" ry="4" fill="#1B1B1B"></ellipse></svg></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;max-width:440px">
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:56px;line-height:1;color:#E8483B;-webkit-text-stroke:1.5px #FFF7EC;animation:shake .4s linear 2"><span style="display:{{ zhD }}">指控错误！</span><span style="display:{{ enD }}">Wrong accusation!</span></div>
+                  <div style="font-family:'ZCOOL KuaiLe';font-size:26px"><span style="display:{{ zhD }}">{{ wrongName }} 变成了幽灵</span><span style="display:{{ enD }}">{{ wrongName }} is now a ghost</span></div>
+                  
+                  <div style="font-size:16px;font-weight:600;line-height:1.45"><span style="display:{{ zhD }}">答案仍然保密。幽灵不能再移动或推理，但仍然要给牌。</span><span style="display:{{ enD }}">The answer stays secret. A ghost can’t move or suggest, but still shows cards.</span></div>
+                </div>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ tvReveal }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,#3A3020 0%,#0B0B10 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:3px solid #FFD54A;box-sizing:border-box">{{ accuserFace }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:30px;color:#FFD54A"><span style="display:{{ zhD }}">{{ accuserCn }} 指控：</span><span style="display:{{ enD }}">{{ accuserCn }} accuses:</span></div><sc-for list="{{ accusedChips }}" as="ac" hint-placeholder-count="3"><div style="background:#FFF7EC;color:#1B1B1B;border:2px solid #1B1B1B;border-radius:10px;padding:3px 12px;font-family:'ZCOOL KuaiLe';font-size:22px">{{ ac.cn }}</div></sc-for></div>
+              <sc-if value="{{ rvEnvelope }}" hint-placeholder-val="{{ true }}"><div style="width:480px;height:270px">{{ envSceneEl }}</div></sc-if>
+              <sc-if value="{{ rvCards }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:24px">
+                  <sc-for list="{{ revealCards }}" as="rc" hint-placeholder-count="3">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="width:160px;height:224px;perspective:900px"><div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.4,.5,1);transform:{{ rc.rot }}"><div style="position:absolute;inset:0;backface-visibility:hidden;border:3px solid #FFF7EC;border-radius:14px;overflow:hidden">{{ rc.back }}</div><div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border:3px solid #1B1B1B;border-radius:14px;overflow:hidden;background:#FFF7EC;color:#1B1B1B"><div style="height:150px;overflow:hidden;border-bottom:3px solid #1B1B1B">{{ rc.art }}</div><div style="padding:8px 10px"><div style="font-family:'ZCOOL KuaiLe';font-size:28px;line-height:1.1">{{ rc.cn }}</div><div style="font-size:12px;font-weight:600">{{ rc.en }}</div></div></div></div></div><div style="width:44px;height:44px;border-radius:50%;border:3px solid #FFF7EC;background:{{ rc.badgeBg }};opacity:{{ rc.badgeOp }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;transition:opacity .3s">{{ rc.badge }}</div></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ rvSpot }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:36px">
+                  <div style="width:260px;height:260px;border-radius:50%;overflow:hidden;border:5px solid #FFD54A;box-shadow:0 0 80px #FFD54A;filter:{{ spotFilter }};transition:filter 2s ease-out">{{ killerFace }}</div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="font-family:'ZCOOL KuaiLe';font-size:30px"><span style="display:{{ zhD }}">凶手是…</span><span style="display:{{ enD }}">The killer is…</span></div>
+                    <div style="font-family:'ZCOOL KuaiLe';font-size:84px;line-height:1;color:#E8483B;-webkit-text-stroke:2px #FFF7EC;opacity:{{ spotTextOp }};transition:opacity .6s .8s">{{ killerCn }}！</div>
+                    <div style="font-size:20px;font-weight:600;opacity:{{ spotTextOp }};transition:opacity .6s 1s"><span style="display:{{ zhD }}">在 {{ solRoom }} · 用 {{ solObj }}</span><span style="display:{{ enD }}">in the {{ solRoom }} · with the {{ solObj }}</span></div>
+                    <sc-if value="{{ rvVerdict }}" hint-placeholder-val="{{ false }}"><div style="margin-top:8px;font-family:'ZCOOL KuaiLe';font-size:28px;color:#FFD54A;animation:fadeUp .4s ease-out both"><span style="display:{{ zhD }}">{{ winnerCn }} 破案了！</span><span style="display:{{ enD }}">{{ winnerCn }} wins!</span></div></sc-if>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tvEnd }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background-color:#FFD54A;background-image:radial-gradient(#1B1B1B 2px,transparent 2.5px);background-size:24px 24px;display:flex;align-items:center;justify-content:center;gap:40px;color:#1B1B1B;padding:30px;box-sizing:border-box">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="width:200px;height:200px;border-radius:50%;overflow:hidden;border:5px solid #1B1B1B;box-shadow:6px 6px 0 #1B1B1B;box-sizing:border-box">{{ winnerFace }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:40px">{{ winnerCn }} 赢了！</div></div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-family:'ZCOOL KuaiLe';font-size:30px"><span style="display:{{ zhD }}">答案</span><span style="display:{{ enD }}">The answer</span></div>
+                <div style="display:flex;gap:12px"><sc-for list="{{ solCards }}" as="sc" hint-placeholder-count="3"><div style="width:130px;border:3px solid #1B1B1B;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:4px 4px 0 #1B1B1B"><div style="font-size:12px;font-weight:700;padding:3px 8px;background:#1B1B1B;color:#FFFFFF">{{ sc.q }}</div><div style="height:96px;overflow:hidden;border-bottom:3px solid #1B1B1B">{{ sc.art }}</div><div style="padding:6px 8px;font-family:'ZCOOL KuaiLe';font-size:22px">{{ sc.cn }}</div></div></sc-for></div>
+                <div style="font-size:16px;font-weight:700"><span style="display:{{ zhD }}">再来一局？房主可以在手机上开始新一局。</span><span style="display:{{ enD }}">Play again? The host can start a new round from their phone.</span></div>
+              </div>
+            </div>
+          </sc-if>
+
+                  <sc-if value="{{ tvMoment }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:rgba(11,11,16,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#FFF7EC;animation:fadeUp .25s ease-out">
+              <div style="display:flex;align-items:center;gap:14px"><div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:4px solid #FFD54A;box-sizing:border-box">{{ mFace }}</div><div style="font-family:'ZCOOL KuaiLe';font-size:36px;color:#FFD54A">{{ mTitle }}</div></div>
+              <div style="display:flex;gap:18px"><sc-for list="{{ mCards }}" as="mc" hint-placeholder-count="3"><div style="width:150px;border:4px solid #1B1B1B;border-radius:14px;overflow:hidden;background:#FFF7EC;color:#1B1B1B;box-shadow:6px 6px 0 #000;animation:{{ mc.anim }}"><div style="font-size:13px;font-weight:700;padding:3px 8px;background:#1B1B1B;color:#FFFFFF">{{ mc.q }}</div><div style="height:118px;overflow:hidden;border-bottom:3px solid #1B1B1B">{{ mc.art }}</div><div style="padding:6px 8px;font-family:'ZCOOL KuaiLe';font-size:26px;line-height:1.1">{{ mc.cn }}</div></div></sc-for></div>
+              <div style="display:flex;gap:16px"><sc-for list="{{ mChain }}" as="ch" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;gap:6px;opacity:{{ ch.op }};transition:opacity .2s"><div style="width:58px;height:58px;border-radius:50%;overflow:hidden;border:4px solid {{ ch.ring }};box-sizing:border-box">{{ ch.face }}</div><div style="min-width:58px;text-align:center;border-radius:8px;padding:2px 6px;font-size:15px;font-weight:700;background:{{ ch.bg }};color:{{ ch.fg }};animation:{{ ch.anim }}">{{ ch.label }}</div></div></sc-for></div>
+              <div style="font-family:'ZCOOL KuaiLe';font-size:28px;min-height:36px">{{ mStatus }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tvBanner }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-20px;right:-20px;top:190px;pointer-events:none;animation:ribbon 1.8s ease-in-out both"><div style="background:#FFD54A;border-top:5px solid #1B1B1B;border-bottom:5px solid #1B1B1B;padding:14px 0;text-align:center;font-family:'ZCOOL KuaiLe';font-size:56px;color:#E8483B;-webkit-text-stroke:2px #1B1B1B">{{ tvBannerTxt }}</div></div></sc-if>
+          <div style="position:absolute;left:0;right:0;bottom:30px;height:0;pointer-events:none"><sc-for list="{{ tvFloats }}" as="fl" hint-placeholder-count="0"><div style="position:absolute;left:{{ fl.l }};bottom:0;display:flex;align-items:center;gap:6px;animation:floatUp 2.6s ease-out both"><div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:3px solid #1B1B1B;box-sizing:border-box">{{ fl.face }}</div><div style="background:{{ fl.bg }};color:{{ fl.fg }};border:3px solid #1B1B1B;border-radius:14px;padding:4px 14px;font-family:'ZCOOL KuaiLe';font-size:28px;white-space:nowrap;box-shadow:3px 3px 0 #1B1B1B">{{ fl.txt }}</div></div></sc-for></div>
+          <sc-if value="{{ tvEnd }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;bottom:0;background:#1B1B1B;color:#FFF7EC;padding:10px 24px;display:flex;align-items:center;gap:18px"><sc-for list="{{ awards }}" as="aw" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0"><div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:2px solid #FFD54A;flex-shrink:0;box-sizing:border-box">{{ aw.face }}</div><div style="min-width:0"><div style="font-family:'ZCOOL KuaiLe';font-size:15px;color:#FFD54A;white-space:nowrap">{{ aw.title }}</div><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ aw.who }}</div></div></div></sc-for><div style="font-family:'ZCOOL KuaiLe';font-size:18px;white-space:nowrap">{{ voteTxt }}</div></div></sc-if>
+</div>
+        <div style="width:160px;height:20px;background:#1B1B1B"></div>
+        <div style="width:300px;height:10px;background:#1B1B1B;border-radius:6px"></div>
+        <div style="margin-top:10px;font-size:14px;font-weight:600"><span style="display:{{ zhD }}">电视 · 观众屏幕</span><span style="display:{{ enD }}">TV spectator screen · not playable, shows public info only</span></div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#FFF7EC;color:#1B1B1B;border:3px solid #1B1B1B;border-radius:16px;padding:16px 18px;box-sizing:border-box;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:18px">
+          <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px"><span style="display:{{ zhD }}">这一步</span><span style="display:{{ enD }}">What's happening</span></div><div style="font-size:14px;font-weight:500;line-height:1.5;text-wrap:pretty">{{ noteWhat }}</div></div>
+          <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px"><span style="display:{{ zhD }}">声音</span><span style="display:{{ enD }}">Sound</span></div><div style="font-size:14px;font-weight:500;line-height:1.5;text-wrap:pretty">{{ noteSfx }}</div></div>
+          <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px"><span style="display:{{ zhD }}">震动</span><span style="display:{{ enD }}">Haptics</span></div><div style="font-size:14px;font-weight:500;line-height:1.5;text-wrap:pretty">{{ noteHap }}</div></div>
+        </div>
+      </sc-if>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;botSpeed&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Normal&quot;,&quot;Fast&quot;],&quot;default&quot;:&quot;Normal&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const SEAT_ORDER=['大嫂','二叔','伯母','姑丈','大姑','表哥'];
+const NAMES=['你 You','Mei','Ah Hock','Jason','Bot','Bot'];
+const SOLUTION={sus:'姑丈',room:'车房',obj:'年糕'};
+const DEAL=['红包','书房','二叔','厨房','大嫂','橘子','神台','伯母','六万','饭厅','大姑','麻将房','筷子','客厅','表哥','鞭炮','后院'];
+const FLOW=[['lang','语言','Language'],['home','首页','Home'],['settings','设置','Settings'],['create','创建','Create room'],['lobby','等待','Lobby'],['story1','故事','Story'],['murder','凶案','Murder'],['story2','任务','Briefing'],['setup','发牌','Setup'],['tutorial','教学','Tutorial'],['game','游戏','Play'],['accuse','指控','Accuse'],['reveal','揭晓','Reveal'],['end','结局','End']];
+class Component extends DCLogic {
+  state={phase:'lang',sheet:null,info:null,settings:{sfx:true,music:true,haptics:true,notify:true},lang:'zh',room:{mode:'tv',max:6,bots:true,name:'陈家过年局'},joined:1,myChar:'表哥',reacts:[],votes:[false,false,false,false,false,false],tutDone:false,story:0,murder:0,story2:0,setup:0,roleFlip:false,handFlip:0,game:null,reveal:null,ready:!!(window.GA&&window.GC)};
+  componentDidMount(){ this.timers=[]; this.tick=setInterval(()=>this.onTick(),1000); if(!this.state.ready){ this.poll=setInterval(()=>{ if(window.GA&&window.GC){clearInterval(this.poll);this.setState({ready:true});} },100); } }
+  componentWillUnmount(){ this.clearTimers(); clearInterval(this.poll); clearInterval(this.tick); }
+  onTick(){ const s=this.state,g=s.game; if(s.phase!=='game'||!g||g.tut!=null||g.moment||s.sheet==='show'||s.sheet==='wrong') return;
+    if(g.tLeft>0) return this.setG(g=>({tLeft:g.tLeft-1}));
+    if(g.turn===0&&!g.out&&['roll','move','end'].includes(g.stage)&&!g.moving&&!g.dice.rolling){ this.setState({sheet:null}); this.setG(g=>({dice:{...g.dice,open:false},reach:{}})); this.log('时间到，自动结束回合','Time’s up, turn ended'); this.endTurn(); } }
+  myTurn(){ const out=this.state.game.out; this.setG(g=>({turn:0,stage:g.out?'out':'roll',round:g.round+1,tLeft:60,banner:!g.out,pending:null,dice:{...g.dice,rolling:false}})); if(!out) this.after(1900,()=>this.setG(()=>({banner:false}))); return out; }
+  pushReact(seat,i){ const id=Math.random(), x=8+Math.random()*60; this.setState(s=>({reacts:[...s.reacts,{id,seat,i,x}]})); if(this.state.game) this.setG(g=>({reactCount:g.reactCount.map((v,k)=>k===seat?v+1:v)})); setTimeout(()=>this.setState(s=>({reacts:s.reacts.filter(r=>r.id!==id)})),2700); }
+  botReact(){ this.pushReact(1+Math.floor(Math.random()*5),Math.floor(Math.random()*6)); }
+  startMoment(by,trio,shower,then){
+    const chain=[]; for(let i=1;i<6;i++){ const k=(by+i)%6; chain.push(k); if(k===shower) break; }
+    this.setG(()=>({moment:{by,trio,chain,shower,shown:0}}));
+    chain.forEach((_,i)=>this.after(this.sp(1400+i*650),()=>this.setG(g=>({moment:g.moment?{...g.moment,shown:i+1}:null}))));
+    if(Math.random()<.75) this.after(this.sp(1700),()=>this.botReact());
+    this.after(this.sp(1400+chain.length*650+1100),()=>{ this.setG(()=>({moment:null})); then(); });
+  }
+  toEnd(){ this.clearTimers(); this.setState({phase:'end',votes:[false,false,false,false,false,false]}); [1,2,3,4,5].forEach((k,i)=>this.after(1400+i*900,()=>this.setState(s=>({votes:s.votes.map((v,j)=>j===k?true:v)})))); }
+  after(ms,fn){ const t=setTimeout(fn,ms); (this.timers=this.timers||[]).push(t); }
+  clearTimers(){ (this.timers||[]).forEach(clearTimeout); this.timers=[]; }
+  sp(ms){ return (this.props.botSpeed==='Fast'?.4:1)*ms; }
+  L(zh,en){ return this.state.lang==='en'?en:zh; }
+  nm(c){ return this.state.lang==='en'&&window.GA?window.GA.enOf(c):c; }
+  pn(i){ return i===0?this.L('你','You'):i>=4?this.L('机器人','Bot'):NAMES[i]; }
+  order(){ const m=this.state.myChar; return [m,...SEAT_ORDER.filter(c=>c!==m)]; }
+  setG(fn){ this.setState(s=>({game:{...s.game,...fn(s.game)}})); }
+  go(p){
+    this.clearTimers();
+    const base={phase:p,sheet:null};
+    if(p==='lobby'){ this.setState({...base,joined:1}); const m=this.state.room.max; [1,2,3].forEach(i=>this.after(800*i,()=>this.setState(s=>({joined:Math.min(s.room.max,Math.max(s.joined,i+1))})))); if(this.state.room.bots) this.after(3800,()=>this.setState(s=>({joined:s.room.max}))); return; }
+    if(p==='story1') return this.setState({...base,story:0});
+    if(p==='story2') return this.setState({...base,story2:0});
+    if(p==='murder'){ this.setState({...base,murder:0}); let t=0; window.GC.MURDER_MS.forEach((ms,i)=>{ t+=ms; this.after(t,()=>this.setState({murder:i+1})); }); return; }
+    if(p==='setup'){ this.setState({...base,setup:0,roleFlip:false,handFlip:0}); this.after(1800,()=>this.setState({setup:1})); this.after(5400,()=>this.setState({setup:2})); this.after(9200,()=>this.setState({setup:3})); return; }
+    if(p==='game'){ const tut=this.state.tutDone?null:0; this.setState({...base,game:{...this.initGame(),tut}}); if(tut===null){ this.setG(()=>({banner:true})); this.after(1900,()=>this.setG(()=>({banner:false}))); } return; }
+    this.setState(base);
+  }
+  jump(id){
+    this.clearTimers();
+    if(id==='create') return this.setState({phase:'home',sheet:'create'});
+    if(id==='tutorial'){ this.setState({phase:'game',sheet:null,game:{...this.initGame(),tut:0}}); return; }
+    if(id==='game'||id==='accuse'){ this.setState({phase:'game',sheet:id==='accuse'?'accuse':null,game:this.initGame()}); return; }
+    if(id==='reveal'){ if(!this.state.game) this.setState({game:this.initGame()}); return this.startReveal({winner:0,accuser:0,picks:[SOLUTION.sus,SOLUTION.room,SOLUTION.obj]}); }
+    if(id==='end'){ this.setState({sheet:null,game:this.state.game||this.initGame(),reveal:{winner:0,accuser:0,picks:[SOLUTION.sus,SOLUTION.room,SOLUTION.obj],step:6,lit:true}}); return this.toEnd(); }
+    this.go(id);
+  }
+  initGame(){
+    const {STARTS}=window.GC, order=this.order(), hands=[0,1,2,3,4,5].map(s=>DEAL.filter((_,i)=>i%6===s)), pos={}, marks={};
+    order.forEach(c=>pos[c]=STARTS[c]); hands[0].forEach(c=>{marks[c+'-0']='v';});
+    return {order,hands,pos,turn:0,stage:'roll',dice:{open:false,rolling:false,value:1,k:0},reach:{},par:{},round:1,pane:'act',log:[{zh:'游戏开始！'+order[0]+' 先走',en:'Game on! '+window.GA.enOf(order[0])+' goes first'}],marks,shown:[],lastSug:null,disprove:null,pending:null,sug:{sus:null,obj:null},acc:{sus:null,room:null,obj:null,confirm:false},out:false,forcedDone:false,moving:false,sugCount:0,wrongFlip:0,tLeft:60,banner:false,moment:null,events:[],suspCount:{},showCount:[0,0,0,0,0,0],reactCount:[0,0,0,0,0,0],tut:null,reactOpen:false};
+  }
+  log(zh,en){ this.setG(g=>({log:[{zh,en:en||zh},...g.log].slice(0,30)})); }
+  walk(ch,path,done){ const step=i=>{ if(i>=path.length){ done&&done(); return; } this.setG(g=>({pos:{...g.pos,[ch]:path[i]}})); this.after(this.sp(170),()=>step(i+1)); }; step(1); }
+  openDice(){ const g=this.state.game; if(g.turn!==0||g.stage!=='roll'||g.out) return; this.setG(g=>({dice:{...g.dice,open:true,rolled:false}})); }
+  roll(){
+    const g=this.state.game; if(g.dice.rolling||g.dice.rolled) return;
+    const v=1+Math.floor(Math.random()*6);
+    this.setG(g=>({dice:{...g.dice,rolling:true,rolled:true,value:v,k:g.dice.k+1}}));
+    this.after(1300,()=>{
+      const g=this.state.game, me=g.order[0], start=g.pos[me], {dist,par}=window.GC.bfs(start,v), reach={};
+      Object.keys(dist).forEach(k=>{ if(dist[k]>0&&k!==start) reach[k]=true; });
+      this.setG(g=>({dice:{...g.dice,rolling:false},reach,par,stage:'move'})); this.log('你掷出 '+v,'You rolled '+v);
+      this.after(1000,()=>this.setG(g=>({dice:{...g.dice,open:false}})));
+    });
+  }
+  tapNode(node){
+    const g=this.state.game; if(g.turn!==0||g.stage!=='move'||!g.reach[node]||g.moving) return;
+    const me=g.order[0], path=window.GC.pathTo(g.par,g.pos[me],node);
+    this.setG(()=>({reach:{},moving:true}));
+    this.walk(me,path,()=>{ if(node.startsWith('R:')){ const r=node.slice(2); this.setG(()=>({moving:false,stage:'suggest',sug:{sus:null,obj:null}})); this.log('你进入了 '+r,'You entered the '+window.GA.ROOM_EN[r]); this.setState({sheet:'suggest'}); } else this.setG(()=>({moving:false,stage:'end'})); });
+  }
+  takeSecret(){
+    const g=this.state.game, me=g.order[0], cur=g.pos[me]; if(g.turn!==0||g.stage!=='roll'||!cur.startsWith('R:')) return;
+    const dest=window.GC.SECRET[cur.slice(2)]; if(!dest) return;
+    this.setG(()=>({moving:true})); this.walk(me,[cur,'R:'+dest],()=>{ this.setG(()=>({moving:false,stage:'suggest',sug:{sus:null,obj:null}})); this.log('你走密道到 '+dest,'Secret passage to the '+window.GA.ROOM_EN[dest]); this.setState({sheet:'suggest'}); });
+  }
+  submitSuggest(){
+    const g=this.state.game, me=g.order[0], room=g.pos[me].slice(2), {sus,obj}=g.sug; if(!sus||!obj) return;
+    const pos={...g.pos}; if(pos[sus]!==undefined&&sus!==me) pos[sus]='R:'+room;
+    const trio=[sus,room,obj]; let shower=null,card=null;
+    for(let k=1;k<6;k++){ const m=g.hands[k].filter(c=>trio.includes(c)); if(m.length){ shower=k; card=m[0]; break; } }
+    this.setState({sheet:null});
+    this.setG(g=>({pos,lastSug:{by:0,sus,room,obj,shower},sugCount:g.sugCount+1,events:[...g.events,{r:g.round,by:0,trio,shower}],suspCount:{...g.suspCount,[sus]:(g.suspCount[sus]||0)+1},showCount:g.showCount.map((v,i)=>i===shower?v+1:v)}));
+    this.log('你推理：'+sus+' · '+room+' · '+obj,'You suggest: '+window.GA.enOf(sus)+' · '+window.GA.enOf(room)+' · '+window.GA.enOf(obj));
+    this.startMoment(0,trio,shower,()=>{
+      this.setG(g=>({disprove:{shower,card,phase:shower===null?'none':'shown'},...(shower!==null?{marks:{...g.marks,[card+'-'+shower]:'v'},shown:[...g.shown,{card,from:shower}]}:{})}));
+      if(shower!==null) this.log(g.order[shower]+' 给你看了一张牌',window.GA.enOf(g.order[shower])+' showed you a card');
+      this.setState({sheet:'disprove'});
+    });
+  }
+  gotIt(){ this.setState({sheet:null}); this.setG(()=>({stage:'end'})); }
+  endTurn(){ const g=this.state.game; if(g.turn!==0) return; this.setG(()=>({stage:'wait',reach:{}})); this.runBot(1); }
+  runBot(seat){
+    if(seat>=6){ const out=this.myTurn(); if(out){ this.log('你是幽灵，跳过回合','You’re a ghost, turn skipped'); this.after(this.sp(1500),()=>this.runBot(1)); } else this.log('轮到你了','Your turn'); return; }
+    if(seat===1&&this.state.game.out&&this.state.game.round>this.state.game.outRound){ const c=this.state.game.order[1]; this.log(c+' 要指控了！',window.GA.enOf(c)+' makes an accusation!'); this.after(this.sp(1600),()=>this.startReveal({winner:1,accuser:1,picks:[SOLUTION.sus,SOLUTION.room,SOLUTION.obj]})); return; }
+    const g=this.state.game, ch=g.order[seat], v=1+Math.floor(Math.random()*6);
+    this.setG(g=>({turn:seat,tLeft:60,dice:{...g.dice,rolling:true,value:v,k:g.dice.k+1}})); this.log(ch+' 掷出 '+v,window.GA.enOf(ch)+' rolled '+v);
+    this.after(this.sp(1400),()=>{
+      const g=this.state.game, start=g.pos[ch], {bfs,pathTo,DR}=window.GC, {dist,par}=bfs(start,v);
+      const cands=Object.keys(dist).filter(k=>dist[k]>0&&k!==start), rooms=cands.filter(k=>k.startsWith('R:'));
+      let target=rooms.length?rooms[Math.floor(Math.random()*rooms.length)]:cands.filter(k=>!k.startsWith('R:')).sort((a,b)=>DR[a]-DR[b])[0];
+      this.setG(g=>({dice:{...g.dice,rolling:false}}));
+      if(!target){ this.after(this.sp(600),()=>this.runBot(seat+1)); return; }
+      this.walk(ch,pathTo(par,start,target),()=>{ if(target.startsWith('R:')) this.after(this.sp(400),()=>this.botSuggest(seat,target.slice(2))); else this.after(this.sp(500),()=>this.runBot(seat+1)); });
+    });
+  }
+  botSuggest(seat,room){
+    const {SUS,OBJS}=window.GA, E=window.GA.enOf, g=this.state.game, ch=g.order[seat];
+    let sus,obj; if(seat===5&&!g.forcedDone){ sus=SOLUTION.sus; obj=g.hands[0].find(c=>OBJS.includes(c))||OBJS[0]; } else { sus=SUS[Math.floor(Math.random()*6)]; obj=OBJS[Math.floor(Math.random()*6)]; }
+    const pos={...g.pos}; if(pos[sus]!==undefined) pos[sus]='R:'+room;
+    const trio=[sus,room,obj]; let shower=null,matches=[];
+    for(let i=1;i<6;i++){ const k=(seat+i)%6, m=g.hands[k].filter(c=>trio.includes(c)); if(m.length){ shower=k; matches=m; break; } }
+    this.setG(g=>({pos,forcedDone:g.forcedDone||seat===5,lastSug:{by:seat,sus,room,obj,shower},events:[...g.events,{r:g.round,by:seat,trio,shower}],suspCount:{...g.suspCount,[sus]:(g.suspCount[sus]||0)+1},showCount:g.showCount.map((v,i)=>i===shower?v+1:v)}));
+    this.log(ch+' 推理：'+sus+' · '+room+' · '+obj,E(ch)+' suggests: '+E(sus)+' · '+E(room)+' · '+E(obj));
+    this.startMoment(seat,trio,shower,()=>{
+      if(shower===0){ this.setG(()=>({pending:{by:seat,sus,room,obj,matches,pick:matches[0]}})); this.setState({sheet:'show'}); this.resume=()=>this.after(this.sp(900),()=>this.runBot(seat+1)); return; }
+      const g=this.state.game; this.log(shower===null?'没有人能反驳':g.order[shower]+' 给 '+ch+' 看了一张牌',shower===null?'Nobody could disprove':E(g.order[shower])+' showed '+E(ch)+' a card');
+      this.after(this.sp(900),()=>this.runBot(seat+1));
+    });
+  }
+  showCard(){ const g=this.state.game, p=g.pending; this.setState({sheet:null}); this.setG(()=>({pending:null})); this.log('你给 '+g.order[p.by]+' 看了 '+p.pick,'You showed '+window.GA.enOf(g.order[p.by])+' the '+window.GA.enOf(p.pick)); this.resume&&this.resume(); }
+  skipBots(){ this.clearTimers(); this.setState({sheet:null}); this.setG(()=>({moment:null})); this.myTurn(); this.log('轮到你了','Your turn'); }
+  accGo(){
+    const g=this.state.game, a=g.acc, picks=[a.sus,a.room,a.obj];
+    if(a.sus===SOLUTION.sus&&a.room===SOLUTION.room&&a.obj===SOLUTION.obj) return this.startReveal({winner:0,accuser:0,picks});
+    this.setState({sheet:'wrong'}); this.setG(g=>({out:true,outRound:g.round,stage:'out',acc:{...g.acc,confirm:false},wrongFlip:0,wrongAnn:{by:0,picks}})); this.setG(g=>({events:[...g.events,{r:g.round,by:0,wrong:true}]})); this.log(g.order[0]+' 指控错误，变成了幽灵',window.GA.enOf(g.order[0])+' accused wrongly and is now a ghost');
+    [1,2,3].forEach(i=>this.after(400+i*500,()=>this.setG(()=>({wrongFlip:i}))));
+  }
+  continueGhost(){ this.setState({sheet:null}); this.after(5000,()=>this.setG(()=>({wrongAnn:null}))); this.after(1200,()=>this.runBot(1)); }
+  startReveal(r){
+    this.clearTimers(); this.setState({phase:'reveal',sheet:null,reveal:{...r,step:0,lit:false}});
+    let t=0; [1600,1200,1100,1100,1100,2800].forEach((ms,i)=>{ t+=ms; this.after(t,()=>this.setState(s=>({reveal:{...s.reveal,step:i+1}}))); if(i===4) this.after(t+900,()=>this.setState(s=>({reveal:{...s.reveal,lit:true}}))); });
+  }
+  renderVals(){ return this.rv(); }
+  rv(){
+    const s=this.state; if(!s.ready||!window.GA||!window.GC) return {isLang:true,tvIdle:true,flow:[],toggles:[],codeDigits:[],zhD:'inline',enD:'none'};
+    window.React=window.React||React; window.GA_LANG=s.lang;
+    const GA=window.GA, GC=window.GC, {SUS,CH,face,cardArt,backArt,enOf}=GA, L=(a,b)=>this.L(a,b), nm=c=>this.nm(c), lg=s.lang;
+    const ph=s.phase, tv=s.room.mode==='tv', g=s.game, V={};
+    const set=o=>this.setState(o);
+    V.zhD=lg==='en'?'none':'inline'; V.enD=lg==='en'?'inline':'none';
+    const cur=s.sheet==='create'?'create':(ph==='game'&&(s.sheet==='accuse'||s.sheet==='wrong'))?'accuse':ph;
+    V.flow=FLOW.map(([id,cn,en],i)=>({n:String(i).padStart(2,'0'),label:cn+' '+en,bg:cur===id?'#FFD54A':'transparent',fg:cur===id?'#1B1B1B':'#FFF7EC',go:()=>this.jump(id)}));
+    V.modeLabel=tv?'电视 + 手机 TV + phones':'只用手机 Phones only'; V.tvMode=tv;
+    V.toggleMode=()=>this.setState(s=>({room:{...s.room,mode:s.room.mode==='tv'?'phones':'tv'}}));
+    const darkBg={story1:'#1B1B1B',story2:'#1B1B1B',murder:'#0B0B10',reveal:'#0B0B10'}[ph];
+    V.stBg=darkBg||({lang:'#FFD54A',home:'#FFD54A',setup:'#2FA37C',end:'#FFD54A'}[ph])||'#FFF7EC'; V.stFg=darkBg?'#FFF7EC':'#1B1B1B';
+    ['lang','home','settings','lobby','murder','setup','game','reveal','end'].forEach(p=>V['is'+p[0].toUpperCase()+p.slice(1)]=ph===p);
+    V.isStory=ph==='story1'||ph==='story2';
+    V.pickZh=()=>{ set({lang:'zh'}); this.go('home'); }; V.pickEn=()=>{ set({lang:'en'}); this.go('home'); };
+    const N=(g&&ph==='game'&&g.tut!=null)?GC.NOTES.tutorial:(GC.NOTES[cur]||GC.NOTES.home); V.showNotes=this.props.showNotes??true; V.noteWhat=ph==='lang'?'First launch: the player picks a language. Only that language is shown in the game; it can be changed later in Settings.':N.what; V.noteSfx=N.sfx; V.noteHap=N.hap;
+    V.backArt=backArt(); V.victimArt=GA.victimArt(); V.qrEl=GA.qrEl();
+    V.toHome=()=>this.go('home'); V.toSettings=()=>this.go('settings');
+    V.openCreate=()=>set({sheet:'create'}); V.closeSheet=()=>{ set({sheet:null}); if(this.state.game) this.setG(g=>({acc:{...g.acc,confirm:false}})); };
+    V.openJoin=()=>set({sheet:'info',info:'join'}); V.openTv=()=>set({sheet:'info',info:'tv'}); V.openRules=()=>set({sheet:'info',info:'rules'});
+    V.toggles=[['sfx','音效','鞭炮、锣声、骰子','Sound effects','Firecrackers, gongs, dice'],['music','背景音乐','新年古筝主题曲','Music','CNY guzheng theme'],['haptics','震动','掷骰、轮到你、看到牌时','Haptics','Dice, your turn, card shown'],['notify','回合提醒','轮到我时提醒我','Turn alerts','Alert me when it’s my turn']].map(([k,a,b,c,d])=>{const on=s.settings[k];return {cn:L(a,c),en:L(b,d),bg:on?'#2FA37C':'#E6E1D8',knob:on?'translateX(24px)':'none',flip:()=>this.setState(s=>({settings:{...s.settings,[k]:!s.settings[k]}}))};});
+    V.langs=[['zh','中文'],['en','English'],['auto',L('跟随系统','System')]].map(([k,l])=>({label:l,bg:lg===k?'#FFD54A':'transparent',fg:lg===k?'#1B1B1B':'#FFFFFF',pick:()=>set({lang:k==='auto'?'zh':k})}));
+    V.sheetCreate=s.sheet==='create'; V.roomName=s.room.name; V.maxSeats=s.room.max;
+    V.setRoomName=e=>{const v=e.target.value;this.setState(s=>({room:{...s.room,name:v}}));};
+    V.maxDown=()=>this.setState(s=>({room:{...s.room,max:Math.max(3,s.room.max-1)}})); V.maxUp=()=>this.setState(s=>({room:{...s.room,max:Math.min(6,s.room.max+1)}}));
+    V.modeOpts=[['phones','只用手机','每部手机都显示完整棋盘。','Phones only','Every phone shows the full board.'],['tv','电视 + 手机','电视给大家看棋盘，手机也保留完整棋盘。','TV + phones','The TV shows the board for everyone; phones keep the full board too.']].map(([m,a,b,c,d])=>({cn:L(a,c),en:L(b,d),bg:s.room.mode===m?'#FFD54A':'#FFFFFF',shadow:s.room.mode===m?'3px 3px 0 #1B1B1B':'none',pick:()=>this.setState(s=>({room:{...s.room,mode:m}}))}));
+    V.botsBg=s.room.bots?'#2FA37C':'#E6E1D8'; V.botsKnob=s.room.bots?'translateX(24px)':'none'; V.flipBots=()=>this.setState(s=>({room:{...s.room,bots:!s.room.bots}}));
+    V.createRoom=()=>this.go('lobby');
+    const INFO={join:[L('加入房间','Join room'),[L('向房主要 4 位房间号，或扫描电视上的二维码。','Ask the host for the 4-digit room code, or scan the QR code on the TV.'),L('输入房间号后进入等待室，选择角色。','Enter the code. You land in the waiting room and pick a character.')],L('加入','Join'),()=>this.go('lobby')],
+      tv:[L('电视观看','Watch on TV'),[L('在电视浏览器打开游戏，或从手机投屏。','Open the game in the TV’s browser, or cast from your phone.'),L('电视会显示二维码和房间号，玩家扫码加入。','The TV shows a QR code and the room code. Players scan it to join.'),L('电视是观众屏幕：显示棋盘、骰子、故事和揭晓，不能操作，也不会显示任何人的手牌。','The TV is a spectator: it shows the board, dice, story and reveals. Nobody plays on it, and it never shows private cards.')],L('预览电视画面','Preview the TV'),()=>{this.setState(s=>({room:{...s.room,mode:'tv'}}));this.go('lobby');}],
+      rules:[L('怎么玩','How to play'),[L('信封里封着三张牌：谁、在哪里、用什么。','Three cards are sealed in the envelope: who, where and with what.'),L('轮到你时掷骰子移动。进入房间就能推理：说出一个嫌疑人、这个房间和一件物品。','On your turn, roll and move. Enter a room to make a suggestion: a suspect, that room and an object.'),L('按顺时针，第一个有相关牌的玩家要偷偷给你看一张。','Going clockwise, the first player with a matching card secretly shows you one.'),L('把得到的线索记在笔记里。','Tick off what you learn in your notes.'),L('有把握时就指控。对了就赢；错了变成幽灵，但还要给别人看牌。','When you’re sure, accuse. Right: you win. Wrong: you become a ghost, but you still show cards.')],L('知道了','Got it'),()=>set({sheet:null})]}[s.info||'rules'];
+    V.sheetInfo=s.sheet==='info'; V.infoCn=INFO[0]; V.infoEn=''; V.infoSteps=INFO[1].map((t,i)=>({n:i+1,t})); V.infoBtn=INFO[2]; V.infoGo=INFO[3]; V.infoJoin=s.info==='join';
+    const ord=this.order(), joined=Math.min(s.joined,s.room.max);
+    V.codeDigits=['8','8','8','8'].map(v=>({v})); V.joinedTxt=joined+'/'+s.room.max;
+    V.charPick=SUS.map(c=>{const seat=ord.indexOf(c),mine=c===s.myChar,taken=!mine&&seat<joined;return {cn:nm(c),face:face(c),bg:mine?'#FFD54A':'#FFFFFF',op:taken?.5:1,shadow:mine?'3px 3px 0 #1B1B1B':'none',tag:mine?L('你','You'):taken?this.pn(seat):L('可选','Free'),tagBg:mine?'#1B1B1B':taken?CH[c].c:'#FFFFFF',tagFg:mine||taken?'#FFFFFF':'#1B1B1B',pick:()=>{ if(!taken) set({myChar:c}); }};});
+    const seatName=i=>i<joined?this.pn(i):L('等待中…','Waiting…');
+    V.seats=[...Array(s.room.max)].map((_,i)=>({name:seatName(i),g:i<joined?CH[ord[i]].g:'',color:i<joined?CH[ord[i]].c:'#E6E1D8',status:i===0?L('房主','Host'):i<joined?(i>=4?L('机器人','Bot'):L('已加入','Joined')):'',op:i<joined?1:.5}));
+    V.tvSeats=[...Array(s.room.max)].map((_,i)=>({face:i<joined?face(ord[i]):null,cn:i<joined?nm(ord[i]):'？',name:seatName(i),bg:i<joined?'#FFFFFF':'#E6E1D8',op:i<joined?1:.55,anim:i<joined?'fadeUp .4s ease-out both':'none'}));
+    V.showFill=joined<s.room.max; V.fillBots=()=>this.setState(s=>({joined:s.room.max})); V.startOp=joined>=3?1:.4; V.startGame=()=>{ if(Math.min(this.state.joined,this.state.room.max)>=3) this.go('story1'); };
+    const s1=ph==='story1', arr=s1?GC.STORY1:GC.STORY2, idx=s1?s.story:s.story2;
+    if(V.isStory){
+      V.storyChapter=s1?L('第一章 · 团圆夜','Chapter 1 · Reunion night'):L('第三章 · 任务','Chapter 3 · Your mission'); V.storyCn=L(arr[idx].cn,arr[idx].en); V.storyEn='';
+      V.storyScene=s1?GA.scene('s1-'+idx+lg,()=>GA.storyScene(idx),'0 0 360 360'):GA.scene('s2-'+idx+lg+ord.join(''),()=>GA.story2Scene(idx,ord),'0 0 360 360');
+      V.storyDots=arr.map((_,i)=>({bg:i===idx?'#FFD54A':'#555555',w:i===idx?'22px':'8px'}));
+      V.storyNextLabel=idx<arr.length-1?L('下一页','Next'):(s1?L('继续','Continue'):L('准备游戏','Prepare the game'));
+      V.storyNext=()=>{ if(idx<arr.length-1) set(s1?{story:idx+1}:{story2:idx+1}); else this.go(s1?'murder':'setup'); };
+      V.storySkip=()=>this.go(s1?'murder':'setup');
+    }
+    if(ph==='murder'){ const m=s.murder; V.murderScene=GA.scene('m'+m+lg,()=>GA.murderScene(m),'0 0 360 360'); V.murderCn=L(GC.MURDER[m].cn,GC.MURDER[m].en); V.murderEn=''; V.murderBars=[0,1,2,3,4,5].map(i=>({bg:i<=m?'#E8483B':'#333333'})); V.murderDone=m===5; }
+    V.murderNext=()=>this.go('story2'); V.murderReplay=()=>this.go('murder');
+    const hand0=DEAL.filter((_,i)=>i%6===0), KIND={sus:L('嫌疑人','Suspect'),room:L('地点','Room'),obj:L('物品','Object')};
+    if(ph==='setup'){ const st=Math.min(s.setup,2); V.setupDeal=s.setup<=2; V.setupScene=GA.scene('su'+st+lg+ord.join(''),()=>GA.setupScene(st,ord)); V.setupCn=L(GC.SETUP[st].cn,GC.SETUP[st].en); V.setupEn=''; V.setupRole=s.setup===3; V.setupHand=s.setup===4; }
+    V.roleRot=s.roleFlip?'rotateY(180deg)':'rotateY(0deg)'; V.roleFlipped=s.roleFlip; V.roleNotFlipped=!s.roleFlip; V.roleNextOp=s.roleFlip?1:.4;
+    V.flipRole=()=>set({roleFlip:true});
+    V.roleNext=()=>{ if(!this.state.roleFlip) return; set({setup:4,handFlip:0}); [1,2,3].forEach(i=>this.after(250+i*450,()=>set({handFlip:i}))); };
+    V.myArt=cardArt(s.myChar); V.myChar=nm(s.myChar); V.myEn=L(enOf(s.myChar),''); V.myColor=CH[s.myChar].c; V.myFace=face(s.myChar);
+    V.tableSeats=ord.map((c,i)=>({face:face(c),name:i===0?L('你','You'):nm(c)}));
+    V.handFlips=hand0.map((c,i)=>({art:cardArt(c),back:backArt(),cn:nm(c),en:L(enOf(c),''),kind:KIND[GA.kindOf(c)],rot:s.handFlip>i?'rotateY(180deg)':'none'}));
+    V.toBoard=()=>this.go('game');
+    V.tvReady=ord.map((c,i)=>{const r=i>0||s.setup===4;return {face:face(c),cn:nm(c),name:this.pn(i),status:r?L('准备好','Ready'):L('查看中…','Checking…'),bg:r?'#2FA37C':'#7C8085'};});
+    const scn=V.isStory||ph==='murder'||(ph==='setup'&&s.setup<=2);
+    V.tvSceneEl=V.isStory?V.storyScene:ph==='murder'?V.murderScene:V.setupScene;
+    V.tvCn=V.isStory?V.storyCn:ph==='murder'?V.murderCn:V.setupCn; V.tvEn=''; V.tvChapter=V.isStory?V.storyChapter:ph==='murder'?L('第二章 · 凶案','Chapter 2 · The murder'):L('准备游戏','Setting up');
+    V.tvOff=!tv; V.tvIdle=tv&&['lang','home','settings'].includes(ph); V.tvLobby=tv&&ph==='lobby'; V.tvScene=tv&&scn; V.tvChecking=tv&&ph==='setup'&&s.setup>=3;
+    V.tvGame=tv&&ph==='game'; V.tvReveal=tv&&ph==='reveal'; V.tvEnd=tv&&ph==='end';
+    V.facesP=GA.scene('facesP',()=>GC.diceFaces(65)); V.facesT=GA.scene('facesT',()=>GC.diceFaces(35));
+    if(g) Object.assign(V,this.gameVals(g,s));
+    return V;
+  }
+  gameVals(g,s){
+    const GA=window.GA, GC=window.GC, {SUS,ROOMS,OBJS,CH,face,cardArt,backArt,enOf}=GA, V={}, L=(a,b)=>this.L(a,b), nm=c=>this.nm(c), pn=i=>this.pn(i);
+    const me=g.order[0], myPos=g.pos[me], inRoom=myPos.startsWith('R:'), myRoom=inRoom?myPos.slice(2):'', myTurn=g.turn===0&&!g.out, tch=g.order[g.turn];
+    V.round=g.round; V.turnFace=face(tch); V.turnBg=g.turn===0?(g.out?'#E6E1D8':'#FFD54A'):'#FFFFFF';
+    V.turnLabel=g.turn===0?(g.out?L('你是幽灵 · 跳过','You’re a ghost · skipped'):L('轮到你了','Your turn')):L(nm(tch)+' 的回合',nm(tch)+'’s turn')+' · '+pn(g.turn);
+    V.meTag=g.out?L('幽灵 你','GHOST · YOU'):L('你','YOU');
+    const moving=g.turn===0&&g.stage==='move';
+    V.bCells=GC.COR.map(k=>{const [c,r]=k.split(',').map(Number),st=Object.keys(GC.STARTS).find(x=>GC.STARTS[x]===k),re=moving&&g.reach[k];
+      return {l:GC.pct(c),t:GC.pct(r),bg:re?'#7FD3A8':st?CH[st].c+'66':((c+r)%2?'#FFFFFF':'#FFF7EC'),anim:re?'pulse .9s ease-in-out infinite':'none',cur:re?'pointer':'default',tap:()=>this.tapNode(k)};});
+    V.bRooms=ROOMS.map(n=>{const [i,j]=GC.RB[n],re=moving&&g.reach['R:'+n];return {l:GC.pct(i*4),t:GC.pct(j*4),cn:nm(n),art:GA.roomArt(n),secret:!!GC.SECRET[n],over:re?'rgba(127,211,168,.55)':'transparent',anim:re?'glow 1s ease-in-out infinite':'none',glow:re?'0 0 0 3px #2FA37C':'none',cur:re?'pointer':'default',tap:()=>this.tapNode('R:'+n)};});
+    V.bDoors=GC.DOORS.map(([x,y,w,h])=>({l:GC.pct(x),t:GC.pct(y),w:GC.pct(w),h:GC.pct(h)}));
+    const slots={};
+    V.bTokens=g.order.map((c,i)=>{const n=g.pos[c],sl=slots[n]=(slots[n]||0)+1,[l,t]=GC.nodeXY(n,sl-1),ghost=g.out&&i===0;return {l,t,c:ghost?'#C9C2B8':CH[c].c,g:ghost?'鬼':CH[c].g,active:i===g.turn&&!ghost,mine:i===0,pinTop:parseFloat(t)<15?'18px':'-52px',pinDir:parseFloat(t)<15?'column-reverse':'column',arTop:parseFloat(t)<15?'0':'8px solid #1B1B1B',arBot:parseFloat(t)<15?'8px solid #1B1B1B':'0',z:i===0?6:(i===g.turn?5:3),op:ghost?.55:1,ring:'none',tvRing:'none'};});
+    const lt=e=>L(e.zh,e.en);
+    V.lastLog=g.log[0]?lt(g.log[0]):'';
+    V.paneTabs=[['act','行动','Actions'],['cards','我的牌','Cards'],['notes','笔记','Notes']].map(([id,a,b])=>({label:L(a,b),bg:g.pane===id?'#FFD54A':'transparent',fg:g.pane===id?'#1B1B1B':'#FFFFFF',go:()=>this.setG(()=>({pane:id}))}));
+    V.paneAct=g.pane==='act'; V.paneCards=g.pane==='cards'; V.paneNotes=g.pane==='notes';
+    V.actRoll=myTurn&&g.stage==='roll'; V.actMove=myTurn&&g.stage==='move'; V.actSuggest=myTurn&&g.stage==='suggest'; V.actEnd=myTurn&&g.stage==='end'; V.actWait=g.turn!==0; V.actOut=g.out;
+    V.diceValue=g.dice.value; V.myRoomCn=nm(myRoom); V.myRoomEn=nm(myRoom);
+    V.openDice=()=>this.openDice(); V.roll=()=>this.roll(); V.endTurn=()=>this.endTurn(); V.skipBots=()=>this.skipBots(); V.takeSecret=()=>this.takeSecret();
+    V.openSuggest=()=>this.setState({sheet:'suggest'});
+    V.peekNotes=()=>{ const sh=this.state.sheet; this.setState({sheet:null}); this.setG(()=>({pane:'notes',resume:sh})); };
+    V.hasResume=!!g.resume&&g.pane==='notes'; V.resumeLabel=g.resume==='accuse'?L('← 返回指控','← Back to accusation'):L('← 返回推理','← Back to suggestion');
+    V.resumeSheet=()=>{ const r=this.state.game.resume; this.setG(()=>({resume:null})); this.setState({sheet:r}); };
+    V.waitCn=g.dice.rolling?L(nm(tch)+' 正在掷骰子…',nm(tch)+' is rolling…'):L(nm(tch)+' 正在行动…',nm(tch)+' is playing…'); V.waitEn=pn(g.turn);
+    V.miniLog=g.log.slice(0,3).map(e=>({t:lt(e)}));
+    const canSecret=myTurn&&g.stage==='roll'&&inRoom&&!!GC.SECRET[myRoom]; V.secretOp=canSecret?1:.35;
+    V.accuseOp=myTurn?1:.35; V.openAccuse=()=>{ if(this.state.game.turn===0&&!this.state.game.out) this.setState({sheet:'accuse'}); };
+    V.myHand=g.hands[0].map(c=>({art:cardArt(c),cn:nm(c),en:L(enOf(c),'')}));
+    V.shownList=g.shown.map(x=>({face:face(g.order[x.from]),from:nm(g.order[x.from]),cn:nm(x.card)})); V.noShown=!g.shown.length;
+    V.noteHead=g.order.map((c,i)=>({c:g.out&&i===0?'#C9C2B8':CH[c].c,g:CH[c].g}));
+    const MK={'':['#FFFFFF','#1B1B1B',''],x:['#E6E1D8','#1B1B1B','✕'],v:['#2FA37C','#FFFFFF','✓'],q:['#FFD54A','#1B1B1B','?']},cyc={'':'x',x:'v',v:'q',q:''};
+    V.noteRows=[];
+    [[L('嫌疑人','Suspects'),SUS],[L('地点','Rooms'),ROOMS],[L('物品','Objects'),OBJS]].forEach(([label,list])=>{ V.noteRows.push({head:true,row:false,label,cells:[]}); list.forEach(c=>{ const ms=[0,1,2,3,4,5].map(i=>g.marks[c+'-'+i]||''), has=ms.includes('v');
+      V.noteRows.push({head:false,row:true,cn:nm(c),deco:has?'line-through':'none',op:has?.45:1,cells:ms.map((m,i)=>({bg:MK[m][0],fg:MK[m][1],glyph:MK[m][2],tap:()=>this.setG(g=>{const k=c+'-'+i,mm={...g.marks},n=cyc[mm[k]||''];if(n)mm[k]=n;else delete mm[k];return {marks:mm};})}))}); }); });
+    V.diceOpen=g.dice.open; V.diceRotP=GC.diceRot(g.dice.value,g.dice.k);
+    V.diceTitle=!g.dice.rolled?L('点击骰子','Tap the die'):g.dice.rolling?'……':L(g.dice.value+' 点！',g.dice.value+'!'); V.diceHint=!g.dice.rolled?L('点一下就会掷出','Tap to roll'):g.dice.rolling?L('掷骰中…','Rolling…'):L('最多走 '+g.dice.value+' 步','Move up to '+g.dice.value+' steps');
+    V.sheetSuggest=this.state.sheet==='suggest';
+    const pickS=(k,v)=>this.setG(g=>({sug:{...g.sug,[k]:v}}));
+    V.sugSus=SUS.map(c=>({cn:nm(c),face:face(c),bg:g.sug.sus===c?'#FFD54A':'#FFFFFF',shadow:g.sug.sus===c?'3px 3px 0 #1B1B1B':'none',pick:()=>pickS('sus',c)}));
+    V.sugObj=OBJS.map(c=>({cn:nm(c),art:cardArt(c),bg:g.sug.obj===c?'#FFD54A':'#FFFFFF',shadow:g.sug.obj===c?'3px 3px 0 #1B1B1B':'none',pick:()=>pickS('obj',c)}));
+    V.sugSusTxt=g.sug.sus?nm(g.sug.sus):'＿＿'; V.sugObjTxt=g.sug.obj?nm(g.sug.obj):'＿＿'; V.sugOp=g.sug.sus&&g.sug.obj?1:.4; V.submitSuggest=()=>this.submitSuggest();
+    const Ls=g.lastSug; V.lastTrio=Ls?[Ls.sus,Ls.room,Ls.obj].map(c=>({cn:nm(c)})):[]; V.hasSug=!!Ls; V.noSug=!Ls;
+    if(Ls){ V.sugByFace=face(g.order[Ls.by]); V.tvShowCn=Ls.shower===null?L('没有人能反驳','Nobody could disprove'):L(g.order[Ls.shower]+' → '+g.order[Ls.by]+' 给了一张牌',nm(g.order[Ls.shower])+' showed '+nm(g.order[Ls.by])+' a card'); V.tvShowEn=Ls.shower===null?'':L('只有他们知道是哪张。','Only they know which one.'); }
+    const D=g.disprove; V.sheetDisprove=this.state.sheet==='disprove'&&!!D;
+    if(D){ V.dpChoosing=D.phase==='choosing'; V.dpShown=D.phase==='shown'; V.dpNone=D.phase==='none'; V.dpDone=!V.dpChoosing; if(D.shower!==null){ V.dpFace=face(g.order[D.shower]); V.dpCn=nm(g.order[D.shower]); V.dpEn=pn(D.shower); V.dpArt=cardArt(D.card); V.dpCard=nm(D.card); V.dpCardEn=L(enOf(D.card),''); } }
+    V.gotIt=()=>this.gotIt();
+    const Pd=g.pending; V.sheetShow=this.state.sheet==='show'&&!!Pd;
+    if(Pd){ V.pFace=face(g.order[Pd.by]); V.pBy=nm(g.order[Pd.by]); V.pCount=Pd.matches.length; V.pTrio=[Pd.sus,Pd.room,Pd.obj].map(c=>({cn:nm(c),bg:Pd.matches.includes(c)?'#FFD54A':'#FFFFFF'})); V.pCards=Pd.matches.map(c=>({cn:nm(c),art:cardArt(c),shadow:Pd.pick===c?'4px 4px 0 #E8483B':'3px 3px 0 #1B1B1B',lift:Pd.pick===c?'translateY(-6px)':'none',pick:()=>this.setG(g=>({pending:{...g.pending,pick:c}}))})); }
+    V.showCard=()=>this.showCard();
+    const A=g.acc, pickA=(k,v)=>this.setG(g=>({acc:{...g.acc,[k]:v}}));
+    V.sheetAccuse=this.state.sheet==='accuse';
+    V.accSus=SUS.map(c=>({cn:nm(c),face:face(c),bg:A.sus===c?'#FFD54A':'#FFFFFF',pick:()=>pickA('sus',c)}));
+    V.accRoom=ROOMS.map(c=>({cn:nm(c),bg:A.room===c?'#FFD54A':'#FFFFFF',pick:()=>pickA('room',c)}));
+    V.accObj=OBJS.map(c=>({cn:nm(c),bg:A.obj===c?'#FFD54A':'#FFFFFF',pick:()=>pickA('obj',c)}));
+    const allA=A.sus&&A.room&&A.obj; V.accOp=allA?1:.4; V.accConfirm=!!A.confirm; V.accLine=allA?L(A.sus+'，在 '+A.room+'，用 '+A.obj,nm(A.sus)+', in the '+nm(A.room)+', with the '+nm(A.obj)):'';
+    V.accAsk=()=>{ if(allA) pickA('confirm',true); }; V.accBack=()=>pickA('confirm',false); V.accGo=()=>this.accGo();
+    const sol=[SOLUTION.sus,SOLUTION.room,SOLUTION.obj], mine=[A.sus,A.room,A.obj];
+    V.sheetWrong=this.state.sheet==='wrong';
+    V.wrongCards=sol.map((c,i)=>({art:cardArt(c),back:backArt(),cn:nm(c),rot:g.wrongFlip>i?'rotateY(180deg)':'none',mine:mine[i]?nm(mine[i]):'',mc:mine[i]===c?'#7FD3A8':'#FF8A7A'}));
+    V.fastForward=()=>this.startReveal({winner:1,accuser:1,picks:sol}); V.continueGhost=()=>this.continueGhost();
+    const W=g.wrongAnn; V.tvWrong=!!W;
+    if(W){ V.wrongFace=face(g.order[W.by]); V.wrongName=nm(g.order[W.by]); V.wrongPicks=W.picks.map(c=>({cn:nm(c)})); }
+    V.tvTurnCn=g.turn===0?L(nm(me)+'（你）',nm(me)+' (you)'):L(nm(tch)+' 的回合',nm(tch)+'’s turn'); V.tvTurnEn=pn(g.turn)+' · '+(g.dice.rolling?L('掷骰中…','rolling the die…'):L('掷出 '+g.dice.value,'rolled '+g.dice.value));
+    V.tvLog=g.log.slice(0,7).map((e,i)=>({t:lt(e),op:1-i*.11}));
+    V.tvSeatRow=g.order.map((c,i)=>{const gh=g.out&&i===0;return {face:face(c),name:gh?L('幽灵','Ghost'):pn(i),ring:i===g.turn?'#FFD54A':'#FFF7EC',op:gh?.45:1,filt:gh?'grayscale(1)':'none'};});
+    const R=s.reveal;
+    if(R){ const acc=g.order[R.accuser], win=g.order[R.winner];
+      V.accuserFace=face(acc); V.accuserCn=nm(acc)+(R.accuser===0?L('（你）',' (you)'):'');
+      V.accusedChips=R.picks.map(c=>({cn:nm(c)}));
+      V.rvEnvelope=R.step<=1; V.rvCards=R.step>=2&&R.step<5; V.rvSpot=R.step>=5; V.rvVerdict=R.step>=6;
+      V.envSceneEl=GA.scene('env'+Math.min(R.step,1),()=>GA.envScene(Math.min(R.step,1)));
+      V.revealCards=sol.map((c,i)=>({art:cardArt(c),back:backArt(),cn:nm(c),en:L(enOf(c),''),rot:R.step>=2+i?'rotateY(180deg)':'none',badge:R.picks[i]===c?'✓':'✕',badgeBg:R.picks[i]===c?'#2FA37C':'#E8483B',badgeOp:R.step>=2+i?1:0}));
+      V.spotFilter=R.lit?'brightness(1)':'brightness(0)'; V.spotTextOp=R.lit?1:0; V.killerFace=face(SOLUTION.sus); V.killerCn=nm(SOLUTION.sus); V.solRoom=nm(SOLUTION.room); V.solObj=nm(SOLUTION.obj);
+      V.winnerFace=face(win); V.winnerCn=R.winner===0?L('你','You'):nm(win); V.winnerEn=V.winnerCn;
+      V.resultNote=R.winner===0?L('指控正确','Correct accusation'):L('你指控错误后成了幽灵','You became a ghost after a wrong accusation');
+    }
+    V.toEnd=()=>this.toEnd();
+    V.solCards=sol.map((c,i)=>({q:L(['谁','哪里','什么'][i],['WHO','WHERE','WHAT'][i]),art:cardArt(c),cn:nm(c)}));
+    V.stats=[[g.round,L('轮数','Rounds')],[g.sugCount,L('推理次数','Suggestions')],[g.shown.length,L('看到的牌','Cards seen')]].map(([v,l])=>({v,l}));
+    V.playAgain=()=>this.go('lobby');
+    const tv=s.room.mode==='tv';
+    // seat bar + timer
+    V.meShort=g.out?L('鬼','GHOST'):L('你','YOU');
+    V.seatBar=g.order.map((c,i)=>{const act=i===g.turn,gh=g.out&&i===0;return {face:face(c),me:i===0,sz:act?'46px':'32px',op:gh?.5:1,filt:gh?'grayscale(1)':'none',ring:g.tLeft<=10?'#E8483B':'#2FA37C',ringBg:act?'#E6E1D8':'transparent',dash:act?(g.tLeft/60*100).toFixed(1)+' 100':'0 100'};});
+    V.timerTxt=g.tLeft+'s'; V.timerBg=g.tLeft<=10?'#E8483B':'#FFFFFF'; V.timerFg=g.tLeft<=10?'#FFFFFF':'#1B1B1B';
+    // reactions
+    const STK=[['可疑！','Sus!','#E8483B','#FFFFFF'],['不是我！','Not me!','#5B8DEF','#FFFFFF'],['哈哈哈','LOL','#FFD54A','#1B1B1B'],['666','Nice!','#2FA37C','#FFFFFF'],['啊？！','What?!','#8A4FB0','#FFFFFF'],['恭喜发财','Huat ah!','#FF9A3C','#1B1B1B']];
+    V.reactOpen=!!g.reactOpen; V.toggleReact=()=>this.setG(g=>({reactOpen:!g.reactOpen}));
+    V.stickers=STK.map(([a,b,bg,fg],i)=>({txt:L(a,b),bg,fg,send:()=>{ this.pushReact(0,i); this.setG(()=>({reactOpen:false})); }}));
+    V.floats=s.reacts.map(r=>{const k=STK[r.i];return {l:r.x+'%',face:face(g.order[r.seat]),txt:L(k[0],k[1]),bg:k[2],fg:k[3]};}); V.tvFloats=tv?V.floats:[];
+    // banner
+    V.bannerOn=!!g.banner; V.tvBanner=tv&&!!g.banner&&s.phase==='game'; V.tvBannerTxt=L('轮到 '+nm(me)+'（'+pn(0)+'）！','Your turn, '+nm(me)+'!');
+    // suggestion moment
+    const M=g.moment; V.momentOn=!!M; V.tvMoment=tv&&!!M&&s.phase==='game';
+    if(M){ const by=g.order[M.by];
+      V.mFace=face(by); V.mTitle=M.by===0?L('你的推理','Your suggestion'):L(nm(by)+' 的推理',nm(by)+'’s suggestion');
+      V.mCards=M.trio.map((c,i)=>({q:L(['谁','在哪里','用什么'][i],['WHO','WHERE','WITH'][i]),art:cardArt(c),cn:nm(c),anim:'pop .45s ease-out '+(0.2+i*0.3)+'s both'}));
+      V.mChain=M.chain.map((k,i)=>{const rev=i<M.shown,asking=i===M.shown,has=k===M.shower;return {face:face(g.order[k]),ring:rev?(has?'#2FA37C':'#555555'):asking?'#FFD54A':'#333333',op:rev||asking?1:.35,label:rev?(has?L('✓ 有牌','✓ Has one'):L('✕ 没有','✕ Pass')):asking?'…':'',bg:rev?(has?'#2FA37C':'#555555'):asking?'#FFD54A':'transparent',fg:asking?'#1B1B1B':'#FFFFFF',anim:rev&&has?'pop .35s ease-out both':'none'};});
+      const done=M.shown>=M.chain.length, cur=g.order[M.chain[Math.min(M.shown,M.chain.length-1)]];
+      V.mStatus=!done?L('正在问 '+nm(cur)+'…','Asking '+nm(cur)+'…'):M.shower===null?L('没有人能反驳！','Nobody could disprove!'):M.shower===0?L('你有相关的牌，要给一张！','You have a match. Pick one to show!'):M.by===0?L(nm(cur)+' 有牌，只给你看','Only you get to see '+nm(cur)+'’s card'):L(nm(cur)+' 给 '+nm(by)+' 看了一张牌',nm(cur)+' showed '+nm(by)+' a card');
+    }
+    // tutorial
+    const TUT=[[8,48,374,374,'这是棋盘。中间红色的是机密信封，四周是 8 个房间。','This is the board. The red square in the middle is the case envelope; the 8 rooms surround it.'],
+      [56,2,280,50,'上面是所有玩家。放大并带倒计时圈的，就是正在行动的人。每回合 60 秒。','All players are up here. The big avatar with the timer ring is whoever is playing. Each turn has 60 seconds.'],
+      [8,500,374,90,'轮到你时，点这里掷骰子。','On your turn, tap here to roll the die.'],
+      [8,48,374,374,'掷出几点就能走几步。发光的格子和房间都能去。只有进入房间才能推理。','Move up to the number you roll. Glowing squares and rooms are reachable. You can only suggest inside a room.'],
+      [8,446,374,54,'「笔记」帮你记录线索：✕ 没有、✓ 有、? 怀疑。你的手牌已经帮你打勾。','Notes track clues: ✕ no, ✓ has it, ? maybe. Your own cards are already ticked.'],
+      [8,728,374,64,'有把握时按「指控」。只有一次机会，猜错就会变成幽灵。','When you’re sure, tap Accuse. One chance only: a wrong guess turns you into a ghost.'],
+      [338,4,48,46,'点这里发表情，大家的手机和电视上都看得到。','Tap here to send a reaction. Everyone sees it on their phone and on the TV.']];
+    V.tutOn=g.tut!=null;
+    if(V.tutOn){ const [x,y,w,hh,zh,en]=TUT[g.tut]; V.tutX=x+'px'; V.tutY=y+'px'; V.tutW=w+'px'; V.tutH=hh+'px'; V.tutBy=(y+hh/2<400?y+hh+12:y-200)+'px'; V.tutText=L(zh,en); V.tutStep=(g.tut+1)+'/'+TUT.length; V.tutBtn=g.tut<TUT.length-1?L('下一步','Next'):L('开始游戏！','Start playing!');
+      const fin=()=>{ this.setState({tutDone:true}); this.setG(()=>({tut:null,tLeft:60,banner:true})); this.after(1900,()=>this.setG(()=>({banner:false}))); };
+      V.tutNext=()=>{ const t=this.state.game.tut; if(t<TUT.length-1) this.setG(()=>({tut:t+1})); else fin(); }; V.tutSkip=fin; }
+    // timeline + awards + votes
+    const RV=s.reveal;
+    V.timeline=g.events.slice(-6).map(e=>{const by=g.order[e.by];if(e.wrong) return {r:'R'+e.r,face:face(by),t:L(nm(by)+' 指控错误，变成幽灵',nm(by)+' accused wrongly and became a ghost'),dot:'#C9C2B8'};
+      return {r:'R'+e.r,face:face(by),t:L(nm(by)+' 推理 '+e.trio.map(nm).join('·')+'，'+(e.shower===null?'无人反驳':nm(g.order[e.shower])+' 给了牌'),nm(by)+' suggested '+e.trio.map(nm).join(' · ')+'. '+(e.shower===null?'Nobody disproved.':nm(g.order[e.shower])+' showed a card.')),dot:e.shower===null?'#E8483B':'#2FA37C'};});
+    if(RV){ const w=g.order[RV.winner]; V.timeline.push({r:'R'+g.round,face:face(w),t:L(nm(w)+' 指控正确，破案！',nm(w)+' made the right accusation and solved it!'),dot:'#FFD54A'}); }
+    const win=RV?RV.winner:0, argmax=(arr,skip)=>arr.reduce((b,v,i)=>i!==skip&&v>arr[b]?i:b,skip===0?1:0), argmin=(arr,skip)=>arr.reduce((b,v,i)=>i!==skip&&v<arr[b]?i:b,skip===0?1:0);
+    const susSeat=(()=>{let best=SOLUTION.sus,bv=-1;Object.keys(g.suspCount).forEach(c=>{if(g.suspCount[c]>bv){bv=g.suspCount[c];best=c;}});return g.order.indexOf(best);})();
+    const tight=argmin(g.showCount,win), party=g.reactCount.some(v=>v>0)?argmax(g.reactCount,-1):1;
+    V.awards=[[win,'神探','Best detective','破了案','Solved the case','#FFD54A'],[susSeat,'最可疑','Most suspected','被推理最多次','Named in the most suggestions','#FFB4A8'],[tight,'守口如瓶','Tight-lipped','给牌最少','Showed the fewest cards','#9DB8F2'],[party,'气氛担当','Life of the party','发表情最多','Sent the most reactions','#7FD3A8']]
+      .map(([k,a,b,c,d,bg])=>({face:face(g.order[k]),title:L(a,b),who:nm(g.order[k])+' · '+pn(k),why:L(c,d),bg}));
+    const yes=s.votes.filter(Boolean).length;
+    V.voteTxt=L('再来一局 '+yes+'/6','Rematch '+yes+'/6');
+    V.voteRow=g.order.map((c,i)=>({face:face(c),yes:s.votes[i],ring:s.votes[i]?'#2FA37C':'#555555',op:s.votes[i]?1:.55}));
+    V.myVote=()=>this.setState(s=>({votes:s.votes.map((v,i)=>i===0?!v:v)}));
+    V.myVoteBg=s.votes[0]?'#2FA37C':'#E8483B'; V.myVoteFg='#FFFFFF'; V.myVoteLabel=s.votes[0]?L('已同意 ✓ 等待其他人','Voted ✓ Waiting for others'):L('我要再来一局！','I want a rematch!');
+    return V;
+  }
+}
+</script>
+</body>
+</html>

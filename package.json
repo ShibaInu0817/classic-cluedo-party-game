@@ -1,0 +1,23 @@
+{
+  "name": "cny-cluedo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.7.0",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json",
+    "theme:check": "tsx packages/theme-sdk/src/cli.ts",
+    "export:art": "node tools/export-cny-art.mjs",
+    "dev": "concurrently -n server,client -c blue,magenta \"pnpm --filter @cluedo/server dev\" \"pnpm --filter @cluedo/client dev\"",
+    "e2e": "pnpm --filter @cluedo/client build && node e2e/smoke.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "concurrently": "^10.0.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
+    "playwright": "1.63.0"
+  }
+}

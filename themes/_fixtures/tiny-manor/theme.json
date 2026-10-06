@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "id": "tiny-manor",
+    "titleKey": "title",
+    "languages": ["en", "fr"],
+    "defaultLanguage": "en",
+    "players": { "min": 3, "max": 3 },
+    "victim": { "nameKey": "victim.name", "art": "assets/victim.svg" }
+  },
+  "deck": {
+    "suspects": [
+      { "id": "P1", "nameKey": "sus.P1", "color": "#AA3333", "glyph": "B", "art": "assets/suspects/P1.svg", "start": "3,0" },
+      { "id": "P2", "nameKey": "sus.P2", "color": "#33AA33", "glyph": "C", "art": "assets/suspects/P2.svg", "start": "6,3" },
+      { "id": "P3", "nameKey": "sus.P3", "color": "#3333AA", "glyph": "M", "art": "assets/suspects/P3.svg", "start": "0,3" }
+    ],
+    "rooms": [
+      { "id": "H1", "nameKey": "room.H1", "art": "assets/rooms/H1.svg" },
+      { "id": "H2", "nameKey": "room.H2", "art": "assets/rooms/H2.svg" },
+      { "id": "H3", "nameKey": "room.H3", "art": "assets/rooms/H3.svg" }
+    ],
+    "objects": [
+      { "id": "W1", "nameKey": "obj.W1", "art": "assets/objects/W1.svg" },
+      { "id": "W2", "nameKey": "obj.W2", "art": "assets/objects/W2.svg" },
+      { "id": "W3", "nameKey": "obj.W3", "art": "assets/objects/W3.svg" }
+    ]
+  },
+  "board": {
+    "map": [
+      "AAA.BBB",
+      "AAA.BBB",
+      "AAA.BBB",
+      ".......",
+      "CCC.###",
+      "CCC.###",
+      "CCC.###"
+    ],
+    "legend": { "A": "H1", "B": "H2", "C": "H3", "#": "@envelope" },
+    "doors": [
+      { "room": "H1", "cell": "3,1" },
+      { "room": "H2", "cell": "5,3" },
+      { "room": "H3", "cell": "1,3" }
+    ],
+    "secretPassages": [["H2", "H3"]]
+  },
+  "rules": { "turnSeconds": 60 },
+  "story": {
+    "chapters": [
+      { "id": "intro", "panels": [{ "art": "assets/story/intro/1.svg", "captionKey": "story.intro.1" }] }
+    ]
+  },
+  "ui": {
+    "tokens": {
+      "color": { "ink": "#111111", "paper": "#FAFAFA", "primary": "#AA0000", "accent": "#FFCC00", "success": "#00AA55", "reach": "#88DDAA" },
+      "font": { "display": "Georgia", "ui": "Arial", "glyph": "Georgia" }
+    },
+    "logo": "assets/logo.svg",
+    "cardBack": "assets/card-back.svg",
+    "ghostGlyph": "G",
+    "stickers": [{ "id": "wave", "labelKey": "sticker.wave", "art": "assets/stickers/wave.svg" }],
+    "awards": [{ "stat": "suspCount", "labelKey": "award.mostSuspected" }],
+    "tutorial": []
+  }
+}

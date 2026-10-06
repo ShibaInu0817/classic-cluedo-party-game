@@ -1,0 +1,10 @@
+{
+  "title": "Tiny Manor",
+  "victim.name": "The Butler",
+  "sus.P1": "Baron", "sus.P2": "Cook", "sus.P3": "Maid",
+  "room.H1": "Hall", "room.H2": "Library", "room.H3": "Cellar",
+  "obj.W1": "Candlestick", "obj.W2": "Rope", "obj.W3": "Poison",
+  "story.intro.1": "Someone is dead.",
+  "sticker.wave": "Hello!",
+  "award.mostSuspected": "Most suspected"
+}

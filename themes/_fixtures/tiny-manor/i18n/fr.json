@@ -1,0 +1,9 @@
+{
+  "title": "Petit Manoir",
+  "victim.name": "Le Majordome",
+  "sus.P1": "Baron", "sus.P2": "Cuisinier", "sus.P3": "Bonne",
+  "room.H1": "Hall", "room.H2": "Bibliothèque", "room.H3": "Cave",
+  "obj.W1": "Chandelier", "obj.W2": "Corde", "obj.W3": "Poison",
+  "story.intro.1": "Quelqu'un est mort.",
+  "sticker.wave": "Salut !"
+}
