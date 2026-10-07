@@ -19,7 +19,7 @@ describe('the session survives a refresh', () => {
     expect(store.getState().me).toEqual({ seat: 0, code: '4821' });
   });
 
-  test('a session the server no longer knows is forgotten', async () => {
+  test('a session the server no longer knows is forgotten, and the player is told the room has ended', async () => {
     sessionStorage.setItem('session', JSON.stringify({ code: '4821', seat: 1, token: TOKEN }));
     const s = new FakeSocket();
     s.replies['room:resume'] = { ok: false, error: 'cannot resume' };
@@ -27,6 +27,7 @@ describe('the session survives a refresh', () => {
     await tick();
     expect(store.getState().me).toBeUndefined();
     expect(sessionStorage.getItem('session')).toBeNull();
+    expect(store.getState().error).toBe('room.ended'); // an i18n key; ErrorBanner translates it
   });
 
   test('when someone before me leaves the lobby, my seat number follows', async () => {

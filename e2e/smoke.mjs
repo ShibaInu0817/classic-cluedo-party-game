@@ -8,16 +8,20 @@ import { chromium } from 'playwright';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 3200 + Math.floor(Math.random() * 500);
-const URL = `http://localhost:${PORT}`;
 const OUT = process.env.E2E_SHOTS; // optional folder for screenshots
+// E2E_URL=https://… runs against a deployed site instead of starting a local server.
+const URL = process.env.E2E_URL?.replace(/\/$/, '') ?? `http://localhost:${PORT}`;
 
-const server = spawn('npx', ['tsx', 'apps/server/src/main.ts'], {
-  cwd: ROOT, env: { ...process.env, PORT: String(PORT), BOT_DELAY_MS: '200' }, stdio: ['ignore', 'pipe', 'inherit'],
-});
-await new Promise((resolve, reject) => {
-  server.stdout.on('data', (d) => String(d).includes('game server on') && resolve());
-  server.on('exit', (c) => reject(new Error(`server exited ${c}`)));
-});
+let server;
+if (!process.env.E2E_URL) {
+  server = spawn('npx', ['tsx', 'apps/server/src/main.ts'], {
+    cwd: ROOT, env: { ...process.env, PORT: String(PORT), BOT_DELAY_MS: '200' }, stdio: ['ignore', 'pipe', 'inherit'],
+  });
+  await new Promise((resolve, reject) => {
+    server.stdout.on('data', (d) => String(d).includes('game server on') && resolve());
+    server.on('exit', (c) => reject(new Error(`server exited ${c}`)));
+  });
+}
 
 const browser = await chromium.launch({ channel: process.env.E2E_CHANNEL ?? 'chrome' });
 const errors = [];
@@ -116,5 +120,5 @@ try {
   console.log('✓ e2e smoke passed');
 } finally {
   await browser.close();
-  server.kill();
+  server?.kill();
 }

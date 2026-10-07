@@ -62,5 +62,8 @@ P0–P6 are done (see the README's delivery phases). What remains needs a design
 
 Don't invent rules for event cards; ask.
 
+## Deployment
+`master` deploys to Render (free plan, `render.yaml`) automatically after CI passes. A deploy restarts the server and **ends every live game** (rooms are in memory). Work on branches, and merge when nobody is playing. Keep `/healthz` cheap: Render polls it.
+
 ## Docs stay in sync
 When containers, components, socket events or flows change, update `docs/architecture/model.json` and rebuild with the `draw-c4` skill (`plot.py check` then `plot.py build model.json architecture.html`). Keep the README's protocol tables and theme schema matching the code.

@@ -31,6 +31,10 @@ export async function createGameServer(opts: GameServerOptions) {
   const themes = await loadRegistry(opts.themeDirs);
   const rooms = new RoomManager();
   const app = express();
+  /** Liveness for the host's health check (Render polls it before routing traffic to a new deploy). */
+  app.get('/healthz', (_req, res) => {
+    res.json({ ok: true, themes: themes.size, rooms: rooms.all().length });
+  });
   app.get('/themes', (_req, res) => {
     res.json(
       [...themes.values()].map(({ theme }) => {

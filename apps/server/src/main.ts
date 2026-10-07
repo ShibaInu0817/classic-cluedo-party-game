@@ -22,3 +22,12 @@ if (existsSync(dist)) {
 
 const port = await server.listen(Number(process.env.PORT ?? 3001));
 console.log(`game server on http://localhost:${port} · themes: ${themeDirs.map((d) => path.basename(d)).join(', ')}`);
+
+// Hosts stop the process with SIGTERM on every deploy: close sockets and timers, then exit promptly.
+for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(signal, () => {
+    console.log(`${signal}: shutting down`);
+    void server.close().then(() => process.exit(0));
+    setTimeout(() => process.exit(0), 5000).unref(); // never hang the deploy
+  });
+}

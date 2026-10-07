@@ -31,6 +31,22 @@ pnpm e2e                      # build the client and play a game in real Chrome 
 - **Production:** run `pnpm --filter @cluedo/client build`, then `pnpm --filter @cluedo/server start`. The server then serves the built client, the theme packs and Socket.IO on one port (`PORT`, default 3001). `BOT_DELAY_MS` (default 900) sets how quickly bots act.
 - **Docker:** `docker build -t classic-cluedo-party-game . && docker run -p 3001:3001 classic-cluedo-party-game`. Run a single instance, because rooms live in memory.
 
+### Deploy (Render, free, no card)
+[`render.yaml`](render.yaml) is a Render Blueprint: one Docker web service on the **free** plan in **Singapore**, health-checked at `/healthz`. It deploys `master` automatically, but only after the [CI workflow](.github/workflows/ci.yml) (typecheck and tests) passes.
+
+**One-time setup**
+1. Sign up at [render.com](https://render.com) with your GitHub account. No card is needed.
+2. Allow the Render GitHub app to access this (private) repo.
+3. **New → Blueprint**, pick this repo and the `master` branch, and apply. The first build takes a few minutes.
+4. Open `https://classic-cluedo-party-game.onrender.com` (Render adds a suffix if the name is taken). Phones use that address; the TV uses `/tv?code=1234`.
+
+**What the free plan means**
+- **Sleep:** the service sleeps after 15 minutes with no requests or WebSocket messages. The first visit afterwards waits about a minute while it wakes. A game in progress keeps it awake.
+- **Restarts end games:** a deploy or restart ends every live game, because rooms are in memory. Phones then show "That room has ended". Merge to `master` when nobody is playing, or set `autoDeployTrigger: off` and deploy by hand from the dashboard (**Manual Deploy**).
+- **Hours:** 750 free instance-hours a month, enough for one always-available service.
+- **Always on:** switch the service to the Starter plan (about US$7/month) to stop it sleeping.
+- **Check a deploy:** `E2E_URL=https://<your-service>.onrender.com node e2e/smoke.mjs` plays a game against it in Chrome.
+
 ---
 
 ## Contents
