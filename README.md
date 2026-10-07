@@ -1,6 +1,8 @@
-# 谁杀了客人？ Who Killed the Guest?
+# Classic Cluedo Party Game
 
-An online deduction game in the style of Cluedo, set at a Chinese New Year family dinner. It is mobile-first. 3–6 players join a room from their phones, and an optional TV acts as a spectator screen that shows public information only.
+A themeable online Cluedo for phones and a TV. Every board is a theme pack under `themes/`. The first one is **谁杀了客人？ Who Killed the Guest?**, a Chinese New Year family dinner.
+
+It is mobile-first: 3–6 players join a room from their phones, and an optional TV acts as a spectator screen that shows public information only.
 
 > **Status: P1–P5 built, plus most of P6.** A whole game works end to end on phones and a TV:
 > - **Before play:** lobby, then the intro (story, setup, private card check).
@@ -27,7 +29,7 @@ pnpm e2e                      # build the client and play a game in real Chrome 
 - **Phones:** open `http://<your-ip>:5173`. The host creates a room; others join with the 4-digit code or the `?code=` link.
 - **TV:** open `http://<your-ip>:5173/tv?code=1234`, or scan the QR code it shows.
 - **Production:** run `pnpm --filter @cluedo/client build`, then `pnpm --filter @cluedo/server start`. The server then serves the built client, the theme packs and Socket.IO on one port (`PORT`, default 3001). `BOT_DELAY_MS` (default 900) sets how quickly bots act.
-- **Docker:** `docker build -t cny-cluedo . && docker run -p 3001:3001 cny-cluedo`. Run a single instance, because rooms live in memory.
+- **Docker:** `docker build -t classic-cluedo-party-game . && docker run -p 3001:3001 classic-cluedo-party-game`. Run a single instance, because rooms live in memory.
 
 ---
 
@@ -134,7 +136,7 @@ The source is [`docs/architecture/model.json`](docs/architecture/model.json). Ed
 The repo is a pnpm workspace:
 
 ```
-cny-cluedo/
+classic-cluedo-party-game/
 ├─ apps/
 │  ├─ client/              React + TS + Vite (phone UI and /tv)
 │  └─ server/              Node + Socket.IO (rooms, game, bots, timers, static /themes)

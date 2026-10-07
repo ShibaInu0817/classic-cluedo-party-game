@@ -1,5 +1,5 @@
 {
-  "name": "cny-cluedo",
+  "name": "classic-cluedo-party-game",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@9.7.0",
