@@ -47,3 +47,13 @@ describe('theme packs over HTTP', () => {
     expect((await fetch(`${url}/themes/cny-guest/..%2F..%2Fpackage.json`)).status).toBe(404);
   });
 });
+
+describe('health check', () => {
+  test('GET /healthz answers 200 with the number of loaded themes and live rooms', async () => {
+    const { url, client } = await startServer();
+    await createRoom(client());
+    const res = await fetch(`${url}/healthz`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, themes: 2, rooms: 1 });
+  });
+});

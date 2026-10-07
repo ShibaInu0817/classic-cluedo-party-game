@@ -1,0 +1,15 @@
+# Render Blueprint: one Docker web service on the free plan (no card), in Singapore.
+# The server keeps every room in memory, so it must stay a single instance; a deploy or restart ends live games.
+services:
+  - type: web
+    name: classic-cluedo-party-game
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    # Deploy master only after the CI workflow passes (.github/workflows/ci.yml).
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: BOT_DELAY_MS
+        value: "1000"

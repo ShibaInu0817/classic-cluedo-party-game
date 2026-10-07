@@ -117,7 +117,10 @@ export function createGameStore(socket: GameSocket): GameStore {
     if (!saved) return;
     const ack = await socket.ask<{ seat: number }>('room:resume', { code: saved.code, token: saved.token });
     if (ack.ok) seated(saved.code, ack.seat, saved.token);
-    else reset();
+    else {
+      reset();
+      store.setState({ error: 'room.ended' }); // e.g. the server restarted and its rooms are gone
+    }
   }
   /** A TV re-watches its room after every reconnect (it has no seat to resume). */
   let watching: string | undefined;
