@@ -14,6 +14,8 @@ import { ErrorBanner } from '../components/ErrorBanner.tsx';
 import { Tutorial } from '../components/Tutorial.tsx';
 import { Dice } from '../components/Dice.tsx';
 import { Moment } from '../components/Moment.tsx';
+import { useAccusation } from '../components/AccuseMoment.tsx';
+import { TurnBanner } from '../components/TurnBanner.tsx';
 import { useFeedback } from '../feedback.ts';
 
 type Tab = 'actions' | 'cards' | 'notes';
@@ -32,6 +34,7 @@ export function Play() {
   const [open, setOpen] = useState<Open>('none');
   const [ghostSeen, setGhostSeen] = useState(false);
   const [fromSuggest, setFromSuggest] = useState(false);
+  const accusing = !!useAccusation();
   const ribbon = useYourTurnRibbon(room?.game?.turn === me?.seat);
   useFeedback();
 
@@ -107,7 +110,7 @@ export function Play() {
       {open === 'react' && <ReactionTray onClose={() => setOpen('none')} />}
       <ShowCardSheet />
       <ShownDialog />
-      {ghost && !ghostSeen && <WrongDialog onClose={() => setGhostSeen(true)} />}
+      {ghost && !ghostSeen && !accusing && <WrongDialog onClose={() => setGhostSeen(true)} />}
       {ribbon && <div className="ribbon" aria-hidden="true">{t('play.yourTurn')}</div>}
       {room.paused && (
         <div className="paused" role="status">
@@ -116,6 +119,7 @@ export function Play() {
         </div>
       )}
       <Moment />
+      <TurnBanner />
       <Dice />
       <FloatingReactions />
       <Tutorial />

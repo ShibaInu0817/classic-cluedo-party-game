@@ -14,6 +14,16 @@ async function issuesOf(edit: Parameters<typeof mutatedPack>[0]): Promise<string
 }
 
 describe('theme validation rejects a broken pack', () => {
+  test('ambient sparkles in a room that does not exist', async () => {
+    const issues = await issuesOf((m) => { m.ui.ambient = { sparkleRooms: ['NOPE'] }; });
+    expect(issues.join('\n')).toMatch(/ui\.ambient\.sparkleRooms\[0\].*NOPE/);
+  });
+
+  test('ambient hanging art that is missing from the pack', async () => {
+    const issues = await issuesOf((m) => { m.ui.ambient = { hanging: { art: 'assets/nope.svg' } }; });
+    expect(issues.join('\n')).toMatch(/assets\/nope\.svg/);
+  });
+
   test('a door that names an unknown room', async () => {
     const issues = await issuesOf((m) => { m.board.doors[0].room = 'NOPE'; });
     expect(issues.join('\n')).toMatch(/NOPE/);

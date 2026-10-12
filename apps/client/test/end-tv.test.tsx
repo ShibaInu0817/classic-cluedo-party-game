@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 import { TvPlay } from '../src/screens/tv/TvPlay.tsx';
 import { playState, renderGame } from './harness.tsx';
@@ -9,7 +9,8 @@ describe('TV during play', () => {
     socket.push('room:state', playState({ turn: 1 }));
     socket.push('game:events', [{ type: 'cardShown', from: 2, to: 0 }]);
     expect(screen.getByTestId('board')).toBeInTheDocument();
-    expect(screen.getByText('Ah Beng is playing…')).toBeInTheDocument();
+    const players = screen.getByRole('complementary', { name: 'Players' });
+    expect(within(players).getByText('Ah Beng').closest('li')).toHaveAttribute('aria-current', 'step');
     expect(screen.getByText('Maid (bot) showed a card to Host')).toBeInTheDocument();
     expect(screen.queryAllByRole('button')).toHaveLength(0);
   });

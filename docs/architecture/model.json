@@ -123,7 +123,7 @@
           "name": "TV view",
           "kind": "client",
           "tech": "Same SPA · /tv route",
-          "desc": "Joins a room as a spectator socket. The server sends it the public projection only, so a TV bug can never leak a hand.",
+          "desc": "Joins a room as a spectator socket. The server sends it the public projection only, so a TV bug can never leak a hand. One stage: the board stays on screen from lobby to end, with the players down the side, and the suggestion scene, dice and turn banner play over it.",
           "x": 40,
           "y": 440
         },
@@ -500,7 +500,7 @@
           "name": "Overlays",
           "kind": "component",
           "tech": "Dice · moment · sheets · tutorial · reveal · reactions",
-          "desc": "Suggestion, show-a-card and accuse sheets, the 3D dice, the suggestion moment and the floating stickers. Sticker art and labels come from theme.ui.stickers.",
+          "desc": "Suggestion, show-a-card and accuse sheets, the 3D dice, the turn banner, the accusation moment and the floating stickers. The suggestion is paced on the client from the public events: the cards first, then each answer in turn, then who showed whom. Sticker art and labels come from theme.ui.stickers.",
           "x": 320,
           "y": 480
         },

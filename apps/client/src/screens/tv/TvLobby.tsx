@@ -4,6 +4,8 @@ import { useGame } from '../../state/store.ts';
 import { useTheme } from '../../theme/ThemeProvider.tsx';
 import { Portrait } from '../../components/Portrait.tsx';
 import { seatName } from '../../state/selectors.ts';
+import { Board } from '../../components/Board.tsx';
+import { Ambient } from '../../components/TvStage.tsx';
 
 export const joinUrl = (code: string) => `${location.origin}/?code=${code}`;
 
@@ -21,6 +23,8 @@ export function TvLobby() {
   if (!room) return null;
   return (
     <main className="tv tv-lobby">
+      <div className="tv-backdrop"><Board backdrop /></div>
+      <Ambient />
       <img className="logo" src={asset(manifest.ui.logo)} alt={t(manifest.meta.titleKey)} />
       <div className="tv-join">
         {qr && <img className="qr" src={qr} data-url={url} alt={t('tv.scan')} />}

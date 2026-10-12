@@ -15,6 +15,10 @@ export interface GameData {
   shownQueue: { card: string; from: number }[];
   reactions: { id: number; seat: number; stickerId: string }[];
   feed: PublicEvent[];
+  /** The last accusation whose moment has finished on this screen. */
+  accuseDone?: PublicEvent;
+  /** The card this phone last showed, so it can say "You showed X" (the public event never names it). */
+  myShown?: string;
   error?: string;
 }
 
@@ -33,6 +37,7 @@ export interface GameActions {
   intent(i: Intent): Promise<Ack>;
   react(stickerId: string): Promise<Ack>;
   dismissShown(): void;
+  doneAccusation(e: PublicEvent): void;
   leave(): Promise<void>;
 }
 
@@ -90,12 +95,14 @@ export function createGameStore(socket: GameSocket): GameStore {
       kick: (seat) => ask('lobby:kick', { seat }),
       pause: (paused) => ask('game:pause', { paused }),
       async intent(i) {
+        if (i.type === 'showCard') set({ myShown: i.card });
         const ack = await ask('game:intent', i);
         if (ack.ok && i.type === 'showCard') set({ showRequest: undefined });
         return ack;
       },
       react: (stickerId) => ask('react', { stickerId }),
       dismissShown: () => set({ shownQueue: get().shownQueue.slice(1) }),
+      doneAccusation: (e) => set({ accuseDone: e }),
       async leave() {
         if (get().me) await socket.ask('room:leave', {});
         reset();

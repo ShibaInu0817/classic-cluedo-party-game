@@ -17,6 +17,7 @@ import { Intro } from './screens/Intro.tsx';
 import { TvIntro } from './screens/tv/TvIntro.tsx';
 import { TvEnd } from './screens/tv/TvEnd.tsx';
 import { LangToggle } from './components/LangToggle.tsx';
+import { AccuseMoment } from './components/AccuseMoment.tsx';
 import { useMusic } from './feedback.ts';
 
 /** Loads the theme list, then the chosen (or the room's) theme, and provides it. */
@@ -81,7 +82,12 @@ function PhoneApp({ themes }: { themes: ThemeSummary[] }) {
   else if (room.phase === 'play') screen = <Play />;
   else screen = <End onHome={leave} />;
 
-  return <ThemeGate themeId={activeTheme} lang={langFor(activeTheme)}>{screen}</ThemeGate>;
+  return (
+    <ThemeGate themeId={activeTheme} lang={langFor(activeTheme)}>
+      {screen}
+      {room && me && <AccuseMoment />}
+    </ThemeGate>
+  );
 }
 
 function TvApp({ themes }: { themes: ThemeSummary[] }) {
@@ -103,6 +109,7 @@ function TvApp({ themes }: { themes: ThemeSummary[] }) {
       {!room ? (
         <TvCodeEntry code={code} setCode={setCode} onWatch={() => watchRoom(code)} error={error} />
       ) : room.phase === 'lobby' ? <TvLobby /> : room.phase === 'intro' ? <TvIntro /> : room.phase === 'play' ? <TvPlay /> : <TvEnd />}
+      {room && <AccuseMoment />}
       <LangToggle onChange={pickLang} />
     </ThemeGate>
   );
