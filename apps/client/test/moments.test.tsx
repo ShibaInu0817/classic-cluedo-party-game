@@ -1,6 +1,6 @@
-import { screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Play } from '../src/screens/Play.tsx';
 import { TvPlay } from '../src/screens/tv/TvPlay.tsx';
 import { playState, renderGame } from './harness.tsx';
@@ -20,23 +20,81 @@ describe('the suggestion moment', () => {
     { type: 'asked', seat: 1, has: false },
     { type: 'asked', seat: 2, has: true },
   ];
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+  const wait = (ms: number) => act(() => vi.advanceTimersByTime(ms));
+  const row = (m: HTMLElement, name: string) => within(m).getByText(name).closest('li')!;
 
-  test('stops every phone: the three cards, then each player asked in turn', () => {
+  test('on a phone: the three cards first, then each player answers in turn', () => {
     const { socket } = renderGame(<Play />, { seat: 1 });
-    socket.push('room:state', playState());
+    socket.push('room:state', playState({ stage: 'disprove' }));
     socket.push('game:events', events);
     const m = screen.getByRole('region', { name: 'Host suggests' });
     for (const n of ['Maid', 'Hall', 'Rope']) expect(within(m).getByText(n)).toBeInTheDocument();
-    expect(within(m).getByText('Ah Beng: pass')).toBeInTheDocument();
-    expect(within(m).getByText('Maid (bot): has one')).toBeInTheDocument();
+    expect(row(m, 'You (Ah Beng)')).toHaveTextContent('waiting');
+    wait(1600);
+    expect(row(m, 'You (Ah Beng)')).toHaveTextContent('your turn to answer');
+    wait(1000);
+    expect(row(m, 'You (Ah Beng)')).toHaveTextContent('you pass');
+    expect(row(m, 'Maid (bot)')).toHaveTextContent('thinking…');
+    wait(1000);
+    expect(row(m, 'Maid (bot)')).toHaveTextContent('has one');
   });
 
-  test('ends by saying who showed a card to whom, also on the TV', () => {
+  test('a player who only watches learns who showed whom, never which card', () => {
+    const { socket } = renderGame(<Play />, { seat: 1 });
+    socket.push('room:state', playState());
+    socket.push('game:events', [...events, { type: 'cardShown', from: 2, to: 0 }]);
+    wait(1600); wait(1000); wait(1000);
+    const m = screen.getByRole('region', { name: 'Host suggests' });
+    expect(within(m).getByText('Maid (bot) showed a card to Host')).toBeInTheDocument();
+    expect(within(m).getByText("You can't see which one.")).toBeInTheDocument();
+  });
+
+  test('the player who showed is reminded which card they gave', async () => {
+    const { socket } = renderGame(<Play />, { seat: 2 });
+    socket.push('room:state', playState({ stage: 'disprove' }));
+    socket.push('game:showRequest', { by: 0, cards: ['W2'] });
+    socket.push('game:events', events);
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Rope' })); });
+    socket.push('game:events', [{ type: 'cardShown', from: 2, to: 0 }]);
+    wait(1600); wait(1000); wait(1000);
+    expect(screen.getByText('You showed Rope to Host')).toBeInTheDocument();
+    expect(screen.getByText('Only Host sees which card.')).toBeInTheDocument();
+  });
+
+  test('on the TV: the scene over the board, answers on the player rail, then who showed whom', () => {
     const { socket } = renderGame(<TvPlay />);
     socket.push('room:state', playState());
     socket.push('game:events', [...events, { type: 'cardShown', from: 2, to: 0 }]);
-    const m = screen.getByRole('region', { name: 'Host suggests' });
-    expect(within(m).getByText('Maid (bot) showed a card to Host')).toBeInTheDocument();
+    const scene = screen.getByRole('region', { name: 'Host suggests' });
+    for (const n of ['Maid', 'Hall', 'Rope']) expect(within(scene).getByText(n)).toBeInTheDocument();
+    const rail = screen.getByRole('complementary', { name: 'Players' });
+    wait(1600);
+    expect(within(scene).getByText('Asking Ah Beng…')).toBeInTheDocument();
+    wait(1000);
+    expect(row(rail, 'Ah Beng')).toHaveTextContent('pass');
+    wait(1000);
+    expect(row(rail, 'Maid (bot)')).toHaveTextContent('has one');
+    expect(within(scene).getByText('Maid (bot) showed a card to Host')).toBeInTheDocument();
+  });
+});
+
+describe('the turn banner', () => {
+  test('the TV announces each new turn with the player\'s face', () => {
+    const { socket } = renderGame(<TvPlay />);
+    socket.push('room:state', playState({ turn: 1 }));
+    socket.push('game:events', [{ type: 'turnStarted', seat: 1, round: 1 }]);
+    expect(screen.getByRole('status')).toHaveTextContent("Ah Beng's turn!");
+  });
+
+  test('a phone gets a toast for other players\' turns, not its own', () => {
+    const { socket } = renderGame(<Play />, { seat: 1 });
+    socket.push('room:state', playState({ turn: 2 }));
+    socket.push('game:events', [{ type: 'turnStarted', seat: 2, round: 1 }]);
+    expect(screen.getByText("Maid (bot)'s turn!")).toBeInTheDocument();
+    socket.push('game:events', [{ type: 'turnStarted', seat: 1, round: 1 }]);
+    expect(screen.queryByText("Ah Beng's turn!")).not.toBeInTheDocument();
   });
 });
 

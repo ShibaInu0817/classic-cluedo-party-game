@@ -17,6 +17,8 @@ export interface GameData {
   feed: PublicEvent[];
   /** The last accusation whose moment has finished on this screen. */
   accuseDone?: PublicEvent;
+  /** The card this phone last showed, so it can say "You showed X" (the public event never names it). */
+  myShown?: string;
   error?: string;
 }
 
@@ -93,6 +95,7 @@ export function createGameStore(socket: GameSocket): GameStore {
       kick: (seat) => ask('lobby:kick', { seat }),
       pause: (paused) => ask('game:pause', { paused }),
       async intent(i) {
+        if (i.type === 'showCard') set({ myShown: i.card });
         const ack = await ask('game:intent', i);
         if (ack.ok && i.type === 'showCard') set({ showRequest: undefined });
         return ack;

@@ -246,6 +246,93 @@ h1, h2, h3, .code, .logo-text { font-family: var(--font-display); margin: .4em 0
 .tutorial .spot { position: fixed; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(0,0,0,.65); transition: all .25s; pointer-events: none; }
 .tutorial .bubble { position: fixed; left: 16px; right: 16px; max-width: 398px; margin: 0 auto; background: #fff; border: var(--border); border-radius: 16px; padding: 12px; box-shadow: var(--hard); }
 
+/* one stage: phase changes fade, the TV board never leaves (scales with --speed from Settings) */
+.tv, .screen { animation: fadeIn .45s both; }
+.board-block { position: relative; }
+.board { transition: transform calc(.9s * var(--speed, 1)) cubic-bezier(.6,0,.2,1); }
+.room.lit { box-shadow: 0 0 0 3px var(--color-accent), 0 0 18px 6px var(--color-accent); z-index: 2; }
+.token.summoned { transition: left calc(.8s * var(--speed, 1)) cubic-bezier(.5,-.4,.3,1.3), top calc(.8s * var(--speed, 1)) cubic-bezier(.5,-.4,.3,1.3); }
+.tv .token { animation: breathe 2.8s ease-in-out infinite; }
+.tv .token:nth-of-type(2n) { animation-delay: -1.4s; }
+.token.active::after { content: ''; position: absolute; inset: -30%; border-radius: 50%; border: 3px dashed var(--color-accent); animation: spin 4s linear infinite; }
+.token.hop0 { animation: hopA .17s ease-out; }
+.token.hop1 { animation: hopB .17s ease-out; }
+.board.entering .token { animation: drop .45s ease-in both; }
+.board.entering .envelope { animation: pop .4s 2.4s both; }
+.dealt { position: absolute; width: 34%; left: 33%; top: 25%; border: 2px solid var(--ink); border-radius: 4px; opacity: 0; animation: dealIn .7s cubic-bezier(.3,0,.2,1) both; }
+.spark { position: absolute; width: 16%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #fff 0 20%, var(--color-accent) 21% 45%, transparent 46%); opacity: 0; animation: spark 2.4s ease-out infinite; pointer-events: none; }
+.spark:nth-of-type(1) { left: 12%; top: 10%; }
+.spark:nth-of-type(2) { left: 45%; top: 4%; animation-delay: -.6s; }
+.spark:nth-of-type(3) { left: 72%; top: 16%; animation-delay: -1.2s; }
+.spark:nth-of-type(4) { left: 30%; top: 26%; animation-delay: -1.8s; }
+.ambient { position: fixed; left: 0; right: 0; top: 0; height: 0; z-index: 3; pointer-events: none; }
+.ambient img { position: absolute; top: -12px; width: clamp(28px, 3vw, 56px); translate: -50% 0; transform-origin: 50% 0; animation: sway 3.4s ease-in-out infinite; }
+.tv-backdrop { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; filter: blur(5px) saturate(.6); opacity: .35; }
+.tv-backdrop .board-block, .tv-backdrop .board { width: min(90vh, 90vw); max-width: none; }
+.tv-lobby > :not(.tv-backdrop, .ambient), .tv-intro > :not(.tv-backdrop, .ambient) { position: relative; z-index: 1; }
+
+/* TV play: board left, players right */
+.tv-play { height: 100vh; padding: 2.5vw 2vw 2vw; overflow: hidden; position: relative; }
+.tv-stage { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 32vw); gap: 2.5vw; }
+.tv-board { position: relative; overflow: hidden; border-radius: 16px; display: grid; place-items: center; min-height: 0; }
+.tv-board .board-block { width: min(100%, calc(100vh - 5vw)); max-width: none; }
+.tv-board .board { max-width: none; }
+.tv-board .legend { display: none; }
+.tv-side { display: flex; flex-direction: column; gap: 1.2vw; min-height: 0; }
+.seat-rail { flex: 1; display: flex; flex-direction: column; gap: 1vw; position: relative; z-index: 6; min-height: 0; }
+.rail-top { display: flex; justify-content: space-between; }
+.rail-seats { --row: clamp(56px, 9vh, 84px); --gap: clamp(6px, 1.2vh, 12px); list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--gap); position: relative; }
+.rail-seats li { height: var(--row); display: flex; align-items: center; gap: 12px; background: #fff; border: var(--border); border-radius: 14px; padding: 0 14px; box-shadow: var(--hard); transition: transform .35s cubic-bezier(.3,1.4,.5,1), background .3s; }
+.rail-seats li.turn { transform: translateX(-14px) scale(1.03); background: color-mix(in srgb, var(--color-accent) 35%, #fff); }
+.rail-seats li.ghost { opacity: .6; }
+.rail-seats .portrait { animation: bob 3.2s ease-in-out infinite; }
+.rail-seats li:nth-child(odd) .portrait { animation-delay: -1.6s; }
+.who { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.who b { font: 600 clamp(15px, 1.3vw, 24px) var(--font-ui); }
+.who small { font-size: clamp(11px, .9vw, 16px); opacity: .7; }
+.st { margin-left: auto; font-style: normal; font-weight: 700; padding: 2px 12px; border-radius: 999px; border: 2px solid var(--ink); background: #fff; white-space: nowrap; animation: pop .3s cubic-bezier(.3,1.6,.5,1) both; }
+.st.think { background: color-mix(in srgb, var(--color-accent) 40%, #fff); }
+.st.pass { background: color-mix(in srgb, var(--color-primary) 25%, #fff); }
+.st.has { background: var(--color-reach); }
+.rail-card { position: absolute; right: 38%; width: 46px; aspect-ratio: 3 / 4; border: 2px solid var(--ink); border-radius: 6px; box-shadow: 3px 3px 0 var(--ink); z-index: 2;
+  top: calc(var(--from) * (var(--row) + var(--gap)) + var(--row) / 2 - 30px); animation: railFly calc(1s * var(--speed, 1)) cubic-bezier(.4,0,.2,1) forwards; }
+.ticker { margin: 0; background: var(--ink); color: var(--paper); border-radius: 12px; padding: 10px 16px; font: 600 clamp(14px, 1.3vw, 22px) var(--font-ui); animation: fadeUp .35s both; }
+.scene { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; overflow: hidden; border-radius: 16px; animation: fadeIn .45s calc(.6s * var(--speed, 1)) both; }
+.scene-bg { position: absolute; inset: 0; background: center / cover; }
+.scene-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.8)); }
+.scene .trio { position: relative; gap: 2vw; flex-wrap: nowrap; }
+.scene .card-face { width: clamp(110px, 11vw, 220px); }
+.scene .card-name { font-size: clamp(13px, 1.2vw, 22px); }
+.slam { display: inline-block; transform: rotate(var(--tilt)); animation: slamIn calc(.5s * var(--speed, 1)) cubic-bezier(.3,1.3,.5,1) both; }
+.scene h2 { position: relative; color: #fff; text-shadow: 3px 3px 0 var(--ink); font-size: clamp(20px, 2.2vw, 40px); text-align: center; margin: 0 3vw; }
+.askline { position: relative; color: var(--color-accent); font: 700 clamp(15px, 1.5vw, 28px) var(--font-ui); min-height: 1.6em; margin: 0; }
+.on-board.dice-overlay { position: absolute; left: 50%; top: 45%; right: auto; bottom: auto; width: 34%; height: 34%; translate: -50% -50%; z-index: 4; animation: tumbleIn calc(.7s * var(--speed, 1)) ease-out both, fadeOut .3s 1.9s forwards; }
+.on-board .cube { --h: 60px; width: 120px; height: 120px; }
+.on-board .cube .face { padding: 16px; gap: 6px; }
+
+/* turn banner (TV) and toast (phone); neither takes taps */
+.turn-banner { position: fixed; left: -10vw; right: -10vw; top: 36vh; height: 24vh; z-index: 28; background: var(--color-primary); border-block: 6px solid var(--ink); display: flex; align-items: center; justify-content: center; gap: 3vw; color: #fff; pointer-events: none; animation: sweep calc(1.9s * var(--speed, 1)) cubic-bezier(.2,.9,.3,1) both; }
+.turn-banner b { font: 5vw var(--font-display); text-shadow: 4px 4px 0 var(--ink); }
+.turn-toast { position: fixed; left: 50%; top: 12px; z-index: 27; width: min(92vw, 400px); display: flex; align-items: center; gap: 10px; background: var(--color-primary); color: #fff; border: var(--border); border-radius: 16px; padding: 8px 12px; box-shadow: var(--hard); pointer-events: none; animation: dropIn calc(2.2s * var(--speed, 1)) both; }
+.turn-toast b { font: 22px var(--font-display); }
+
+/* the suggestion on a phone: over the lower half, the board stays in view */
+.moment.chain-panel { inset: auto 0 0 0; max-height: 64vh; max-width: 430px; margin: 0 auto; background: var(--paper); color: var(--ink); border-top: var(--border); border-radius: 22px 22px 0 0; justify-content: flex-start; gap: 8px; padding: 14px 16px 18px; box-shadow: 0 -6px 20px rgba(0,0,0,.25); overflow: auto; animation: slideUp .35s cubic-bezier(.3,1.3,.5,1) both; }
+.chain-panel .asker { display: flex; align-items: center; gap: 8px; align-self: flex-start; }
+.chain-panel .card-face.small { width: 66px; }
+.chain-panel .card-name { color: var(--ink); }
+.chain { list-style: none; padding: 0; margin: 0; width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.moment .chain li.crow { display: flex; align-items: center; gap: 8px; border: var(--border); border-radius: 12px; padding: 4px 10px; background: #fff; font-weight: 600; animation: none; transition: background .25s; }
+.crow.me { outline: 3px solid var(--color-accent); outline-offset: 1px; }
+.crow.now { background: color-mix(in srgb, var(--color-accent) 30%, #fff) !important; }
+.crow .st { font-size: 12px; padding: 0 10px; }
+.handoff { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding-top: 22px; }
+.handoff .lane { position: relative; flex: 0 1 160px; border-top: 3px dashed var(--ink); }
+.handoff .lane::after { content: ''; position: absolute; right: -2px; top: -8px; border: 6px solid transparent; border-left: 10px solid var(--ink); border-right: 0; }
+.handoff .fly { position: absolute; left: 0; top: -28px; width: 38px; aspect-ratio: 3 / 4; border: 2px solid var(--ink); border-radius: 5px; background: var(--color-primary) center / cover; box-shadow: 2px 2px 0 var(--ink); animation: lane calc(.9s * var(--speed, 1)) cubic-bezier(.4,0,.2,1) forwards; }
+.chain-panel .status { color: var(--ink); font: 18px var(--font-display); text-align: center; margin: 0; }
+.chain-panel .status small { display: block; font: 500 13px var(--font-ui); opacity: .7; }
+
 @keyframes roll { from { transform: rotateX(0) rotateY(0); } to { transform: var(--end); } }
 @keyframes fadeOut { to { opacity: 0; } }
 @keyframes bounce { 50% { transform: translate(-50%, -4px); } }
@@ -263,6 +350,22 @@ h1, h2, h3, .code, .logo-text { font-family: var(--font-display); margin: .4em 0
 @keyframes slam { from { transform: rotate(-12deg) scale(3); opacity: 0; } to { transform: rotate(-12deg); opacity: 1; } }
 @keyframes burst { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(42vmin) rotate(200deg); } }
 @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes breathe { 50% { transform: translate(-50%, -50%) scale(1.07); } }
+@keyframes hopA { 50% { transform: translate(-50%, -85%) scale(1.15); } }
+@keyframes hopB { 50% { transform: translate(-50%, -85%) scale(1.15); } }
+@keyframes drop { from { transform: translate(-50%, -400%) scale(1.4); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(.85); opacity: 1; } to { transform: translate(-50%, -50%); } }
+@keyframes dealIn { from { transform: translate(300%, -160%) rotate(-380deg); opacity: 0; } 20% { opacity: 1; } 85% { transform: none; opacity: 1; } to { transform: scale(.6); opacity: 0; } }
+@keyframes spark { 0% { opacity: 0; transform: scale(.2); } 20% { opacity: 1; } 100% { opacity: 0; transform: scale(2.2); } }
+@keyframes sway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+@keyframes bob { 50% { transform: translateY(-3px); } }
+@keyframes railFly { 50% { transform: translate(-70px, calc((var(--to) - var(--from)) * (var(--row) + var(--gap)) / 2)) rotate(-200deg) scale(1.4); } to { transform: translateY(calc((var(--to) - var(--from)) * (var(--row) + var(--gap)))) rotate(-360deg); } }
+@keyframes slamIn { from { transform: translateY(-60vh) rotate(calc(var(--tilt) * 4)); opacity: 0; } 75% { transform: translateY(1vh) rotate(var(--tilt)); opacity: 1; } to { transform: rotate(var(--tilt)); } }
+@keyframes tumbleIn { from { transform: translate(-60vw, -20vh) rotate(-540deg) scale(.6); } 60% { transform: translate(2vw, 1vh) rotate(20deg) scale(1.1); } to { transform: none; } }
+@keyframes sweep { 0% { transform: translateX(-110%) skewY(-4deg); } 20%, 80% { transform: translateX(0) skewY(-4deg); } 100% { transform: translateX(110%) skewY(-4deg); } }
+@keyframes dropIn { 0% { transform: translate(-50%, -160%); } 15%, 85% { transform: translate(-50%, 0); } 100% { transform: translate(-50%, -160%); } }
+@keyframes slideUp { from { transform: translateY(100%); } }
+@keyframes lane { to { left: calc(100% - 38px); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
 /* legend, join hint, TV fill */

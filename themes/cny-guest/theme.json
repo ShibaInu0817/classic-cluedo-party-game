@@ -474,7 +474,13 @@
       "cardShown": "soft",
       "killerReveal": "heavy",
       "accuse": "double",
-      "accuseWrong": "heavy"
+      "accuseWrong": "heavy",
+      "turn": "light",
+      "hasOne": "soft"
+    },
+    "ambient": {
+      "hanging": { "art": "assets/lantern.svg", "count": 6 },
+      "sparkleRooms": ["R08"]
     },
     "dice": {
       "accentFaces": [

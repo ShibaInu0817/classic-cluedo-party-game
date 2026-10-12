@@ -3,6 +3,8 @@ import { useTheme } from '../../theme/ThemeProvider.tsx';
 import { Portrait } from '../../components/Portrait.tsx';
 import { StoryPanel, useStory } from '../../components/StoryPanel.tsx';
 import { seatName } from '../../state/selectors.ts';
+import { Board } from '../../components/Board.tsx';
+import { Ambient } from '../../components/TvStage.tsx';
 
 /** The story, big, while the phones check their cards; then who is ready. */
 export function TvIntro() {
@@ -14,6 +16,8 @@ export function TvIntro() {
   const ready = room.ready ?? [];
   return (
     <main className="tv tv-intro">
+      <div className="tv-backdrop"><Board backdrop /></div>
+      <Ambient />
       {story.panel && <StoryPanel art={story.panel.art} captionKey={story.panel.captionKey} big />}
       <ul className="tv-seats">
         {room.seats.map((s) => (

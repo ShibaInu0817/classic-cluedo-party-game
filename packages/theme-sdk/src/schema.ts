@@ -62,6 +62,13 @@ export const ManifestSchema = z.object({
     haptics: z.record(z.string(), z.string()).optional(),
     /** Which die faces are drawn in the accent colour (CNY dice paint 1 and 4 red). */
     dice: z.object({ accentFaces: z.array(z.number().int().min(1)) }).optional(),
+    /** Life on screen while nobody acts: art hung along the top of the TV that sways, and rooms that sparkle. */
+    ambient: z
+      .object({
+        hanging: z.object({ art: asset, count: z.number().int().min(1).max(12).default(6) }).optional(),
+        sparkleRooms: z.array(id).default([]),
+      })
+      .optional(),
   }),
 });
 
