@@ -472,7 +472,9 @@
       "diceLand": "hard",
       "yourTurn": "double",
       "cardShown": "soft",
-      "killerReveal": "heavy"
+      "killerReveal": "heavy",
+      "accuse": "double",
+      "accuseWrong": "heavy"
     },
     "dice": {
       "accentFaces": [

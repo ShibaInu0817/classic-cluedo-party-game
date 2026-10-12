@@ -205,6 +205,20 @@ h1, h2, h3, .code, .logo-text { font-family: var(--font-display); margin: .4em 0
 .moment .chain .pass::before { content: '✕ '; color: var(--color-primary); }
 .moment .chain .has::before { content: '✓ '; color: var(--color-reach); }
 .moment .status { font: 20px var(--font-display); color: var(--color-accent); }
+.accuse-moment { position: fixed; inset: 0; z-index: 32; background: rgba(0,0,0,.85); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 20px; text-align: center; overflow: hidden; animation: fadeIn .3s both; }
+.accuse-moment .accuser { display: flex; flex-direction: column; align-items: center; gap: 10px; animation: pop .5s cubic-bezier(.3,1.4,.5,1) both; }
+.accuse-moment .accuser .portrait { box-shadow: 0 0 0 4px var(--color-accent), 0 0 60px var(--color-accent); transition: box-shadow .6s; }
+.accuse-moment h2 { color: var(--color-accent); font: 28px var(--font-display); margin: 0; }
+.accuse-moment .envelope-seal { font-size: 72px; line-height: 1; animation: shake .12s linear 1s 9; transition: opacity .5s, filter .5s; }
+.accuse-moment .stamp { position: absolute; top: 46%; margin: 0; font: 54px var(--font-display); letter-spacing: .06em; padding: 4px 18px; border: 6px solid currentColor; border-radius: 12px; transform: rotate(-12deg); animation: slam .35s cubic-bezier(.2,.9,.3,1.4) both; }
+.accuse-moment.wrong .stamp { color: var(--color-primary); }
+.accuse-moment.right .stamp { color: var(--color-accent); }
+.accuse-moment.wrong .accuser .portrait { box-shadow: 0 0 0 4px #777; }
+.accuse-moment.wrong .envelope-seal { opacity: .4; filter: grayscale(1); }
+.accuse-moment .verdict-line { position: absolute; bottom: 12%; left: 20px; right: 20px; margin: 0; font-weight: 700; animation: fadeUp .4s .3s both; }
+.accuse-moment .burst { position: absolute; top: 50%; left: 50%; }
+.accuse-moment .burst i { position: absolute; width: 12px; height: 12px; border-radius: 3px; background: var(--color-accent); opacity: 0; animation: burst 1.1s ease-out both; }
+.accuse-moment .burst i:nth-child(2n) { background: var(--color-primary); }
 /* The die lands in a corner (never over the board), below every sheet, and never takes taps. */
 .dice-overlay { position: fixed; right: 12px; bottom: 12px; width: 130px; height: 130px; z-index: 25; display: grid; place-items: center; pointer-events: none; perspective: 600px; animation: fadeOut .3s 1.5s forwards; }
 .tv .dice-overlay { right: 3vw; bottom: 3vw; width: 200px; height: 200px; }
@@ -245,6 +259,9 @@ h1, h2, h3, .code, .logo-text { font-family: var(--font-display); margin: .4em 0
 @keyframes floatUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-70vh); opacity: 0; } }
 @keyframes flash { from { opacity: 1; } to { opacity: 0; } }
 @keyframes shake { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes slam { from { transform: rotate(-12deg) scale(3); opacity: 0; } to { transform: rotate(-12deg); opacity: 1; } }
+@keyframes burst { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(42vmin) rotate(200deg); } }
 @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
