@@ -333,6 +333,12 @@ h1, h2, h3, .code, .logo-text { font-family: var(--font-display); margin: .4em 0
 .chain-panel .status { color: var(--ink); font: 18px var(--font-display); text-align: center; margin: 0; }
 .chain-panel .status small { display: block; font: 500 13px var(--font-ui); opacity: .7; }
 
+.host-badge { align-self: center; background: var(--color-accent); border: var(--border); border-radius: 999px; padding: 2px 12px; font-weight: 700; box-shadow: var(--hard); }
+.btn.leave { align-self: center; margin-top: 8px; }
+.tv-seats li { position: relative; }
+.crown { position: absolute; top: -18px; left: 50%; translate: -50% 0; font-size: 28px; }
+.tv-hint { text-align: center; font-size: 1.6vw; }
+.tv-setup { display: flex; flex-direction: column; gap: 12px; min-width: min(480px, 90vw); }
 @keyframes roll { from { transform: rotateX(0) rotateY(0); } to { transform: var(--end); } }
 @keyframes fadeOut { to { opacity: 0; } }
 @keyframes bounce { 50% { transform: translate(-50%, -4px); } }

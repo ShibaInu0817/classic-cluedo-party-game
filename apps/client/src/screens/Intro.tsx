@@ -4,6 +4,7 @@ import { useTheme } from '../theme/ThemeProvider.tsx';
 import { Card } from '../components/Card.tsx';
 import { Portrait } from '../components/Portrait.tsx';
 import { StoryPanel, useStory } from '../components/StoryPanel.tsx';
+import { LeaveGame } from '../components/LeaveGame.tsx';
 
 type Step = 'setup' | 'role' | 'hand';
 const NONE: string[] = [];
@@ -79,6 +80,7 @@ export function Intro() {
         </section>
       )}
       {hostBar}
+      <LeaveGame />
     </main>
   );
 }

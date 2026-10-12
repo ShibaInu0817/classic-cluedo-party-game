@@ -11,11 +11,18 @@ export const C2S = {
     themeId: z.string(),
     playerName: z.string().trim().min(1).max(20),
   }),
+  /** A TV opens a room it will show but never play in. The first phone to join becomes the host. */
+  'room:host': z.object({
+    name: z.string().trim().min(1).max(40),
+    maxPlayers: z.number().int().min(2).max(12),
+    bots: z.boolean(),
+    themeId: z.string(),
+  }),
   'room:join': z.object({ code: z.string().regex(/^\d{4}$/), playerName: z.string().trim().min(1).max(20) }),
   'room:watch': z.object({ code: z.string().regex(/^\d{4}$/) }),
   /** Take your seat back after a refresh, with the token from create/join. */
   'room:resume': z.object({ code: z.string().regex(/^\d{4}$/), token: z.string().uuid() }),
-  /** Leave the room (lobby: frees the seat). */
+  /** Leave the room (lobby: frees the seat; mid-game: a bot takes over the character). */
   'room:leave': z.object({}),
   'lobby:pickChar': z.object({ characterId: z.string() }),
   /** Host: remove a player from the lobby. */

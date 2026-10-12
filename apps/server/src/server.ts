@@ -151,6 +151,15 @@ export async function createGameServer(opts: GameServerOptions) {
     clearTimeout(room.idleTimer);
   }
 
+  /** A TV joins the room's public channel. It has no seat, so it can never act. */
+  function watch(socket: Socket, room: Room) {
+    socket.data = { code: room.code, watcher: true };
+    socket.join(channel(room));
+    room.watchers.add(socket.id);
+    clearTimeout(room.idleTimer);
+    broadcast(room);
+  }
+
   io.on('connection', (socket) => {
     on(socket, 'room:create', (p) => {
       const entry = themes.get(p.themeId);
@@ -165,6 +174,16 @@ export async function createGameServer(opts: GameServerOptions) {
       seatSocket(socket, room, 0);
       broadcast(room);
       return { ok: true, code: room.code, seat: 0, token };
+    });
+
+    on(socket, 'room:host', (p) => {
+      const entry = themes.get(p.themeId);
+      if (!entry) return { ok: false, error: 'unknown theme' };
+      unbind(socket);
+      const { min, max } = entry.theme.manifest.meta.players;
+      const room = rooms.create({ name: p.name, theme: entry.theme, mode: 'tv', maxPlayers: Math.max(min, Math.min(max, p.maxPlayers)), bots: p.bots });
+      watch(socket, room);
+      return { ok: true, code: room.code };
     });
 
     on(socket, 'room:join', (p) => {
@@ -201,11 +220,7 @@ export async function createGameServer(opts: GameServerOptions) {
       if (!room) return { ok: false, error: 'room not found' };
       if (room.mode === 'phones') return { ok: false, error: 'this room has no TV' };
       unbind(socket);
-      socket.data = { code: room.code, watcher: true }; // no seat: a TV can never act
-      socket.join(channel(room));
-      room.watchers.add(socket.id);
-      clearTimeout(room.idleTimer);
-      broadcast(room);
+      watch(socket, room);
       return { ok: true };
     });
 

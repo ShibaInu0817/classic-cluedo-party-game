@@ -42,11 +42,11 @@ export interface Room {
 export class RoomManager {
   private rooms = new Map<string, Room>();
 
-  create(init: Omit<Room, 'code' | 'phase' | 'seats' | 'log' | 'history' | 'suggestions' | 'watchers' | 'gameNo' | 'createdAt'>, host: Seat): Room {
+  create(init: Omit<Room, 'code' | 'phase' | 'seats' | 'log' | 'history' | 'suggestions' | 'watchers' | 'gameNo' | 'createdAt'>, host?: Seat): Room {
     let code: string;
     do code = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
     while (this.rooms.has(code));
-    const room: Room = { ...init, code, phase: 'lobby', seats: [host], log: [], history: [], suggestions: [], watchers: new Set(), gameNo: 0, createdAt: Date.now() };
+    const room: Room = { ...init, code, phase: 'lobby', seats: host ? [host] : [], log: [], history: [], suggestions: [], watchers: new Set(), gameNo: 0, createdAt: Date.now() };
     this.rooms.set(code, room);
     return room;
   }

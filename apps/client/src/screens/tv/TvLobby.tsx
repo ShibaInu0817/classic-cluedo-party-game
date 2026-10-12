@@ -36,12 +36,16 @@ export function TvLobby() {
       <ul className="tv-seats">
         {room.seats.map((s) => (
           <li key={s.seat} className="pop">
+            {s.seat === room.hostSeat && !s.isBot && <span className="crown" aria-label={t('lobby.host')}>👑</span>}
             {s.characterId ? <Portrait id={s.characterId} size={96} /> : <span className="portrait empty" />}
             <strong>{seatName(room, s.seat, theme)}</strong>
             {s.characterId && <span>{cardName(s.characterId)}</span>}
           </li>
         ))}
       </ul>
+      <p className="hint tv-hint">
+        {room.seats.some((s) => !s.isBot) ? t('tv.hostIs', { name: seatName(room, room.hostSeat, theme) }) : t('tv.firstHost')}
+      </p>
     </main>
   );
 }

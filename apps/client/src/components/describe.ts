@@ -16,6 +16,10 @@ export function describe(e: PublicEvent, room: RoomState | undefined, th: ThemeA
     case 'accused': return e.correct ? undefined : t('log.accused.wrong', { name: name(e.seat) });
     case 'turnStarted': return t('log.turnStarted', { name: name(e.seat) });
     case 'timedOut': return t('log.timedOut', { name: name(e.seat) });
+    case 'seatLeft': {
+      const s = room?.seats[e.seat];
+      return t('log.seatLeft', { name: s?.name ?? name(e.seat), character: s?.characterId ? cardName(s.characterId) : '' });
+    }
     case 'gameWon': return t('end.winner', { name: name(e.seat) });
     default: return undefined;
   }

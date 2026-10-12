@@ -28,7 +28,9 @@ export type GameEvent =
   | { type: 'becameGhost'; seat: SeatIndex }
   | { type: 'gameWon'; seat: SeatIndex; envelope: Trio }
   | { type: 'gameOver'; envelope: Trio }
-  | { type: 'timedOut'; seat: SeatIndex };
+  | { type: 'timedOut'; seat: SeatIndex }
+  /** A player walked away and a bot took their character. Sent by the server; the rules never produce it. */
+  | { type: 'seatLeft'; seat: SeatIndex };
 
 export interface Ctx { theme: CompiledTheme }
 export type Result = { state: GameState; events: GameEvent[] } | { error: string };

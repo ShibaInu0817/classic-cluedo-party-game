@@ -62,9 +62,9 @@ export class GameController {
     s.isBot = true;
     s.token = undefined;
     s.socketId = undefined;
+    this.deps.projection.publish(r, [{ type: 'seatLeft', seat }]);
     if (r.phase === 'intro' && r.ready) return this.ready(seat);
     if (r.phase === 'end') return this.vote(seat, false);
-    this.deps.projection.state(r);
     if (r.phase === 'play' && !r.paused) this.scheduleBot();
     return { ok: true } as const;
   }

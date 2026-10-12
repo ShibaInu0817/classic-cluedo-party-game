@@ -123,7 +123,7 @@
           "name": "TV view",
           "kind": "client",
           "tech": "Same SPA · /tv route",
-          "desc": "Joins a room as a spectator socket. The server sends it the public projection only, so a TV bug can never leak a hand. One stage: the board stays on screen from lobby to end, with the players down the side, and the suggestion scene, dice and turn banner play over it.",
+          "desc": "Joins a room as a spectator socket. The server sends it the public projection only, so a TV bug can never leak a hand. One stage: the board stays on screen from lobby to end, with the players down the side, and the suggestion scene, dice and turn banner play over it. It can also open the room itself (room:host) and show the QR; the first phone in becomes the host.",
           "x": 40,
           "y": 440
         },
@@ -654,7 +654,7 @@
           "from": "phone",
           "to": "server",
           "title": "Create room",
-          "note": "The host sends <b>room:create</b> with a name, maxPlayers <b>3–6</b>, mode <b>phones | tv</b>, the bots toggle and a <b>themeId</b>."
+          "note": "The host sends <b>room:create</b> with a name, maxPlayers <b>3–6</b>, mode <b>phones | tv</b>, the bots toggle and a <b>themeId</b>. Or the TV opens the room itself with <b>room:host</b> (no seat); then the first phone to join is the host."
         },
         {
           "from": "server",
