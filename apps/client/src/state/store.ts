@@ -26,6 +26,8 @@ export interface GameActions {
   createRoom(p: C2SPayload<'room:create'>): Promise<Ack<{ code: string }>>;
   joinRoom(code: string, playerName: string): Promise<Ack>;
   watchRoom(code: string): Promise<Ack>;
+  /** A TV opens its own room and watches it; the first phone to join becomes the host. */
+  hostRoom(p: C2SPayload<'room:host'>): Promise<Ack<{ code: string }>>;
   pickChar(characterId: string): Promise<Ack>;
   fillBots(): Promise<Ack>;
   start(): Promise<Ack>;
@@ -85,6 +87,11 @@ export function createGameStore(socket: GameSocket): GameStore {
       async watchRoom(code) {
         watching = code;
         return ask('room:watch', { code });
+      },
+      async hostRoom(p) {
+        const ack = (await ask('room:host', p)) as Ack<{ code: string }>;
+        if (ack.ok) watching = ack.code;
+        return ack;
       },
       pickChar: (characterId) => ask('lobby:pickChar', { characterId }),
       fillBots: () => ask('lobby:fillBots'),

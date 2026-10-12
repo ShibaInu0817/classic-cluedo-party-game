@@ -101,13 +101,14 @@ function TvApp({ themes }: { themes: ThemeSummary[] }) {
     if (/^\d{4}$/.test(code)) void watchRoom(code);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const themeId = room?.themeId ?? themes[0]!.id;
+  const [board, setBoard] = useState(themes[0]!.id);
+  const themeId = room?.themeId ?? board;
   const t = themes.find((x) => x.id === themeId)!;
   const tvLang = lang && t.languages.includes(lang) ? lang : t.languages[0]!;
   return (
     <ThemeGate themeId={themeId} lang={tvLang}>
       {!room ? (
-        <TvCodeEntry code={code} setCode={setCode} onWatch={() => watchRoom(code)} error={error} />
+        <TvHome themes={themes} board={board} onBoard={setBoard} code={code} setCode={setCode} onWatch={() => watchRoom(code)} error={error} />
       ) : room.phase === 'lobby' ? <TvLobby /> : room.phase === 'intro' ? <TvIntro /> : room.phase === 'play' ? <TvPlay /> : <TvEnd />}
       {room && <AccuseMoment />}
       <LangToggle onChange={pickLang} />
@@ -115,16 +116,59 @@ function TvApp({ themes }: { themes: ThemeSummary[] }) {
   );
 }
 
-function TvCodeEntry({ code, setCode, onWatch, error }: { code: string; setCode: (c: string) => void; onWatch: () => void; error?: string }) {
-  const { t, manifest, asset } = useTheme();
+/** The TV's start screen: host a new room here (the main way), or watch an existing one by its code. */
+export function TvHome({ themes, board, onBoard, code, setCode, onWatch, error }: {
+  themes: ThemeSummary[]; board: string; onBoard: (id: string) => void;
+  code: string; setCode: (c: string) => void; onWatch: () => void; error?: string;
+}) {
+  const { t, manifest, asset, lang } = useTheme();
+  const hostRoom = useGame((s) => s.hostRoom);
+  const { min, max } = manifest.meta.players;
+  const [setup, setSetup] = useState(false);
+  const [players, setPlayers] = useState(max);
+  const [bots, setBots] = useState(true);
+  const count = Math.min(max, Math.max(min, players));
   return (
     <main className="tv tv-idle dotted">
       <img className="logo" src={asset(manifest.ui.logo)} alt={t(manifest.meta.titleKey)} />
-      <form onSubmit={(e) => { e.preventDefault(); onWatch(); }} className="row">
+      {!setup ? (
+        <button className="btn primary big" onClick={() => setSetup(true)}>{t('tv.host')}</button>
+      ) : (
+        <form
+          className="card tv-setup"
+          aria-label={t('tv.setup')}
+          onSubmit={(e) => { e.preventDefault(); void hostRoom({ name: t('create.defaultName'), maxPlayers: count, bots, themeId: board }); }}
+        >
+          <h2>{t('tv.setup')}</h2>
+          {themes.length > 1 && (
+            <label className="field">
+              <span>{t('create.theme')}</span>
+              <select value={board} onChange={(e) => onBoard(e.target.value)}>
+                {themes.map((th) => <option key={th.id} value={th.id}>{th.title[lang] ?? th.title[th.languages[0]!] ?? th.id}</option>)}
+              </select>
+            </label>
+          )}
+          <div className="field">
+            <span>{t('create.max')}</span>
+            <div className="stepper">
+              <button type="button" aria-label="−" onClick={() => setPlayers(Math.max(min, count - 1))}>−</button>
+              <output aria-label={t('create.max')}>{count}</output>
+              <button type="button" aria-label="+" onClick={() => setPlayers(Math.min(max, count + 1))}>+</button>
+            </div>
+          </div>
+          <label className="toggle"><input type="checkbox" checked={bots} onChange={(e) => setBots(e.target.checked)} />{t('create.bots')}</label>
+          <div className="row">
+            <button type="button" className="btn" onClick={() => setSetup(false)}>{t('cancel')}</button>
+            <button type="submit" className="btn primary">{t('tv.open')}</button>
+          </div>
+        </form>
+      )}
+      <form onSubmit={(e) => { e.preventDefault(); onWatch(); }} className="row" aria-label={t('tv.orWatch')}>
+        <span className="hint">{t('tv.orWatch')}</span>
         <label className="field"><span>{t('tv.enterCode')}</span>
           <input inputMode="numeric" maxLength={4} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
         </label>
-        <button className="btn primary" disabled={code.length !== 4}>{t('tv.watch')}</button>
+        <button className="btn" disabled={code.length !== 4}>{t('tv.watch')}</button>
       </form>
       {error && <p role="alert" className="error">{error}</p>}
     </main>

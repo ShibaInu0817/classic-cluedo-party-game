@@ -27,6 +27,7 @@ export function Lobby() {
 
   return (
     <main className="screen lobby">
+      {isHost && <span className="host-badge">👑 {t('lobby.youHost')}</span>}
       <section className="card code-card">
         <div className="label">{t('lobby.code')}</div>
         <div className="code" data-testid="room-code">{room.code}</div>

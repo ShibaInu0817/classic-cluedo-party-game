@@ -183,7 +183,7 @@ The types are in the code. These are the main ones:
   - `intro` → `play`: the turn clock starts.
   - `play` → `end`: the game is won, or everyone has become a ghost.
   - `end` → `intro`: every human votes for a rematch, and the same seats are dealt a new game.
-- **Host:** the first *connected* person. If the host drops or leaves, the role passes on.
+- **Host:** the first *connected* person. If the host drops or leaves, the role passes on. A room the TV opened (`room:host`) starts with no seats, so its first phone is the host.
 - **Seat token:** a secret per seat, used to resume. It is never broadcast.
 - **One owner per seat:** every action checks that the socket still owns its seat, so a retired tab or a renumbered seat cannot act for someone else.
 - **One room per connection:** joining, creating or watching a room leaves the previous one.
@@ -203,6 +203,7 @@ Every event is emitted with an ack and answered with `{ ok: true, … }` or `{ o
 | `room:create` | `{ name, maxPlayers, mode, bots, themeId, playerName }` | always. The ack carries `{ code, seat: 0 }` |
 | `room:join` | `{ code, playerName }` | phase `lobby`, a seat is free. The ack carries `{ seat }` |
 | `room:watch` | `{ code }` | TV, any phase, unless the room is phones-only. It gives no seat, so a TV can never act |
+| `room:host` | `{ name, maxPlayers, bots, themeId }` | TV. Opens a `tv` room with no seats and watches it; the first phone to join becomes the host. The ack carries `{ code }` |
 | `room:resume` | `{ code, token }` | after a refresh or a dropped connection. It re-binds the seat, re-sends its private state, and retires any older tab on that seat (`room:kicked`) |
 | `room:leave` | `{}` | lobby: frees the seat, and later seats move up (each is told its new number by `room:you`). Mid-game: a bot takes over the seat |
 | `lobby:pickChar` | `{ characterId }` | lobby, character not taken by another seat |
@@ -415,7 +416,7 @@ Avoided:
   - A room node ends expansion.
   - The start room is excluded as a destination.
   - The server re-checks the client's chosen node against `reach`.
-- **Events:** each change emits typed events: `rolled`, `moved{path}`, `suggested`, `asked{seat, has}`, `noDisprove`, `cardShown{from, to, card}` (`card` is private), `accused{correct}` (never the guess), `becameGhost`, `turnStarted`, `timedOut`, `gameWon`, `gameOver`. `publicEvent` strips the private part, and `Projection` sends each private part to its owner only.
+- **Events:** each change emits typed events: `rolled`, `moved{path}`, `suggested`, `asked{seat, has}`, `noDisprove`, `cardShown{from, to, card}` (`card` is private), `accused{correct}` (never the guess), `becameGhost`, `turnStarted`, `timedOut`, `gameWon`, `gameOver`, and `seatLeft` (sent by the server when a player leaves mid-game and a bot takes the character; the rules never produce it). `publicEvent` strips the private part, and `Projection` sends each private part to its owner only.
 - **No theme strings:** log lines are events plus ids, and the client renders them through `t()`.
 
 ## 8. Bots and timers
@@ -452,6 +453,8 @@ Avoided:
 - **Moments:** the dice, the suggestion moment (cards, then each player's pass or has-one, then "A showed B"), the accusation moment (the accuser in the spotlight, the sealed envelope shaking, then a WRONG or CORRECT stamp; the guess is never shown) and token walking (170 ms a step) are all driven by the public event feed, so the TV gets them too.
 - **One stage on the TV:** the board stays on screen from lobby to end. The lobby and the story sit on a blurred board; play opens with the pieces dropping onto their squares and the answer dealt into the envelope. During play the players run down the side (whose turn, each one's answer), the die tumbles over the board, tokens hop square by square and the room they enter lights up.
 - **The suggestion, paced:** the server sends the suggestion and every answer at once, so the client paces it ([useSuggestion.ts](apps/client/src/components/useSuggestion.ts)): the three cards hold the stage (1.6 s), then each player answers in turn (1 s each), then who showed whom. On the TV the camera zooms into the room, which becomes the backdrop, and a face-down card flies between the two players. On a phone the panel covers the lower half and is worded for its owner: the one who showed sees which card, the suggester gets it in their own sheet, everyone else learns only that a card changed hands. The named suspect flies into the room.
+- **TV start screen:** the main action is **Host a game here** (board, players, bots; no player name), which opens the room on the TV with its QR. Watching another room by code is the second option.
+- **Leaving:** Leave game (story and play) asks first, then a bot plays your character for the rest of the game; everyone sees who left.
 - **Turn banner:** a band sweeps across the TV with the player's face; other phones get a toast (your own turn keeps the YOUR TURN ribbon).
 - **Fast animations** (Settings, per device) halves every staged beat. It is published to CSS as `--speed`.
 - **Tutorial:** coach marks from `theme.ui.tutorial`, each spotlighting a `data-tut` target. They show on the first game per device per theme.

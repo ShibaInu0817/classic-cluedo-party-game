@@ -16,6 +16,7 @@ import { Dice } from '../components/Dice.tsx';
 import { Moment } from '../components/Moment.tsx';
 import { useAccusation } from '../components/AccuseMoment.tsx';
 import { TurnBanner } from '../components/TurnBanner.tsx';
+import { LeaveGame } from '../components/LeaveGame.tsx';
 import { useFeedback } from '../feedback.ts';
 
 type Tab = 'actions' | 'cards' | 'notes';
@@ -82,6 +83,7 @@ export function Play() {
               )}
             </div>
             {isHost && !room.paused && <button className="btn small" onClick={() => pause(true)}>{t('play.pause')}</button>}
+            <LeaveGame />
             <ErrorBanner />
           </div>
         )}
