@@ -350,7 +350,11 @@ Any web image format works (SVG, PNG or WebP). Paths are relative to the pack fo
     "tutorial": [ { "target": "board", "textKey": "tut.board" } /* … 7 marks */ ],
     "sfx":     { "diceLand": "assets/sfx/dice.mp3", "yourTurn": "assets/sfx/gong.mp3" },
     "haptics": { "diceLand": "hard", "yourTurn": "double", "killerReveal": "heavy" },
-    "dice": { "accentFaces": [1, 4] }            // faces drawn in the accent colour (Chinese dice paint 1 and 4 red)
+    "dice": { "accentFaces": [1, 4] },           // faces drawn in the accent colour (Chinese dice paint 1 and 4 red)
+    "ambient": {                                 // optional life while nobody acts
+      "hanging": { "art": "assets/lantern.svg", "count": 6 },  // hung along the top of the TV, swaying
+      "sparkleRooms": ["R08"]                    // rooms that sparkle (fireworks over the backyard)
+    }
   }
 }
 ```
@@ -438,21 +442,26 @@ Avoided:
 - **Motion** (pop, fadeUp, card flip `cubic-bezier(.3,1.4,.5,1)`, token step 170 ms, ribbon 1.8 s, dice ~1.3 s) is part of the shared design system, not the theme. A theme may override durations in a later schema version.
 - **Reach:** the server includes `reach` (the squares and rooms the active seat may move to) in `room:state`. The client highlights them and never computes movement itself.
 - **TV route** `/tv?code=XXXX` uses the same components in a 16:9 layout and is fed only by the room channel (`room:state`, `game:events`, `reaction`).
-- **Sound and haptics** ([apps/client/src/feedback.ts](apps/client/src/feedback.ts)) are looked up by moment in `theme.ui.sfx` (audio files) and `theme.ui.haptics`, and respect the Settings toggles. The moments are `diceLand`, `step`, `suggest`, `cardShown`, `yourTurn`, `killerReveal` and `music`.
+- **Sound and haptics** ([apps/client/src/feedback.ts](apps/client/src/feedback.ts)) are looked up by moment in `theme.ui.sfx` (audio files) and `theme.ui.haptics`, and respect the Settings toggles. The moments are `diceLand`, `step`, `suggest`, `pass`, `hasOne`, `cardShown`, `turn`, `yourTurn`, `accuse`, `accuseWrong`, `killerReveal` and `music`.
   - Haptic patterns are named (`light`, `soft`, `hard`, `double`, `heavy`, `celebrate`) or given as raw durations (`"40,30,40"`).
   - With turn alerts on, the tab title is flagged when your turn comes while the tab is in the background.
   - The CNY pack ships haptics only; there are no audio files yet.
 - **Detective notes** form a card × player grid.
   - Marks fill in by themselves from your hand, cards shown to you, and players who passed (public `suggestions`). A mark you set by hand always wins.
   - Notes are kept per room and game, on the device.
-- **Moments:** the dice, the suggestion moment (cards, then each player's pass or has-one, then "A showed B") and token walking (170 ms a step) are all driven by the public event feed, so the TV gets them too.
+- **Moments:** the dice, the suggestion moment (cards, then each player's pass or has-one, then "A showed B"), the accusation moment (the accuser in the spotlight, the sealed envelope shaking, then a WRONG or CORRECT stamp; the guess is never shown) and token walking (170 ms a step) are all driven by the public event feed, so the TV gets them too.
+- **One stage on the TV:** the board stays on screen from lobby to end. The lobby and the story sit on a blurred board; play opens with the pieces dropping onto their squares and the answer dealt into the envelope. During play the players run down the side (whose turn, each one's answer), the die tumbles over the board, tokens hop square by square and the room they enter lights up.
+- **The suggestion, paced:** the server sends the suggestion and every answer at once, so the client paces it ([useSuggestion.ts](apps/client/src/components/useSuggestion.ts)): the three cards hold the stage (1.6 s), then each player answers in turn (1 s each), then who showed whom. On the TV the camera zooms into the room, which becomes the backdrop, and a face-down card flies between the two players. On a phone the panel covers the lower half and is worded for its owner: the one who showed sees which card, the suggester gets it in their own sheet, everyone else learns only that a card changed hands. The named suspect flies into the room.
+- **Turn banner:** a band sweeps across the TV with the player's face; other phones get a toast (your own turn keeps the YOUR TURN ribbon).
+- **Fast animations** (Settings, per device) halves every staged beat. It is published to CSS as `--speed`.
 - **Tutorial:** coach marks from `theme.ui.tutorial`, each spotlighting a `data-tut` target. They show on the first game per device per theme.
 - **Overlay layering**, from bottom to top:
   - the die (a corner, never takes taps);
-  - the suggestion moment;
+  - the suggestion moment (on a phone, a panel over the lower half);
+  - the accusation moment (on every screen; a wrong accuser's envelope sheet waits for it, and a winning one plays before the reveal);
   - the pause screen;
   - your own sheets: show a card, a card shown to you, suggest, accuse, wrong accusation;
-  - the YOUR TURN ribbon (never takes taps);
+  - the YOUR TURN ribbon, the turn toast and the TV turn banner (never take taps);
   - the tutorial.
 
   The suggestion moment also steps aside while you have a card to show or a shown card to read, and a newer roll ends it.

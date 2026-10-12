@@ -2,6 +2,7 @@ import { useTheme } from '../theme/ThemeProvider.tsx';
 import { langName } from '../i18n/langName.ts';
 import { local } from '../storage.ts';
 import { useState } from 'react';
+import { applyMotion } from '../motion.ts';
 
 export function Settings({ onLang, onBack }: { onLang: (l: string) => void; onBack: () => void }) {
   const { t, manifest, lang } = useTheme();
@@ -9,6 +10,7 @@ export function Settings({ onLang, onBack }: { onLang: (l: string) => void; onBa
   const [haptics, setHaptics] = useState(local.get('haptics') !== 'off');
   const [music, setMusic] = useState(local.get('music') !== 'off');
   const [alerts, setAlerts] = useState(local.get('alerts') !== 'off');
+  const [fast, setFast] = useState(local.get('motion') === 'fast');
   const toggle = (key: string, v: boolean, set: (b: boolean) => void) => { set(v); local.set(key, v ? 'on' : 'off'); };
   return (
     <main className="screen settings">
@@ -17,6 +19,7 @@ export function Settings({ onLang, onBack }: { onLang: (l: string) => void; onBa
       <label className="toggle"><input type="checkbox" checked={haptics} onChange={(e) => toggle('haptics', e.target.checked, setHaptics)} />{t('settings.haptics')}</label>
       <label className="toggle"><input type="checkbox" checked={music} onChange={(e) => toggle('music', e.target.checked, setMusic)} />{t('settings.music')}</label>
       <label className="toggle"><input type="checkbox" checked={alerts} onChange={(e) => toggle('alerts', e.target.checked, setAlerts)} />{t('settings.alerts')}</label>
+      <label className="toggle"><input type="checkbox" checked={fast} onChange={(e) => { setFast(e.target.checked); local.set('motion', e.target.checked ? 'fast' : 'normal'); applyMotion(); }} />{t('settings.fastMotion')}</label>
       <fieldset className="field">
         <legend>{t('settings.language')}</legend>
         <div className="segmented">

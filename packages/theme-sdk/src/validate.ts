@@ -22,6 +22,7 @@ export function crossCheck(m: Manifest): string[] {
     roomRef(`board.secretPassages[${i}]`, a);
     roomRef(`board.secretPassages[${i}]`, b);
   });
+  (m.ui.ambient?.sparkleRooms ?? []).forEach((r, i) => roomRef(`ui.ambient.sparkleRooms[${i}]`, r));
   const { min, max } = m.meta.players;
   if (min > max) issues.push(`meta.players.min ${min} is above max ${max}`);
   if (m.deck.suspects.length < max) {

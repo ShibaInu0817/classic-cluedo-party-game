@@ -7,6 +7,7 @@ export function assetRefs(m: Manifest): string[] {
   for (const ch of m.story.chapters) for (const p of ch.panels) out.push(p.art);
   for (const s of m.ui.stickers) if (s.art) out.push(s.art);
   for (const f of Object.values(m.ui.sfx ?? {})) out.push(f);
+  if (m.ui.ambient?.hanging) out.push(m.ui.ambient.hanging.art);
   return out;
 }
 

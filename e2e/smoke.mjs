@@ -106,16 +106,16 @@ try {
   for (const i of [0, 6, 14]) await a.getByRole('radio').nth(i).check({ force: true });
   await a.getByRole('button', { name: 'Accuse' }).click();
   await a.getByRole('button', { name: 'Confirm' }).click();
+  // Right or wrong, the TV plays the accusation moment and stamps the verdict, never the guess.
+  const tvMoment = tv.getByRole('region', { name: /Ah Beng accuses!|Ah Beng 发起指控！/ });
+  await tvMoment.getByText(/^(WRONG|CORRECT|错误|正确)$/).waitFor();
+  step('TV showed the accusation moment');
   const outcome = await Promise.race([
     guest.getByRole('dialog', { name: /Wrong!/ }).waitFor().then(() => 'ghost'),
     guest.getByRole('region', { name: 'Reveal' }).waitFor().then(() => 'won'),
   ]);
   step(`accusation result: ${outcome}`);
   await shot(guest, '4-after-accuse');
-  if (outcome === 'ghost') {
-    const tvText = await tv.locator('body').innerText();
-    assert.match(tvText, /Ah Beng made a wrong accusation|Ah Beng 指控错误/);
-  }
   assert.deepEqual(errors, [], `page errors: ${errors.join('; ')}`);
   console.log('✓ e2e smoke passed');
 } finally {
