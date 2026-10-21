@@ -1,3 +1,5 @@
+<p align="center"><b>English</b> · <a href="README.zh-CN.md">简体中文</a></p>
+
 <p align="center">
   <a href="https://classic-cluedo-party-game.onrender.com"><img src="media/teaser.gif" alt="Who Killed the Guest? on the TV: turns, an accusation and the verdict" width="640"></a>
 </p>
