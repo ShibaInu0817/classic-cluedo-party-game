@@ -26,8 +26,10 @@ if (!process.env.E2E_URL) {
 const browser = await chromium.launch({ channel: process.env.E2E_CHANNEL ?? 'chrome' });
 const errors = [];
 const shot = (p, name) => (OUT ? p.screenshot({ path: path.join(OUT, `${name}.png`) }) : undefined);
-async function page(viewport) {
-  const p = await (await browser.newContext({ viewport })).newPage();
+async function page(viewport, video) {
+  // with E2E_SHOTS: crisp 2x shots, and the TV is also filmed (for the README's teaser)
+  const opts = OUT ? { viewport, deviceScaleFactor: 2, ...(video ? { recordVideo: { dir: OUT, size: viewport } } : {}) } : { viewport };
+  const p = await (await browser.newContext(opts)).newPage();
   p.on('pageerror', (e) => errors.push(e.message));
   return p;
 }
@@ -52,7 +54,7 @@ try {
   await guest.getByLabel('Your name').fill('Ah Beng');
   await guest.getByRole('button', { name: 'Join', exact: true }).click();
   await guest.getByTestId('room-code').waitFor();
-  const tv = await page({ width: 1280, height: 720 });
+  const tv = await page({ width: 1280, height: 720 }, true);
   await tv.goto(`${URL}/tv?code=${code}`);
   await tv.getByRole('button', { name: 'English' }).click(); // the TV starts in the theme's default language
   await tv.getByRole('img', { name: /Scan to join/ }).waitFor();
@@ -67,6 +69,7 @@ try {
   await guest.getByRole('button', { name: 'Skip story' }).click();
   await guest.getByRole('button', { name: 'Next' }).click();
   await guest.getByRole('heading', { name: /^You are/ }).waitFor();
+  await shot(guest, '1b-you-are');
   await guest.getByRole('button', { name: 'Next' }).click();
   await guest.getByRole('button', { name: 'Ready' }).click();
   await tv.getByText(/· Ready/).first().waitFor();
@@ -90,6 +93,7 @@ try {
     const d = host.getByRole('dialog', { name: 'Make a suggestion' });
     await d.getByRole('radio').nth(0).check({ force: true });
     await d.getByRole('radio').nth(6).check({ force: true });
+    await shot(host, '2b-suggest');
     await d.getByRole('button', { name: 'Confirm' }).click();
   }
   const show = guest.getByRole('dialog', { name: /suggested/ });
@@ -109,6 +113,7 @@ try {
   // Right or wrong, the TV plays the accusation moment and stamps the verdict, never the guess.
   const tvMoment = tv.getByRole('region', { name: /Ah Beng accuses!|Ah Beng 发起指控！/ });
   await tvMoment.getByText(/^(WRONG|CORRECT|错误|正确)$/).waitFor();
+  await shot(tv, '3b-tv-accuse');
   step('TV showed the accusation moment');
   const outcome = await Promise.race([
     guest.getByRole('dialog', { name: /Wrong!/ }).waitFor().then(() => 'ghost'),
@@ -119,6 +124,7 @@ try {
   assert.deepEqual(errors, [], `page errors: ${errors.join('; ')}`);
   console.log('✓ e2e smoke passed');
 } finally {
+  if (OUT) await Promise.all(browser.contexts().map((c) => c.close())); // flushes the TV video
   await browser.close();
   server?.kill();
 }

@@ -1,6 +1,6 @@
 # CLAUDE.md: Who Killed the Guest? (CNY Cluedo)
 
-An online Cluedo-style game: React + TypeScript (Vite) client, Node + Socket.IO server that holds the authoritative state. Read `README.md` for the architecture, and `docs/architecture/architecture.html` for the C4 diagram, before changing structure.
+An online Cluedo-style game: React + TypeScript (Vite) client, Node + Socket.IO server that holds the authoritative state. Read `docs/DESIGN.md` for the architecture, and `docs/architecture/architecture.html` for the C4 diagram, before changing structure.
 
 ## Rule #1: everything is a theme (customization)
 The prototype contains the full game logic, but **this codebase must stay theme-agnostic**. The CNY family dinner is only the first theme pack. Design every change so that another Cluedo board can be added by **only providing a list of assets plus a data manifest** under `themes/<id>/`, with no code changes.
@@ -51,11 +51,11 @@ The reference for this split is `../3D Monopoly board setup` (`game/data.js` `BO
 - Hands are random, so tests pick seeds through the public API; for example `tinySeed` uses the engine as an oracle. Never poke internal state to set up a scenario.
 - Any change that touches who receives what must keep the TV leak test green (`apps/server/test/accuse.test.ts`).
 - Server tests that wait for a later state must pass `client.mark()` as `from`. Otherwise an older matching message satisfies the wait.
-- Your own sheets always sit above shared overlays (moment, dice, pause). Keep to the layering order in the README (§9) when adding an overlay.
+- Your own sheets always sit above shared overlays (moment, dice, pause). Keep to the layering order in `docs/DESIGN.md` (§9) when adding an overlay.
 - Zustand selectors must return stable values (`useGame((s) => s.fn)`). A new object or array in a selector loops React.
 
 ## Status and what's next
-P0–P6 are done (see the README's delivery phases). What remains needs a design or spec before building:
+P0–P6 are done (see the delivery phases in `docs/DESIGN.md`). What remains needs a design or spec before building:
 - Pixel-matching the handoff.
 - CNY event cards, and player profiles and levels (profiles need persistence).
 - Sound files for the CNY pack.
@@ -66,4 +66,4 @@ Don't invent rules for event cards; ask.
 `master` deploys to Render (free plan, `render.yaml`) automatically after CI passes. A deploy restarts the server and **ends every live game** (rooms are in memory). Work on branches, and merge when nobody is playing. Keep `/healthz` cheap: Render polls it.
 
 ## Docs stay in sync
-When containers, components, socket events or flows change, update `docs/architecture/model.json` and rebuild with the `draw-c4` skill (`plot.py check` then `plot.py build model.json architecture.html`). Keep the README's protocol tables and theme schema matching the code.
+When containers, components, socket events or flows change, update `docs/architecture/model.json` and rebuild with the `draw-c4` skill (`plot.py check` then `plot.py build model.json architecture.html`). Keep the protocol tables and theme schema in `docs/DESIGN.md` matching the code.

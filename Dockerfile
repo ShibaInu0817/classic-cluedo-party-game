@@ -11,6 +11,6 @@ RUN corepack enable
 COPY --from=build /app /app
 ENV PORT=3001 NODE_ENV=production
 EXPOSE 3001
-# Rooms live in memory: run a single instance (see README, open questions).
+# Rooms live in memory: run a single instance (see docs/DESIGN.md, open questions).
 # Node runs as PID 1 (not pnpm) so it receives SIGTERM on deploy and shuts down cleanly.
 CMD ["node", "--import", "tsx", "apps/server/src/main.ts"]
