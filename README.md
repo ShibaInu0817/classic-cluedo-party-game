@@ -70,7 +70,9 @@ classic-cluedo-party-game/
 ├─ media/                  teaser and screenshots for this README
 ├─ tools/                  art export, dev helpers
 ├─ prototype/              the design handoff (read-only reference)
-└─ CLAUDE.md               rules for working on the code (start here)
+├─ CLAUDE.md               rules for working on the code (start here)
+├─ LICENSE                 MIT, for the code
+└─ NOTICE                  the art, story and media: all rights reserved
 ```
 
 ## Run, test, deploy
@@ -90,5 +92,7 @@ E2E_SHOTS=/tmp/shots pnpm e2e # the same, saving screenshots and a TV video
 - **Phones:** `http://<your-ip>:5173`. **TV:** `http://<your-ip>:5173/tv?code=1234`, or scan its QR code.
 - **Production:** `pnpm --filter @cluedo/client build`, then `pnpm --filter @cluedo/server start` serves everything on one port (`PORT`, default 3001).
 - **Deploy:** [`render.yaml`](render.yaml) deploys `master` to Render's free plan after [CI](.github/workflows/ci.yml) passes. Rooms live in memory, so a deploy ends live games: work on branches and merge when nobody is playing. `E2E_URL=https://… node e2e/smoke.mjs` checks a deploy. Full walkthrough: [docs/DESIGN.md](docs/DESIGN.md#deploy-on-render-free-no-card).
+
+Code: MIT. The art, story and media: all rights reserved. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 How it all fits together: [docs/DESIGN.md](docs/DESIGN.md) and the C4 diagram in [docs/architecture/architecture.html](docs/architecture/architecture.html).

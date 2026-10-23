@@ -72,7 +72,9 @@ classic-cluedo-party-game/
 ├─ media/                  README 用的动图和截图
 ├─ tools/                  美术导出、开发辅助脚本
 ├─ prototype/              设计交付稿（只读参考）
-└─ CLAUDE.md               改代码的规则（从这里开始读）
+├─ CLAUDE.md               改代码的规则（从这里开始读）
+├─ LICENSE                 MIT 许可，适用于代码
+└─ NOTICE                  美术、故事和媒体：保留所有权利
 ```
 
 ## 运行、测试、部署
@@ -92,5 +94,7 @@ E2E_SHOTS=/tmp/shots pnpm e2e # 同上，并保存截图和电视画面录像
 - **手机：** `http://<你的 IP>:5173`。**电视：** `http://<你的 IP>:5173/tv?code=1234`，或扫电视上的二维码。
 - **正式运行：** 先 `pnpm --filter @cluedo/client build`，再 `pnpm --filter @cluedo/server start`，所有内容都在同一个端口（`PORT`，默认 3001）。
 - **部署：** [`render.yaml`](render.yaml) 会在 [CI](.github/workflows/ci.yml) 通过后把 `master` 部署到 Render 免费方案。房间只存在内存里，所以每次部署都会结束正在进行的对局：在分支上开发，没人玩的时候再合并。用 `E2E_URL=https://… node e2e/smoke.mjs` 检查部署结果。完整步骤见 [docs/DESIGN.md](docs/DESIGN.md#deploy-on-render-free-no-card)（英文）。
+
+代码采用 MIT 许可；美术、故事和媒体保留所有权利。详见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。
 
 整体结构：[docs/DESIGN.md](docs/DESIGN.md)（英文）和 C4 架构图 [docs/architecture/architecture.html](docs/architecture/architecture.html)。

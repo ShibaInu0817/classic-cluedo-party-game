@@ -1,0 +1,14 @@
+Who Killed the Guest?: what the MIT License covers
+
+The MIT License in LICENSE applies to the source code only: apps/, packages/,
+e2e/, tools/, the build and test configuration, and the theme-pack format
+(the schema and validator in packages/theme-sdk).
+
+The game's content is not covered, and is
+Copyright (c) 2026 ShibaInu0817. All rights reserved:
+  - the theme packs' art, characters, story and other text
+    (themes/*/assets/, themes/*/i18n/, themes/*/theme.json content);
+  - the homepage's copy and screenshots (themes/*/homepage/);
+  - media/ and the design handoff in prototype/.
+
+You may use the code to build your own boards and games with your own content.
