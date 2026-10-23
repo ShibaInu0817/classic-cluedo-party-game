@@ -11,6 +11,8 @@
 <p align="center">
   <a href="https://classic-cluedo-party-game.onrender.com"><img src="https://img.shields.io/badge/%E2%96%B6%20%E7%AB%8B%E5%8D%B3%E5%BC%80%E7%8E%A9-%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9B%B4%E6%8E%A5%E7%8E%A9-e8513f?style=for-the-badge" alt="立即开玩"></a>
   &nbsp;
+  <a href="https://classic-cluedo-party-game.onrender.com/homepage/"><img src="https://img.shields.io/badge/%E7%9C%8B%E7%9C%8B-%E4%B8%BB%E9%A1%B5-c9a24a?style=for-the-badge" alt="看看主页"></a>
+  &nbsp;
   <a href="docs/DESIGN.md"><img src="https://img.shields.io/badge/%E5%AE%83%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9A%E7%9A%84-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3-2b2f3a?style=for-the-badge" alt="设计文档"></a>
 </p>
 <p align="center"><sub>服务器闲置时会休眠，第一次打开可能要等一分钟左右。</sub></p>
@@ -61,7 +63,7 @@ classic-cluedo-party-game/
 │  ├─ protocol/            客户端和服务器共用的事件名和 zod 校验
 │  └─ theme-sdk/           主题包类型、校验、棋盘图编译器、命令行工具
 ├─ themes/
-│  ├─ cny-guest/           第一个主题包（谁杀了客人？）
+│  ├─ cny-guest/           第一个主题包（谁杀了客人？）；其中的 homepage/ 就是 /homepage 主页
 │  └─ _fixtures/tiny-manor 7×7 测试棋盘，用来证明代码与主题无关
 ├─ e2e/smoke.mjs           在真实 Chrome 里玩完一整局（也用来生成 README 截图）
 ├─ docs/

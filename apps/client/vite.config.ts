@@ -10,6 +10,7 @@ export default defineConfig({
     proxy: {
       '/socket.io': { target: SERVER, ws: true },
       '/themes': SERVER,
+      '/homepage': SERVER,
     },
   },
   test: {

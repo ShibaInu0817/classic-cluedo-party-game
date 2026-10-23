@@ -11,6 +11,8 @@
 <p align="center">
   <a href="https://classic-cluedo-party-game.onrender.com"><img src="https://img.shields.io/badge/%E2%96%B6%20Play%20now-in%20your%20browser-e8513f?style=for-the-badge" alt="Play now in your browser"></a>
   &nbsp;
+  <a href="https://classic-cluedo-party-game.onrender.com/homepage/"><img src="https://img.shields.io/badge/Visit-the%20homepage-c9a24a?style=for-the-badge" alt="Visit the homepage"></a>
+  &nbsp;
   <a href="docs/DESIGN.md"><img src="https://img.shields.io/badge/How%20it's-built-2b2f3a?style=for-the-badge" alt="How it's built"></a>
 </p>
 <p align="center"><sub>The server sleeps when idle: the first visit can take about a minute to wake it.</sub></p>
@@ -59,7 +61,7 @@ classic-cluedo-party-game/
 │  ├─ protocol/            event names + zod schemas shared by client and server
 │  └─ theme-sdk/           theme-pack types, schema, validator, board-graph compiler, CLI
 ├─ themes/
-│  ├─ cny-guest/           the first theme pack (谁杀了客人？)
+│  ├─ cny-guest/           the first theme pack (Who Killed the Guest?); its homepage/ is served at /homepage
 │  └─ _fixtures/tiny-manor a 7×7 test board that proves the code is theme-agnostic
 ├─ e2e/smoke.mjs           a whole game in real Chrome (and the README screenshots)
 ├─ docs/

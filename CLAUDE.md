@@ -15,6 +15,7 @@ The prototype contains the full game logic, but **this codebase must stay theme-
   - Copy comes from `t(key)`.
 - **One room, one theme.** A room pins `themeId` at creation. Pass the compiled theme into `initGame(theme, seed)`; never use a global "current board".
 - **Validate.** Any new manifest field needs a zod schema entry, a default and a `theme:check` rule. A pack that fails validation must stop the server at boot.
+- **A pack may ship a homepage.** An optional `themes/<id>/homepage/` (a static marketing page) is served at `/homepage` from the first pack that has one. Its copy and art live only there.
 - **Before you finish a change, ask:** "Could someone ship a haunted-mansion board without touching this file?" If not, move the content into the pack.
 
 The reference for this split is `../3D Monopoly board setup` (`game/data.js` `BOARDS` registry and `setBoard`, `game/engine.js`).

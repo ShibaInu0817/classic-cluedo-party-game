@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import http from 'node:http';
+import path from 'node:path';
 import express from 'express';
 import { Server, type Socket } from 'socket.io';
 import { C2S, type Ack, type C2SEvent } from '@cluedo/protocol';
@@ -51,6 +53,9 @@ export async function createGameServer(opts: GameServerOptions) {
     );
   });
   for (const { theme, dir } of themes.values()) app.use(`/themes/${theme.id}`, express.static(dir, { dotfiles: 'deny' }));
+  // /homepage: the marketing page of the first pack that ships a homepage/ folder (the page is theme-owned)
+  const home = [...themes.values()].find(({ dir }) => existsSync(path.join(dir, 'homepage', 'index.html')));
+  if (home) app.use('/homepage', express.static(path.join(home.dir, 'homepage'), { dotfiles: 'deny' }));
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, { cors: { origin: true } });
 
