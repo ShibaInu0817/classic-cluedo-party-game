@@ -288,12 +288,12 @@ body.cut .pc-killer { opacity: 1; }
 body.cut.flash .pc-shadow { opacity: .78; }                          /* lit up, it reads as a shadow on the page */
 .pc-eye { fill: #ff2a17; filter: drop-shadow(0 0 6px #ff2a17) drop-shadow(0 0 18px rgba(255, 30, 10, .8)); transform-box: fill-box; transform-origin: center; animation: blink 5.5s infinite; }
 @keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
-.pc-grin { fill: #ff4a37; filter: drop-shadow(0 0 5px rgba(255, 60, 40, .9)); opacity: 0; transition: opacity 2.2s ease 1.4s; }
-.pc-teeth { fill: #2a0605; opacity: 0; transition: opacity 2.2s ease 1.4s; }
+.pc-grin { fill: #ff4a37; filter: drop-shadow(0 0 5px rgba(255, 60, 40, .9)); opacity: 0; transition: opacity 1s ease .7s; }
+.pc-teeth { fill: #2a0605; opacity: 0; transition: opacity 1s ease .7s; }
 body.cut .pc-grin { opacity: .92; }
 body.cut .pc-teeth { opacity: 1; }
 
-.pc-restore { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); transform: translateX(-50%); z-index: 46; visibility: hidden; opacity: 0; transition: opacity .6s ease 1.8s; background: rgba(15, 11, 12, .85); }
+.pc-restore { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); transform: translateX(-50%); z-index: 46; visibility: hidden; opacity: 0; transition: opacity .4s ease .6s; background: rgba(15, 11, 12, .85); }
 body.cut .pc-restore { visibility: visible; opacity: 1; }
 
 /* the page's own lanterns die with the power and relight after */
@@ -607,7 +607,7 @@ img { max-width: 100%; }
   // ---------- the power cut: the page goes dark, a broken light stutters, and the killer watches with red eyes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const B = document.body, face = document.getElementById('pcFace'), restoreBtn = document.getElementById('pcRestore');
-  const DARK_MS = 7000; // the lights come back by themselves after this long
+  const DARK_MS = 4000; // the lights come back by themselves after this long
   let flicker = 0, back = 0, opener = null;
   const flash = (dim, ms) => { B.classList.add('flash'); B.classList.toggle('dim', dim); setTimeout(() => B.classList.remove('flash', 'dim'), ms); };
   // a dying tube: a burst of 1–4 stutters, then darkness for a while
@@ -615,12 +615,12 @@ img { max-width: 100%; }
     if (!B.classList.contains('cut')) return;
     let t = 0; const n = 1 + Math.floor(Math.random() * 4);
     for (let i = 0; i < n; i++) { const on = 40 + Math.random() * 110; setTimeout(() => flash(Math.random() < .4, on), t); t += on + 50 + Math.random() * 140; }
-    flicker = setTimeout(stutter, t + 900 + Math.random() * 2600);
+    flicker = setTimeout(stutter, t + 600 + Math.random() * 1200);
   };
   const cutPower = (btn) => {
     if (B.classList.contains('cut')) return restore();
     opener = btn; clearTimeout(settle); B.classList.remove('relight', 'returning'); B.classList.add('cut');
-    if (!reduce) { flicker = setTimeout(() => { flash(false, 90); setTimeout(() => flash(true, 60), 160); setTimeout(stutter, 1400); }, 700); }
+    if (!reduce) { flicker = setTimeout(() => { flash(false, 90); setTimeout(() => flash(true, 60), 160); setTimeout(stutter, 900); }, 500); }
     setTimeout(() => restoreBtn.focus({ preventScroll: true }), 50);
     back = setTimeout(restore, DARK_MS);
   };
