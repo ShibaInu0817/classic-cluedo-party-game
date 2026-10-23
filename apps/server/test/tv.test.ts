@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { createRoom, startServer } from './helpers.ts';
+import { TINY_DIR, createRoom, startServer } from './helpers.ts';
 
 describe('the TV', () => {
   test('watches a room by code: it sees the lobby but never takes a seat', async () => {
@@ -45,6 +45,19 @@ describe('theme packs over HTTP', () => {
     const svg = await fetch(`${url}/themes/cny-guest/assets/suspects/S01.svg`);
     expect(svg.headers.get('content-type')).toMatch(/svg/);
     expect((await fetch(`${url}/themes/cny-guest/..%2F..%2Fpackage.json`)).status).toBe(404);
+  });
+
+  test('GET /homepage/ serves the homepage of the first pack that ships one', async () => {
+    const { url } = await startServer();
+    const page = await fetch(`${url}/homepage/`);
+    expect(page.status).toBe(200);
+    expect(await page.text()).toContain('<title>Who Killed the Guest?</title>');
+    expect((await fetch(`${url}/homepage/media/tv-en.jpg`)).headers.get('content-type')).toMatch(/jpeg/);
+  });
+
+  test('GET /homepage/ is not found when no pack ships a homepage', async () => {
+    const { url } = await startServer({ themeDirs: [TINY_DIR] });
+    expect((await fetch(`${url}/homepage/`)).status).toBe(404);
   });
 });
 

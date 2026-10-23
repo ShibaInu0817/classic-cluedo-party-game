@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Who Killed the Guest?</title>
+<meta name="description" content="A Chinese New Year murder mystery for 3 to 6 players: phones in hand, the TV as the table. Free in the browser.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Who Killed the Guest? · 谁杀了客人？">
+<meta property="og:description" content="A Chinese New Year murder mystery for 3 to 6 players: phones in hand, the TV as the table. Free in the browser.">
+<meta property="og:url" content="https://classic-cluedo-party-game.onrender.com/homepage/">
+<meta property="og:image" content="https://classic-cluedo-party-game.onrender.com/homepage/media/tv-en.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/themes/cny-guest/assets/lantern.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,400&family=Ma+Shan+Zheng&family=Spectral:ital,wght@0,400;0,500;1,400&family=Courier+Prime:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@400;700&display=swap">
+<style>
+/* Who Killed the Guest? homepage, served at /homepage by the game server. The page belongs to this theme pack. */
+/* Layout: one night at the old house, read top to bottom — dinner, blackout, the six at the table, the sealed envelope, then the invitation. */
+:root {
+  --night: #0f0b0c;      /* the house with the lights out */
+  --lacquer: #1d1012;    /* red-black lacquer panels */
+  --lacquer-2: #2a1518;
+  --seal: #b8322a;       /* wax seal, lantern red */
+  --gold: #cfa85a;       /* gold foil on red packets */
+  --paper: #ece2cf;      /* aged paper: text */
+  --ash: #9a8c82;        /* muted text */
+  --rule: #3a2427;
+  --glow: rgba(232, 150, 70, .22);
+
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-brush: "Ma Shan Zheng", "STKaiti", "KaiTi", "Kaiti SC", serif;
+  --f-body: "Spectral", Georgia, "Times New Roman", serif;
+  --f-type: "Courier Prime", "Courier New", ui-monospace, monospace;
+
+  color-scheme: dark;
+}
+/* Chinese: its own faces, no Latin display type */
+:root[data-lang="zh"] {
+  --f-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --f-body: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --f-type: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+:root[data-lang="zh"] .label { letter-spacing: .12em; }
+:root[data-lang="zh"] h2 em, :root[data-lang="zh"] .script li.gone, :root[data-lang="zh"] .threat small, :root[data-lang="zh"] .table .foot, :root[data-lang="zh"] .sealed .peek { font-style: normal; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--paper);
+  font-family: var(--f-body);
+  font-size: 1.06rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.label {
+  font-family: var(--f-type);
+  font-size: .78rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+h2 {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4.6vw, 3rem);
+  line-height: 1.08;
+  margin: .3em 0 .4em;
+  text-wrap: balance;
+}
+h2 em { font-style: italic; color: var(--gold); font-weight: 400; }
+p { margin: 0; }
+.lede { color: var(--ash); max-width: 58ch; }
+
+/* ---------- buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: .6em;
+  font-family: var(--f-type); font-weight: 700; font-size: .95rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .95em 1.5em; border-radius: 2px; text-decoration: none; cursor: pointer;
+  border: 1px solid var(--gold); background: transparent; color: var(--paper);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.btn:hover { background: rgba(207, 168, 90, .1); }
+.btn.primary { background: var(--seal); border-color: var(--seal); color: #fff4e6; box-shadow: 0 0 0 0 var(--glow); }
+.btn.primary:hover { box-shadow: 0 0 40px 4px var(--glow); background: #c63a30; }
+.btn .seal { width: 1.2em; height: 1.2em; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e0574c, #7c1a14); box-shadow: inset 0 0 0 2px rgba(0,0,0,.25); }
+
+/* ---------- top bar */
+.top { position: absolute; inset: 0 0 auto; z-index: 3; padding-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.mark { font-size: 1.35rem; color: var(--paper); text-decoration: none; }
+.top nav { display: flex; gap: 22px; align-items: center; font-family: var(--f-type); font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; }
+.top nav a { text-decoration: none; color: var(--ash); }
+.top nav a:hover { color: var(--paper); }
+.top nav .play { color: var(--gold); }
+
+/* ---------- hero: dinner, lanterns, the threat */
+.hero {
+  position: relative; overflow: hidden;
+  padding-block: calc(env(safe-area-inset-top, 0px) + 120px) 96px;
+  background:
+    radial-gradient(ellipse 60% 55% at 70% 20%, rgba(184, 50, 42, .28), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 15% 90%, rgba(207, 168, 90, .10), transparent 70%),
+    linear-gradient(180deg, #170c0e 0%, var(--night) 100%);
+}
+.lanterns { position: absolute; inset: calc(env(safe-area-inset-top, 0px) + 52px) 0 auto auto; width: min(52%, 560px); height: 100%; pointer-events: none; }
+.lantern { position: absolute; top: 10px; transform-origin: 50% 0; animation: sway 6s ease-in-out infinite; filter: drop-shadow(0 0 26px rgba(232, 72, 60, .55)); }
+.lantern img { display: block; width: 100%; }
+.lantern::after { content: ""; position: absolute; left: 50%; top: 60%; width: 180%; aspect-ratio: 1; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(232, 120, 60, .25), transparent 60%); animation: flicker 3.2s infinite; }
+.lantern:nth-child(1) { right: 8%; width: 74px; animation-duration: 7s; }
+.lantern:nth-child(2) { right: 34%; width: 56px; top: 30px; animation-duration: 5.5s; animation-delay: -2s; }
+.lantern:nth-child(3) { right: 58%; width: 44px; top: 60px; animation-duration: 6.4s; animation-delay: -4s; opacity: .8; }
+@keyframes sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes flicker { 0%, 100% { opacity: .9; } 45% { opacity: .7; } 48% { opacity: .95; } 52% { opacity: .6; } 70% { opacity: .85; } }
+
+.hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+.hero .when { margin-bottom: 18px; }
+.hero h1 { margin: 0; line-height: .95; font-weight: 400; color: var(--paper); text-shadow: 0 0 40px rgba(184, 50, 42, .35); font-family: var(--f-display); font-style: italic; font-size: clamp(2.7rem, 7.4vw, 5.4rem); text-wrap: balance; }
+:root[data-lang="zh"] .hero h1 { font-family: var(--f-brush); font-style: normal; font-size: min(5.6rem, 14.5vw); white-space: nowrap; letter-spacing: .02em; }
+.mark { font-family: var(--f-display); font-style: italic; }
+:root[data-lang="zh"] .mark { font-family: var(--f-brush); font-style: normal; }
+.hero h1 .zh { display: block; font-family: var(--f-brush); font-weight: 400; font-size: min(5.6rem, 14.5vw); white-space: nowrap; color: var(--paper); letter-spacing: .02em; text-shadow: 0 0 40px rgba(184, 50, 42, .35); }
+.hero h1 .en { display: block; margin-top: .25em; font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: clamp(1.5rem, 3.6vw, 2.3rem); color: var(--gold); }
+.threat { margin-top: 30px; padding-left: 18px; border-left: 2px solid var(--seal); max-width: 34ch; }
+.threat q { font-family: var(--f-display); font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.3; quotes: "“" "”"; }
+.threat small { display: block; margin-top: 8px; color: var(--ash); font-style: italic; font-size: .95rem; }
+.hero .cta { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.hero .note { margin-top: 14px; font-size: .85rem; color: var(--ash); font-family: var(--f-type); }
+
+.invite { background: var(--paper); color: #2a1a16; padding: 26px 24px 56px; border-radius: 2px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,.5); transform: rotate(1.5deg); max-width: 360px; justify-self: end; }
+.invite::before { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(42,26,22,.25); pointer-events: none; }
+.invite .label { color: #8a2a22; }
+.invite h3 { font-family: var(--f-display); font-weight: 500; font-size: 1.45rem; margin: .3em 0 .5em; line-height: 1.15; }
+.invite dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: .95rem; }
+.invite dt { font-family: var(--f-type); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: #7a6155; padding-top: 3px; }
+.invite dd { margin: 0; }
+.invite .code { font-family: var(--f-type); font-weight: 700; font-size: 1.6rem; letter-spacing: .3em; }
+.invite .stamp { position: absolute; right: -14px; bottom: -18px; width: 74px; height: 74px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d9483d, #7a1912 75%); display: grid; place-items: center; color: #ffe9d6; font-family: var(--f-brush); font-size: 2rem; box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 0 3px rgba(0,0,0,.18); transform: rotate(-12deg); }
+
+/* ---------- midnight: the blackout script */
+.midnight { position: relative; padding-block: 110px; background: var(--night); border-top: 1px solid var(--rule); }
+.mid-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 56px; align-items: start; }
+.script { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; font-family: var(--f-display); font-size: clamp(1.15rem, 2.3vw, 1.45rem); line-height: 1.35; }
+.script li { padding-left: 74px; position: relative; }
+.script li .t { position: absolute; left: 0; top: .3em; font-family: var(--f-type); font-size: .78rem; letter-spacing: .1em; color: var(--ash); }
+.script li.loud { font-family: var(--f-type); font-weight: 700; letter-spacing: .25em; color: var(--seal); font-size: clamp(1.4rem, 3vw, 2rem); }
+.script li.gone { font-style: italic; color: var(--gold); }
+.mid-side p + p { margin-top: 14px; }
+.mid-side .btn { margin-top: 26px; }
+
+
+/* ---------- the six at the table */
+.table { padding-block: 110px; background: linear-gradient(180deg, var(--night), var(--lacquer) 40%, var(--lacquer) 100%); border-top: 1px solid var(--rule); }
+.table header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; margin-bottom: 44px; }
+.suspects { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+.suspect { position: relative; }
+.suspect button { all: unset; display: block; width: 100%; cursor: pointer; }
+.suspect .frame { position: relative; aspect-ratio: 246 / 208; overflow: hidden; border: 1px solid var(--rule); background: #000; }
+.suspect img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.32) contrast(1.2); transition: filter .5s ease; }
+.suspect .q { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--f-brush); font-size: 2.6rem; color: rgba(236, 226, 207, .55); transition: opacity .4s; }
+.suspect button:hover img, .suspect button:focus-visible img { filter: grayscale(.15) brightness(.95); }
+.suspect button:hover .q, .suspect button:focus-visible .q { opacity: 0; }
+.suspect .who { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; align-items: baseline; }
+.suspect .name { font-family: var(--f-display); font-size: 1.05rem; }
+.suspect .zh { font-family: var(--f-brush); color: var(--gold); font-size: 1.15rem; }
+.table .foot { margin-top: 30px; color: var(--ash); font-style: italic; }
+
+/* ---------- the envelope */
+.envelope { padding-block: 110px; background: var(--lacquer); }
+.env-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 56px; align-items: center; }
+.sealed { position: relative; background: #e3d6bd; color: #2a1a16; padding: 40px 30px 34px; border-radius: 2px; box-shadow: 0 30px 70px rgba(0,0,0,.55); }
+.sealed::before { content: ""; position: absolute; inset: 0 0 auto; height: 46%; background: linear-gradient(160deg, #d8c9ad 50%, transparent 50.5%), linear-gradient(200deg, #d8c9ad 50%, transparent 50.5%); background-size: 50% 100%; background-repeat: no-repeat; background-position: left top, right top; opacity: .9; pointer-events: none; }
+.sealed .label { color: #8a2a22; position: relative; }
+.slots { position: relative; display: grid; gap: 16px; margin-top: 18px; }
+.slot { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 12px; align-items: center; }
+.slot b { font-family: var(--f-type); font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: #6d5448; }
+.redact { height: 1.35em; background: #1a1112; border-radius: 1px; position: relative; overflow: hidden; }
+.redact::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.07) 50%, transparent 70%); transform: translateX(-100%); animation: sheen 5s infinite; }
+.slot:nth-child(2) .redact::after { animation-delay: .6s; }
+.slot:nth-child(3) .redact::after { animation-delay: 1.2s; }
+@keyframes sheen { 60%, 100% { transform: translateX(100%); } }
+.sealed .wax { position: absolute; right: 22px; top: 22px; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d9483d, #7a1912 75%); display: grid; place-items: center; color: #ffe9d6; font-family: var(--f-brush); font-size: 1.7rem; box-shadow: 0 4px 10px rgba(0,0,0,.35), inset 0 0 0 3px rgba(0,0,0,.18); }
+.sealed .peek { margin-top: 22px; position: relative; font-size: .95rem; color: #5b463c; min-height: 1.6em; font-style: italic; }
+.sealed .btn { color: #2a1a16; border-color: #8a2a22; margin-top: 16px; }
+.sealed .btn:hover { background: rgba(138, 42, 34, .08); }
+.sealed.shake { animation: shake .45s; }
+@keyframes shake { 20% { transform: translateX(-6px) rotate(-.6deg); } 40% { transform: translateX(5px) rotate(.4deg); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+
+.clues { display: grid; gap: 28px; }
+.clues h3 { margin: 0 0 10px; }
+.rooms { display: flex; flex-wrap: wrap; gap: 8px 10px; list-style: none; padding: 0; margin: 0; }
+.rooms li { font-family: var(--f-type); font-size: .86rem; padding: .35em .7em; border: 1px solid var(--rule); color: var(--paper); background: rgba(0,0,0,.2); }
+.objects { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.objects li { text-align: center; font-size: .8rem; color: var(--ash); }
+.objects img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; filter: sepia(.6) brightness(.85); background: rgba(0,0,0,.25); border: 1px solid var(--rule); padding: 6px; margin-bottom: 6px; }
+
+/* ---------- how a night plays (a real sequence) */
+.night { padding-block: 110px; background: var(--night); border-top: 1px solid var(--rule); }
+.steps { list-style: none; counter-reset: step; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); }
+.steps li { counter-increment: step; padding: 26px 22px 6px 0; border-right: 1px solid var(--rule); }
+.steps li + li { padding-left: 22px; }
+.steps li:last-child { border-right: 0; }
+.steps li::before { content: counter(step, upper-roman); display: block; font-family: var(--f-display); font-style: italic; font-size: 2.1rem; color: var(--seal); line-height: 1; margin-bottom: 14px; }
+.steps h3 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 1.25rem; }
+.steps p { color: var(--ash); font-size: .98rem; }
+
+/* ---------- evidence: real screens */
+.evidence { padding-block: 110px; background: linear-gradient(180deg, var(--night), #140d0e); border-top: 1px solid var(--rule); }
+.shots { display: grid; grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr); gap: 28px; align-items: end; margin-top: 40px; }
+.shot { margin: 0; }
+.shot .pic { position: relative; border: 1px solid var(--rule); background: #000; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,.5); }
+.shot img { display: block; width: 100%; max-width: 100%; filter: sepia(.15) saturate(.9); }
+.shot.phone .pic { border-radius: 22px; padding: 8px; }
+.shot.phone img { border-radius: 14px; }
+.shot figcaption { margin-top: 12px; display: flex; gap: 12px; align-items: baseline; }
+.shot figcaption .label { flex: none; }
+.shot figcaption span:last-child { color: var(--ash); font-size: .95rem; }
+
+/* ---------- final invitation */
+.final { position: relative; overflow: hidden; padding-block: 130px 120px; text-align: center; background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(184, 50, 42, .32), transparent 70%), var(--night); border-top: 1px solid var(--rule); }
+.final h2 { font-size: clamp(2.2rem, 6vw, 4rem); max-width: 18ch; margin-inline: auto; }
+.final .lede { margin: 0 auto 34px; }
+.final .note { margin-top: 16px; font-family: var(--f-type); font-size: .85rem; color: var(--ash); }
+footer { padding-block: 34px calc(env(safe-area-inset-bottom, 0px) + 34px); border-top: 1px solid var(--rule); color: var(--ash); font-size: .9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+footer .zh { font-family: var(--f-brush); color: var(--gold); font-size: 1.2rem; }
+
+/* ---------- narrow screens */
+@media (max-width: 900px) {
+  .hero-grid, .mid-grid, .env-grid, .table header { grid-template-columns: minmax(0, 1fr); }
+  .invite { justify-self: start; transform: rotate(-1deg); }
+  .suspects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps li:nth-child(2) { border-right: 0; }
+  .steps li:nth-child(3) { padding-left: 0; }
+  .shots { grid-template-columns: minmax(0, 1fr); }
+  .shot.phone { max-width: 260px; }
+  .lanterns { width: 70%; opacity: .7; }
+}
+@media (max-width: 520px) {
+  .top nav a:not(.play) { display: none; }
+  .objects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .steps li, .steps li + li { padding: 22px 0 8px; border-right: 0; border-bottom: 1px solid var(--rule); }
+  .script li { padding-left: 0; padding-top: 1.3em; }
+  .script li .t { top: 0; }
+  .hero, .midnight, .table, .envelope, .night, .evidence { padding-block: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+:root[data-lang="zh"] .steps li::before { content: counter(step, cjk-ideographic); font-family: var(--f-brush); font-style: normal; }
+/* language switch */
+.langs { display: inline-flex; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+.langs button { all: unset; cursor: pointer; padding: .3em .7em; font-size: .8rem; color: var(--ash); letter-spacing: .06em; }
+.langs button[aria-pressed="true"] { background: var(--gold); color: var(--night); }
+.langs button:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.suspect .name { font-family: var(--f-display); font-size: 1.05rem; }
+
+[hidden] { display: none !important; }
+
+/* ---------- the power cut: the homepage itself goes dark; a broken light stutters; someone is standing behind it */
+.powercut { position: fixed; inset: 0; z-index: 45; pointer-events: none; visibility: hidden; }
+body.cut .powercut { visibility: visible; }
+.pc-dark { position: absolute; inset: 0; background: #020101; opacity: 0; transition: opacity .12s steps(2); }
+body.cut .pc-dark { opacity: .965; }
+body.cut.flash .pc-dark { opacity: .18; transition: none; }          /* the broken light catches */
+body.cut.flash.dim .pc-dark { opacity: .55; }                        /* ...and only half catches */
+.pc-tint { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(200, 235, 210, .16), transparent 70%); opacity: 0; }
+body.cut.flash .pc-tint { opacity: 1; }                              /* cold, failing tube light */
+
+.pc-killer { position: absolute; right: max(2vw, env(safe-area-inset-right, 0px)); bottom: 0; height: min(86vh, 760px); aspect-ratio: 400 / 600; max-width: 92vw; opacity: 0; transition: opacity 1.6s ease; }
+body.cut .pc-killer { opacity: 1; }
+.pc-killer svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pc-shadow { fill: #050203; opacity: .9; }
+body.cut.flash .pc-shadow { opacity: .78; }                          /* lit up, it reads as a shadow on the page */
+.pc-eye { fill: #ff2a17; filter: drop-shadow(0 0 6px #ff2a17) drop-shadow(0 0 18px rgba(255, 30, 10, .8)); transform-box: fill-box; transform-origin: center; animation: blink 5.5s infinite; }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+.pc-grin { fill: #ff4a37; filter: drop-shadow(0 0 5px rgba(255, 60, 40, .9)); opacity: 0; transition: opacity 1s ease .7s; }
+.pc-teeth { fill: #2a0605; opacity: 0; transition: opacity 1s ease .7s; }
+body.cut .pc-grin { opacity: .92; }
+body.cut .pc-teeth { opacity: 1; }
+
+.pc-restore { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); transform: translateX(-50%); z-index: 46; visibility: hidden; opacity: 0; transition: opacity .4s ease .6s; background: rgba(15, 11, 12, .85); }
+body.cut .pc-restore { visibility: visible; opacity: 1; }
+
+/* the page's own lanterns die with the power and relight after */
+body.cut .lantern { filter: brightness(.08) saturate(0); }
+body.cut .lantern::after { opacity: 0; animation: none; }
+body.relight .lantern { animation: sway 6s ease-in-out infinite, relight 1.1s steps(1); }
+@keyframes relight { 0% { filter: brightness(.15); } 20% { filter: none; } 35% { filter: brightness(.2); } 50%, 100% { filter: drop-shadow(0 0 26px rgba(232, 72, 60, .55)); } }
+
+/* the lights come back: they stutter on, the shadow shows once more and is gone, then the room surges bright */
+body.returning .powercut { visibility: visible; }
+body.returning .pc-dark { animation: lightsback 1.3s steps(1) forwards; }
+@keyframes lightsback { 0% { opacity: .965; } 8% { opacity: .25; } 16% { opacity: .92; } 26% { opacity: .12; } 34% { opacity: .8; } 46% { opacity: .05; } 52%, 100% { opacity: 0; } }
+body.returning .pc-tint { animation: tintback 1.3s steps(1) forwards; }
+@keyframes tintback { 0% { opacity: 0; } 8% { opacity: 1; } 16% { opacity: 0; } 26% { opacity: 1; } 34% { opacity: 0; } 46% { opacity: 1; } 52%, 100% { opacity: 0; } }
+body.returning .pc-killer { transition: none; animation: vanish 1.3s steps(1) forwards; }
+@keyframes vanish { 0% { opacity: 1; } 26% { opacity: .85; } 34% { opacity: 0; } 46% { opacity: .45; } 52%, 100% { opacity: 0; } }
+body.returning main, body.returning footer { animation: surge 1.3s ease-out; }
+@keyframes surge { 0%, 50% { filter: none; } 60% { filter: brightness(1.35) saturate(1.12); } 100% { filter: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  body.cut .pc-dark { opacity: .9; }
+}
+img { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <a class="mark" href="#top" data-i18n="title">Who Killed the Guest?</a>
+    <nav aria-label="Sections" data-i18n-aria="nav">
+      <a href="#midnight" data-i18n="nav.night">The night</a>
+      <a href="#table" data-i18n="nav.suspects">Suspects</a>
+      <a href="#how" data-i18n="nav.how">How to play</a>
+      <a class="play" href="/" data-i18n="nav.play">Play ▸</a>
+      <span class="langs" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-set-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+      </span>
+    </nav>
+  </div>
+</div>
+
+<main id="top">
+  <section class="hero" aria-labelledby="title">
+    <div class="lanterns" aria-hidden="true">
+      <div class="lantern"><img src="/themes/cny-guest/assets/lantern.svg" alt=""></div>
+      <div class="lantern"><img src="/themes/cny-guest/assets/lantern.svg" alt=""></div>
+      <div class="lantern"><img src="/themes/cny-guest/assets/lantern.svg" alt=""></div>
+    </div>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="label when" data-i18n="hero.when">The first night of Chinese New Year</p>
+        <h1 id="title" data-i18n="title">Who Killed the Guest?</h1>
+        <div class="threat">
+          <q data-i18n="hero.quote">I know every one of your secrets.</q>
+          <small data-i18n="hero.by">The guest, at dinner. Nobody is smiling now.</small>
+        </div>
+        <div class="cta">
+          <a class="btn primary" href="/"><span class="seal" aria-hidden="true"></span><span data-i18n="cta.open">Open the case</span></a>
+          <button class="btn" type="button" data-blackout data-i18n="hero.cut">Cut the power</button>
+        </div>
+        <p class="note" data-i18n="hero.note">Free in the browser · 3–6 players · phones + an optional TV</p>
+      </div>
+      <aside class="invite" aria-labelledby="invite-h">
+        <p class="label" data-i18n="invite.label">Tonight · the old house</p>
+        <h3 id="invite-h" data-i18n="invite.h">You are invited to reunion dinner.</h3>
+        <dl>
+          <dt data-i18n="invite.room">Room</dt><dd class="code">3024</dd>
+          <dt data-i18n="invite.seats">Seats</dt><dd data-i18n="invite.seatsV">Six family members. Empty chairs are filled by bots.</dd>
+          <dt data-i18n="invite.tv">The TV</dt><dd data-i18n="invite.tvV">Shows the table. Never your cards.</dd>
+        </dl>
+        <div class="stamp" aria-hidden="true" data-i18n="invite.stamp">✦</div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="midnight" id="midnight" aria-labelledby="mid-h">
+    <div class="wrap mid-grid">
+      <div class="mid-side">
+        <p class="label" data-i18n="mid.label">Midnight</p>
+        <h2 id="mid-h" data-i18n-html="mid.h">Then the lights <em>went out.</em></h2>
+        <p class="lede" data-i18n="mid.p1">Fireworks outside. The family scattered through eight rooms. When the power came back, the guest was gone, and the doors had been locked all night.</p>
+        <p class="lede" data-i18n="mid.p2">The killer is one of the six of you.</p>
+        <button class="btn" type="button" data-blackout data-i18n="mid.relive">Relive the blackout</button>
+      </div>
+      <ol class="script" data-i18n-aria="mid.aria" aria-label="What happened at midnight">
+        <li><span class="t">00:00</span><span data-i18n="s1">Midnight fireworks. Everyone is scattered around the house.</span></li>
+        <li><span class="t">00:03</span><span data-i18n="s2">Suddenly, the whole house loses power.</span></li>
+        <li><span class="t">00:04</span><span data-i18n="s3">In the dark, someone is moving…</span></li>
+        <li class="loud"><span class="t">00:04</span><span data-i18n="s4">THUD!</span></li>
+        <li><span class="t">00:05</span><span data-i18n="s5">A scream.</span></li>
+        <li class="gone"><span class="t">00:09</span><span data-i18n="s6">The lights come back on. The guest is gone!</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="table" id="table" aria-labelledby="table-h">
+    <div class="wrap">
+      <header>
+        <div>
+          <p class="label" data-i18n="table.label">The suspects</p>
+          <h2 id="table-h" data-i18n-html="table.h">Six at the table. <em>One of them did it.</em></h2>
+        </div>
+        <p class="lede" data-i18n="table.lede">Every player sits as one of the family, and your own character can still be the killer. Hover a chair to bring the light back.</p>
+      </header>
+      <ul class="suspects">
+        <li class="suspect"><button type="button" data-i18n-aria="sus.S01" aria-label="2nd Uncle"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S01.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S01">2nd Uncle</span></div></button></li><li class="suspect"><button type="button" data-i18n-aria="sus.S02" aria-label="Big Aunt"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S02.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S02">Big Aunt</span></div></button></li><li class="suspect"><button type="button" data-i18n-aria="sus.S03" aria-label="Cousin"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S03.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S03">Cousin</span></div></button></li><li class="suspect"><button type="button" data-i18n-aria="sus.S04" aria-label="Sister-in-law"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S04.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S04">Sister-in-law</span></div></button></li><li class="suspect"><button type="button" data-i18n-aria="sus.S05" aria-label="Uncle-in-law"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S05.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S05">Uncle-in-law</span></div></button></li><li class="suspect"><button type="button" data-i18n-aria="sus.S06" aria-label="Uncle&#x27;s Wife"><div class="frame"><img src="/themes/cny-guest/assets/suspects/S06.svg" alt=""><span class="q" aria-hidden="true">?</span></div><div class="who"><span class="name" data-i18n="sus.S06">Uncle&#x27;s Wife</span></div></button></li>
+      </ul>
+      <p class="foot" data-i18n="table.foot">Drag marks on the floor: the body was moved. He was killed in one of the eight rooms inside.</p>
+    </div>
+  </section>
+
+  <section class="envelope" aria-labelledby="env-h">
+    <div class="wrap env-grid">
+      <div class="sealed" id="sealed">
+        <div class="wax" aria-hidden="true" data-i18n="env.wax">?</div>
+        <p class="label" data-i18n="env.label">The envelope · sealed</p>
+        <div class="slots">
+          <div class="slot"><b data-i18n="env.who">Who</b><span class="redact" role="img" data-i18n-aria="env.hidden" aria-label="hidden"></span></div>
+          <div class="slot"><b data-i18n="env.where">Where</b><span class="redact" role="img" data-i18n-aria="env.hidden" aria-label="hidden"></span></div>
+          <div class="slot"><b data-i18n="env.what">With what</b><span class="redact" role="img" data-i18n-aria="env.hidden" aria-label="hidden"></span></div>
+        </div>
+        <p class="peek" id="peek" aria-live="polite"></p>
+        <button class="btn" type="button" id="peekBtn" data-i18n="env.peek">Try to peek</button>
+      </div>
+      <div class="clues">
+        <div>
+          <p class="label" data-i18n="env.find">Find out three things</p>
+          <h2 id="env-h" data-i18n-html="env.h">Who? Where? <em>With what?</em></h2>
+          <p class="lede" data-i18n="env.lede">One suspect, one room and one object are sealed in the envelope at the start of every game, dealt fresh each time. Everything else is in someone's hand.</p>
+        </div>
+        <div>
+          <h3 class="label" data-i18n="env.rooms">Eight rooms</h3>
+          <ul class="rooms">
+            <li data-i18n="room.R01">Mahjong Room</li><li data-i18n="room.R02">Altar</li><li data-i18n="room.R03">Study</li><li data-i18n="room.R04">Living Room</li><li data-i18n="room.R05">Dining Room</li><li data-i18n="room.R06">Garage</li><li data-i18n="room.R07">Kitchen</li><li data-i18n="room.R08">Backyard</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="label" data-i18n="env.objects">Six objects</h3>
+          <ul class="objects">
+            <li><img src="/themes/cny-guest/assets/objects/O01.svg" alt=""><span data-i18n="obj.O01">Mahjong Tile</span></li><li><img src="/themes/cny-guest/assets/objects/O02.svg" alt=""><span data-i18n="obj.O02">Red Packet</span></li><li><img src="/themes/cny-guest/assets/objects/O03.svg" alt=""><span data-i18n="obj.O03">Firecracker</span></li><li><img src="/themes/cny-guest/assets/objects/O04.svg" alt=""><span data-i18n="obj.O04">Nian Gao</span></li><li><img src="/themes/cny-guest/assets/objects/O05.svg" alt=""><span data-i18n="obj.O05">Mandarin</span></li><li><img src="/themes/cny-guest/assets/objects/O06.svg" alt=""><span data-i18n="obj.O06">Chopsticks</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="night" id="how" aria-labelledby="how-h">
+    <div class="wrap">
+      <p class="label" data-i18n="how.label">How a night plays</p>
+      <h2 id="how-h" data-i18n-html="how.h">Ask questions. <em>Trust nobody.</em></h2>
+      <ol class="steps">
+        <li><h3 data-i18n="how.1h">Gather</h3><p data-i18n="how.1">The host opens a room. Everyone joins from their phone with the 4-digit code or the QR on the TV.</p></li>
+        <li><h3 data-i18n="how.2h">Search the house</h3><p data-i18n="how.2">Roll the die and move. Stepping into a room ends your move.</p></li>
+        <li><h3 data-i18n="how.3h">Suggest</h3><p data-i18n="how.3">Name a suspect, this room and an object. The next player clockwise who holds one shows you a card, in secret.</p></li>
+        <li><h3 data-i18n="how.4h">Accuse</h3><p data-i18n="how.4">Once, on your turn. Right, and you win. Wrong, and you become a ghost who still has to show cards.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="evidence" aria-labelledby="ev-h">
+    <div class="wrap">
+      <p class="label" data-i18n="ev.label">Evidence</p>
+      <h2 id="ev-h" data-i18n-html="ev.h">One table on the TV. <em>Your secrets in your hand.</em></h2>
+      <div class="shots">
+        <figure class="shot">
+          <div class="pic"><img src="media/tv-en.jpg" data-src-en="media/tv-en.jpg" data-src-zh="media/tv-zh.jpg" data-i18n-alt="ev.aAlt" alt="The TV view: the house, whose turn it is, and every player's seat"></div>
+          <figcaption><span class="label" data-i18n="ev.a">Exhibit A</span><span data-i18n="ev.aCap">The TV shows everyone's turn and nobody's cards.</span></figcaption>
+        </figure>
+        <figure class="shot phone">
+          <div class="pic"><img src="media/phone-en.jpg" data-src-en="media/phone-en.jpg" data-src-zh="media/phone-zh.jpg" data-i18n-alt="ev.bAlt" alt="A phone during a turn: the board and the Actions, Cards and Notes tabs"></div>
+          <figcaption><span class="label" data-i18n="ev.b">Exhibit B</span><span data-i18n="ev.bCap">Your phone keeps your hand and your notes.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" aria-labelledby="final-h">
+    <div class="wrap">
+      <p class="label" data-i18n="final.label">The doors stay locked until morning</p>
+      <h2 id="final-h" data-i18n="final.h">Someone at this table is lying.</h2>
+      <p class="lede" data-i18n="final.lede">Bring the family, open a room and find out who before they find out about you.</p>
+      <a class="btn primary" href="/"><span class="seal" aria-hidden="true"></span><span data-i18n="cta.open">Open the case</span></a>
+      <p class="note" data-i18n="final.note">The house may take a minute to wake on the first visit.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span class="mark" data-i18n="title">Who Killed the Guest?</span> &nbsp;<span data-i18n="foot">A Chinese New Year Cluedo for phones and a TV.</span></span>
+    <span class="langs" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-set-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+    </span>
+  </div>
+</footer>
+
+<div class="powercut" aria-hidden="true">
+  <div class="pc-dark"></div>
+  <div class="pc-tint"></div>
+  <div class="pc-killer">
+    <svg viewBox="0 0 400 600" role="presentation">
+      <g class="pc-shadow">
+        <rect x="140" y="12" width="120" height="96" rx="6"/>
+        <rect x="96" y="100" width="208" height="16" rx="8"/>
+        <ellipse cx="200" cy="176" rx="72" ry="80"/>
+        <path d="M150 238 Q200 268 250 238 L262 262 Q330 280 360 330 Q392 392 396 600 L4 600 Q8 392 40 330 Q70 280 138 262 Z"/>
+      </g>
+      <g id="pcFace">
+        <g transform="rotate(12 170 168)"><ellipse class="pc-eye" cx="170" cy="168" rx="15" ry="6"/></g>
+        <g transform="rotate(-12 230 168)"><ellipse class="pc-eye" cx="230" cy="168" rx="15" ry="6"/></g>
+        <path class="pc-grin" d="M150 204 Q200 250 250 204 Q200 226 150 204 Z"/>
+        <path class="pc-teeth" d="M168 212 L174 220 L180 213 L186 222 L192 215 L198 224 L204 215 L210 222 L216 213 L222 220 L230 211 Q200 222 168 212 Z"/>
+      </g>
+    </svg>
+  </div>
+</div>
+<button class="btn pc-restore" type="button" id="pcRestore" data-i18n="pc.restore">Turn the lights back on</button>
+
+<script>
+(() => {
+  // Each language is complete on its own: nothing on the page mixes the two.
+  const T = {
+    en: {
+      title: 'Who Killed the Guest?', doc: 'Who Killed the Guest?',
+      nav: 'Sections', 'nav.night': 'The night', 'nav.suspects': 'Suspects', 'nav.how': 'How to play', 'nav.play': 'Play ▸',
+      'hero.when': 'The first night of Chinese New Year', 'hero.quote': 'I know every one of your secrets.', 'hero.by': 'The guest, at dinner. Nobody is smiling now.',
+      'cta.open': 'Open the case', 'hero.cut': 'Cut the power', 'hero.note': 'Free in the browser · 3–6 players · phones + an optional TV',
+      'invite.label': 'Tonight · the old house', 'invite.h': 'You are invited to reunion dinner.', 'invite.room': 'Room', 'invite.seats': 'Seats',
+      'invite.seatsV': 'Six family members. Empty chairs are filled by bots.', 'invite.tv': 'The TV', 'invite.tvV': 'Shows the table. Never your cards.', 'invite.stamp': '✦',
+      'mid.label': 'Midnight', 'mid.h': 'Then the lights <em>went out.</em>',
+      'mid.p1': 'Fireworks outside. The family scattered through eight rooms. When the power came back, the guest was gone, and the doors had been locked all night.',
+      'mid.p2': 'The killer is one of the six of you.', 'mid.relive': 'Relive the blackout', 'mid.aria': 'What happened at midnight',
+      s1: 'Midnight fireworks. Everyone is scattered around the house.', s2: 'Suddenly, the whole house loses power.', s3: 'In the dark, someone is moving…',
+      s4: 'THUD!', s5: 'A scream.', s6: 'The lights come back on. The guest is gone!',
+      'table.label': 'The suspects', 'table.h': 'Six at the table. <em>One of them did it.</em>',
+      'table.lede': 'Every player sits as one of the family, and your own character can still be the killer. Hover a chair to bring the light back.',
+      'table.foot': 'Drag marks on the floor: the body was moved. He was killed in one of the eight rooms inside.',
+      'env.wax': '?', 'env.label': 'The envelope · sealed', 'env.who': 'Who', 'env.where': 'Where', 'env.what': 'With what', 'env.hidden': 'hidden', 'env.peek': 'Try to peek',
+      'env.find': 'Find out three things', 'env.h': 'Who? Where? <em>With what?</em>',
+      'env.lede': "One suspect, one room and one object are sealed in the envelope at the start of every game, dealt fresh each time. Everything else is in someone's hand.",
+      'env.rooms': 'Eight rooms', 'env.objects': 'Six objects',
+      'how.label': 'How a night plays', 'how.h': 'Ask questions. <em>Trust nobody.</em>',
+      'how.1h': 'Gather', 'how.1': 'The host opens a room. Everyone joins from their phone with the 4-digit code or the QR on the TV.',
+      'how.2h': 'Search the house', 'how.2': 'Roll the die and move. Stepping into a room ends your move.',
+      'how.3h': 'Suggest', 'how.3': 'Name a suspect, this room and an object. The next player clockwise who holds one shows you a card, in secret.',
+      'how.4h': 'Accuse', 'how.4': 'Once, on your turn. Right, and you win. Wrong, and you become a ghost who still has to show cards.',
+      'ev.label': 'Evidence', 'ev.h': 'One table on the TV. <em>Your secrets in your hand.</em>',
+      'ev.a': 'Exhibit A', 'ev.aCap': "The TV shows everyone's turn and nobody's cards.", 'ev.aAlt': "The TV view: the house, whose turn it is, and every player's seat",
+      'ev.b': 'Exhibit B', 'ev.bCap': 'Your phone keeps your hand and your notes.', 'ev.bAlt': 'A phone during a turn: the board and the Actions, Cards and Notes tabs',
+      'final.label': 'The doors stay locked until morning', 'final.h': 'Someone at this table is lying.',
+      'final.lede': 'Bring the family, open a room and find out who before they find out about you.', 'final.note': 'The house may take a minute to wake on the first visit.',
+      foot: 'A Chinese New Year Cluedo for phones and a TV.', 'pc.restore': 'Turn the lights back on',
+      peeks: ['The seal holds. Only an accusation opens it.', 'Nobody has seen inside. Not even the host.', 'A different killer every game. Play to find out.'],
+      'sus.S01': "2nd Uncle", 'sus.S02': "Big Aunt", 'sus.S03': "Cousin", 'sus.S04': "Sister-in-law", 'sus.S05': "Uncle-in-law", 'sus.S06': "Uncle's Wife", 'room.R01': "Mahjong Room", 'room.R02': "Altar", 'room.R03': "Study", 'room.R04': "Living Room", 'room.R05': "Dining Room", 'room.R06': "Garage", 'room.R07': "Kitchen", 'room.R08': "Backyard", 'obj.O01': "Mahjong Tile", 'obj.O02': "Red Packet", 'obj.O03': "Firecracker", 'obj.O04': "Nian Gao", 'obj.O05': "Mandarin", 'obj.O06': "Chopsticks",
+    },
+    zh: {
+      title: '谁杀了客人？', doc: '谁杀了客人？',
+      nav: '页面导航', 'nav.night': '那一夜', 'nav.suspects': '嫌疑人', 'nav.how': '怎么玩', 'nav.play': '开玩 ▸',
+      'hero.when': '大年初一 · 晚上', 'hero.quote': '我知道你们每个人的秘密。', 'hero.by': '客人在饭桌上说。大家的脸色都变了。',
+      'cta.open': '开始查案', 'hero.cut': '拉下电闸', 'hero.note': '浏览器免费玩 · 3–6 人 · 手机 + 可选电视',
+      'invite.label': '今晚 · 老房子', 'invite.h': '诚邀您回家吃团圆饭。', 'invite.room': '房间号', 'invite.seats': '座位',
+      'invite.seatsV': '六位家人，空位由机器人补上。', 'invite.tv': '电视', 'invite.tvV': '显示牌桌，绝不显示你的手牌。', 'invite.stamp': '福',
+      'mid.label': '午夜', 'mid.h': '然后，<em>灯灭了。</em>',
+      'mid.p1': '外面在放烟花，一家人散在八个房间里。电来了，客人却不见了，而门窗整晚都锁着。',
+      'mid.p2': '凶手就在你们六个人之中。', 'mid.relive': '重回停电那一刻', 'mid.aria': '午夜发生了什么',
+      s1: '午夜放烟花，大家散在屋子各处。', s2: '突然，整间屋子停电了。', s3: '黑暗中，有人在走动……',
+      s4: '砰！', s5: '“啊——！”', s6: '灯亮了。客人不见了！',
+      'table.label': '嫌疑人', 'table.h': '饭桌上六个人，<em>凶手就是其中一个。</em>',
+      'table.lede': '每位玩家扮演一位家人，而你自己的角色也可能是凶手。把鼠标移到座位上，看清是谁。',
+      'table.foot': '地上有拖动的痕迹：尸体是从屋里搬出来的。真正的案发地点，是屋里八个房间之一。',
+      'env.wax': '密', 'env.label': '信封 · 已封', 'env.who': '谁', 'env.where': '在哪里', 'env.what': '用什么', 'env.hidden': '已遮盖', 'env.peek': '偷看一眼',
+      'env.find': '找出三件事', 'env.h': '谁？在哪里？<em>用什么？</em>',
+      'env.lede': '每局开始时，一个嫌疑人、一个房间和一件物品会被封进信封，每局都不一样。其余的牌，都在某个人手里。',
+      'env.rooms': '八个房间', 'env.objects': '六件物品',
+      'how.label': '一晚怎么玩', 'how.h': '多问问题，<em>谁都别信。</em>',
+      'how.1h': '集合', 'how.1': '房主开一个房间，大家用手机输入 4 位房间号，或扫电视上的二维码加入。',
+      'how.2h': '搜屋子', 'how.2': '掷骰子移动，走进房间就停下。',
+      'how.3h': '推理', 'how.3': '说出一个嫌疑人、这个房间和一件物品。顺时针下一位有其中一张牌的玩家，会悄悄给你看一张。',
+      'how.4h': '指控', 'how.4': '在你的回合，只有一次机会。猜对就赢；猜错就变成幽灵，但仍要出示手牌。',
+      'ev.label': '证物', 'ev.h': '电视上是牌桌，<em>秘密在你手里。</em>',
+      'ev.a': '证物一', 'ev.aCap': '电视显示每个人的回合，但不显示任何人的手牌。', 'ev.aAlt': '电视画面：屋子、正在进行的推理和每位玩家的座位',
+      'ev.b': '证物二', 'ev.bCap': '你的手机里，是你的手牌和笔记。', 'ev.bAlt': '手机画面：棋盘，以及行动、手牌和笔记三个标签',
+      'final.label': '门锁到天亮', 'final.h': '这张桌上，有人在说谎。',
+      'final.lede': '叫上家人，开个房间，在被别人看穿之前，先找出凶手。', 'final.note': '第一次打开时，可能要等一分钟左右。',
+      foot: '用手机和电视一起玩的新年推理游戏。', 'pc.restore': '把灯打开',
+      peeks: ['封得很紧。只有指控才能打开它。', '没有人看过里面，连房主也没有。', '每局的凶手都不一样，开一局就知道。'],
+      'sus.S01': "二叔", 'sus.S02': "大姑", 'sus.S03': "表哥", 'sus.S04': "大嫂", 'sus.S05': "姑丈", 'sus.S06': "伯母", 'room.R01': "麻将房", 'room.R02': "神台", 'room.R03': "书房", 'room.R04': "客厅", 'room.R05': "饭厅", 'room.R06': "车房", 'room.R07': "厨房", 'room.R08': "后院", 'obj.O01': "六万", 'obj.O02': "红包", 'obj.O03': "鞭炮", 'obj.O04': "年糕", 'obj.O05': "橘子", 'obj.O06': "筷子",
+    },
+  };
+  let lang = 'en';
+  const setLang = (l, save) => {
+    lang = T[l] ? l : 'en'; const d = T[lang];
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.documentElement.dataset.lang = lang;
+    document.title = d.doc;
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = d[el.dataset.i18n]; });
+    document.querySelectorAll('[data-i18n-html]').forEach((el) => { el.innerHTML = d[el.dataset.i18nHtml]; });
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', d[el.dataset.i18nAria]));
+    document.querySelectorAll('[data-i18n-alt]').forEach((el) => { el.alt = d[el.dataset.i18nAlt]; el.src = el.dataset['src' + (lang === 'zh' ? 'Zh' : 'En')]; });
+    document.querySelectorAll('[data-set-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)));
+    document.getElementById('peek').textContent = '';
+    if (save) { try { localStorage.setItem('lang', lang); } catch (_) {} }
+  };
+  document.querySelectorAll('[data-set-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.setLang, true)));
+  let saved = null; try { saved = localStorage.getItem('lang'); } catch (_) {}
+  setLang(saved || ((navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en'), false);
+
+  // ---------- the power cut: the page goes dark, a broken light stutters, and the killer watches with red eyes
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const B = document.body, face = document.getElementById('pcFace'), restoreBtn = document.getElementById('pcRestore');
+  const DARK_MS = 4000; // the lights come back by themselves after this long
+  let flicker = 0, back = 0, opener = null;
+  const flash = (dim, ms) => { B.classList.add('flash'); B.classList.toggle('dim', dim); setTimeout(() => B.classList.remove('flash', 'dim'), ms); };
+  // a dying tube: a burst of 1–4 stutters, then darkness for a while
+  const stutter = () => {
+    if (!B.classList.contains('cut')) return;
+    let t = 0; const n = 1 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < n; i++) { const on = 40 + Math.random() * 110; setTimeout(() => flash(Math.random() < .4, on), t); t += on + 50 + Math.random() * 140; }
+    flicker = setTimeout(stutter, t + 600 + Math.random() * 1200);
+  };
+  const cutPower = (btn) => {
+    if (B.classList.contains('cut')) return restore();
+    opener = btn; clearTimeout(settle); B.classList.remove('relight', 'returning'); B.classList.add('cut');
+    if (!reduce) { flicker = setTimeout(() => { flash(false, 90); setTimeout(() => flash(true, 60), 160); setTimeout(stutter, 900); }, 500); }
+    setTimeout(() => restoreBtn.focus({ preventScroll: true }), 50);
+    back = setTimeout(restore, DARK_MS);
+  };
+  let settle = 0;
+  const restore = () => {
+    clearTimeout(flicker); clearTimeout(back);
+    if (!B.classList.contains('cut')) return;
+    B.classList.remove('cut', 'flash', 'dim', 'relight', 'returning'); void B.offsetWidth;
+    if (!reduce) { B.classList.add('returning', 'relight'); clearTimeout(settle); settle = setTimeout(() => B.classList.remove('returning'), 1300); }
+    if (opener) opener.focus({ preventScroll: true });
+  };
+  document.querySelectorAll('[data-blackout]').forEach((b) => b.addEventListener('click', () => cutPower(b)));
+  restoreBtn.addEventListener('click', restore);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && B.classList.contains('cut')) restore(); });
+  // its eyes follow you
+  addEventListener('pointermove', (e) => {
+    if (!B.classList.contains('cut') || reduce) return;
+    const dx = (e.clientX / innerWidth - .5) * 14, dy = (e.clientY / innerHeight - .5) * 8;
+    face.setAttribute('transform', `translate(${dx.toFixed(1)} ${dy.toFixed(1)})`);
+  });
+
+  let n = 0; const sealed = document.getElementById('sealed');
+  document.getElementById('peekBtn').addEventListener('click', () => {
+    const p = T[lang].peeks; document.getElementById('peek').textContent = p[n++ % p.length];
+    sealed.classList.remove('shake'); void sealed.offsetWidth; sealed.classList.add('shake');
+  });
+})();
+</script>
+
+</body>
+</html>
